@@ -1,0 +1,78 @@
+name: "Öneri"
+description: "Yeni bir özellik, iyileştirme ya da çeviri önerisi."
+title: "[Öneri] "
+labels: ["öneri"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Öneriniz için teşekkürler. Önce şartnameyi okuyun: projenin
+        [12 ilkesi](https://github.com/{GITHUB_KULLANICI}/ilk72/blob/main/README.md) değiştirilemez.
+
+        **Kabul edilmeyecek öneriler** (ilke gereği):
+        sunucu, hesap, senkronizasyon, analitik, çerez, dış istek, harita ya da
+        toplanma alanı verisi, anlık uyarı/bildirim, "güvendeyim" iletisi, konum paylaşımı,
+        bağış/IBAN/reklam/sponsor, kurum adı ya da amblemi kullanımı, ilk yardım anlatımı,
+        bina risk değerlendirmesi, sigorta tavsiyesi, kullanıcıdan kullanıcıya herkese açık içerik.
+
+  - type: dropdown
+    id: tur
+    attributes:
+      label: "Öneri türü"
+      options:
+        - "Arayüz / kullanılabilirlik"
+        - "Erişilebilirlik"
+        - "Çevrimdışı / PWA"
+        - "Yazdırma çıktısı"
+        - "İçerik kaydı (yeni rehber maddesi)"
+        - "Çeviri"
+        - "Geliştirici deneyimi / kod"
+        - "Belge"
+    validations:
+      required: true
+
+  - type: textarea
+    id: sorun
+    attributes:
+      label: "Hangi sorunu çözüyor?"
+      description: "Kullanıcı kim, hangi durumda neyi yapamıyor? Kişisel veri yazmayın."
+    validations:
+      required: true
+
+  - type: textarea
+    id: oneri
+    attributes:
+      label: "Öneriniz"
+      description: "Kısa ve uygulanabilir yazın. Birden fazla çözüm varsa en küçüğünden başlayın."
+    validations:
+      required: true
+
+  - type: textarea
+    id: ilke
+    attributes:
+      label: "İlkelerle ilişkisi"
+      description: "Öneri 12 ilkenin hangisiyle ilgili ve onları neden delmiyor? Sade dil, tek vurgu rengi, kâğıt önceliği gibi."
+      placeholder: "Örn. İ3 (kâğıt önceliklidir): yeni düğme kullanıcıyı doğrudan yazdırmaya götürüyor."
+    validations:
+      required: true
+
+  - type: textarea
+    id: maliyet
+    attributes:
+      label: "Bağımlılık ve boyut etkisi"
+      description: "Yeni bir paket gerekiyor mu? Çalışma zamanı bağımlılığı yalnızca preact ve qrcode-generator olabilir; toplam JS (gzip) sınırı 150 kB'dır (§18.8)."
+      placeholder: "Yeni bağımlılık yok; ~2 kB eklenecek."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: onaylar
+    attributes:
+      label: "Onaylar"
+      options:
+        - label: "Şartnamenin 12 ilkesini okudum ve önerim onları delmiyor."
+          required: true
+        - label: "Bu öneri kişisel veri, hesap ya da sunucu gerektirmiyor."
+          required: true
+        - label: "Bu bildirimde kişisel veri yok."
+          required: true

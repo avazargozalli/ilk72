@@ -1,0 +1,535 @@
+/**
+ * Şartname §12 — yazdırma çıktılarının stilleri.
+ *
+ * Kural özeti (§12, §15):
+ * - Yalnızca seçilen belgeler basılır; gezinme, düğmeler, alt bilgi ve ekran
+ *   denetimleri gizlenir.
+ * - Kâğıtta siyah metin, beyaz zemin; renkler adlandırılmış değerlerdir
+ *   (`black`, `white`) — dosyada hex renk yoktur. Koyu tema belirteçleri kâğıda
+ *   taşınmaz, `color-scheme: light` zorlanır.
+ * - Gövde en az 11 pt, buzdolabı sayfası 16 pt, kartlar 8,5 pt.
+ * - Her belge yeni sayfada başlar (`break-before: page`); satır ve kutular sayfa
+ *   ortasında bölünmez (`break-inside: avoid`).
+ * - Her sayfanın altında küçük puntoyla "İlk 72 ile hazırlandı · {tarih} ·
+ *   Resmî bir belge değildir."
+ * - Kâğıt: `A4`, kenar 12 mm. Kart ölçüleri mm ile verilir (85,6 × 54 mm).
+ *
+ * Ekran görünümü bozulmaz: baskıya özgü kurallar yalnızca `@media print`
+ * içindedir; ekranda yalnızca önizleme çerçevesi ve sayfa ayırıcıları çizilir.
+ */
+
+/* --- Ekran: seçim, seçenekler ve önizleme çerçevesi ----------------------- */
+.print__intro {
+  max-width: var(--measure);
+}
+
+.print__controls {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-end: var(--space-4);
+}
+
+.print__fieldset {
+  margin: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.print__legend {
+  padding-inline: var(--space-1);
+  font-weight: 600;
+}
+
+.print__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.print__hint {
+  color: var(--color-text-muted);
+}
+
+.print__preview {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.print__empty {
+  color: var(--color-text-muted);
+}
+
+/* Önizlemede her belge bir kâğıt yaprağı gibi çerçevelenir. */
+.print-doc {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  overflow-x: auto;
+}
+
+.print-doc__heading {
+  margin-block-end: var(--space-2);
+}
+
+.print-doc__title {
+  margin-block-end: var(--space-1);
+}
+
+.print-doc__meta {
+  color: var(--color-text-muted);
+}
+
+/* Ekranda sayfa sınırı kesikli çizgiyle görünür. */
+.print-sheet + .print-sheet {
+  margin-block-start: var(--space-2);
+  padding-block-start: var(--space-2);
+  border-block-start: 1px dashed var(--color-border);
+}
+
+.print-section {
+  margin-block-end: var(--space-2);
+}
+
+.print-row {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+  margin-block-end: 4px;
+}
+
+.print-row__label {
+  font-weight: 600;
+}
+
+.print-list {
+  margin: 0;
+  padding-inline-start: var(--space-3);
+}
+
+.print-checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.print-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  break-inside: avoid;
+}
+
+.print-check__box {
+  flex: none;
+  inline-size: 1em;
+  block-size: 1em;
+  border: 1px solid var(--color-border);
+  line-height: 1;
+  text-align: center;
+}
+
+.print-note,
+.print-source,
+.print-foot {
+  color: var(--color-text-muted);
+}
+
+.print-emergency {
+  margin-block-end: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.print-emergency__title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.print-emergency__number {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.print-emergency__call {
+  font-weight: 700;
+}
+
+/* Kart ölçüleri mm ile (§12): 85,6 × 54 mm — önizlemede de gerçek ölçü. */
+.wallet-row,
+.child-sheet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 4mm;
+}
+
+.wallet-row {
+  margin-block-end: 4mm;
+}
+
+.wallet-card,
+.child-card {
+  inline-size: 85.6mm;
+  block-size: 54mm;
+  padding: 2mm;
+  border: 1px dashed var(--color-border);
+  overflow: hidden;
+}
+
+.wallet-card__fold {
+  inline-size: 4mm;
+  border-inline-start: 1px dashed var(--color-border);
+  text-align: center;
+}
+
+.wallet-card__fold-label {
+  font-size: 6pt;
+}
+
+.print-blank__line {
+  flex: 1;
+  min-inline-size: 40mm;
+  min-block-size: 1em;
+  border-block-end: 1px solid var(--color-border);
+}
+
+/* --- Kâğıt (§12) --------------------------------------------------------- */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+    /* Kâğıt paleti: siyah metin, beyaz zemin. Adlandırılmış değerler
+       kullanılır; dosyada hex renk yoktur. */
+    --print-ink: black;
+    --print-paper: white;
+    --print-rule: black;
+  }
+
+  html,
+  body {
+    background: var(--print-paper);
+    color: var(--print-ink);
+    font-size: 11pt;
+    line-height: 1.35;
+  }
+
+  /* Yalnızca seçilen belgeler basılır: gezinme, düğmeler, alt bilgi ve ekran
+     denetimleri kâğıda çıkmaz (§12). */
+  nav,
+  footer,
+  .skip-link,
+  .button,
+  button,
+  .print__controls,
+  .print__intro,
+  .print__hint,
+  .print__empty,
+  .print__preview-title {
+    display: none;
+  }
+
+  main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    color: var(--print-ink);
+    text-decoration: underline;
+  }
+
+  .print__preview {
+    display: block;
+  }
+
+  .print-doc {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+    break-before: page;
+  }
+
+  /* İlk belgeden önce boş sayfa oluşmasın: yalnızca sonraki belgeler yeni
+     sayfadan başlar. `:first-of-type`, gizlenen önizleme başlığından etkilenmez. */
+  .print-doc:first-of-type {
+    break-before: auto;
+  }
+
+  /* Her belge yeni sayfada başlar; belgenin ilk sayfası ekstra bölünmez. */
+  .print-sheet {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 245mm;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    break-before: page;
+  }
+
+  .print-doc .print-sheet:first-of-type {
+    break-before: auto;
+  }
+
+  /* Her sayfanın altında küçük punto alt bilgi satırı (§12, §14.5). */
+  .print-foot {
+    margin-block-start: auto;
+    padding-block-start: 3mm;
+    border-block-start: 0.2mm solid var(--print-rule);
+    color: var(--print-ink);
+    font-size: 8pt;
+  }
+
+  /* Satırlar ve kutular sayfa ortasında bölünmez (§12). */
+  .print-row,
+  .print-section,
+  .print-emergency,
+  .print-check,
+  .print-table tr,
+  .wallet-row,
+  .wallet-card,
+  .child-card,
+  .print-blank,
+  .print-blank-lines {
+    break-inside: avoid;
+  }
+
+  /* Punto: gövde en az 11 pt (§12). */
+  .print-doc {
+    font-size: 11pt;
+  }
+
+  .print-doc__title {
+    font-size: 16pt;
+  }
+
+  .print-doc__meta {
+    color: var(--print-ink);
+    font-size: 11pt;
+  }
+
+  .print-section__title {
+    margin-block: 0 2mm;
+    font-size: 13pt;
+  }
+
+  h2,
+  h3,
+  p,
+  ul,
+  li {
+    margin-block: 0 1.5mm;
+  }
+
+  /* Buzdolabı sayfası: en az 16 pt (§12.2). */
+  /* Kartlar: en az 8 pt (§12.3, §12.4). */
+  .print-doc--wallet,
+  .print-doc--child {
+    font-size: 8.5pt;
+  }
+
+  .print-doc--wallet .print-doc__title,
+  .print-doc--child .print-doc__title {
+    font-size: 14pt;
+  }
+
+  .print-note,
+  .print-source {
+    color: var(--print-ink);
+  }
+
+  .print-source {
+    padding-block-start: 2mm;
+    border-block-start: 0.2mm solid var(--print-rule);
+    font-size: 8pt;
+  }
+
+  .print-emergency {
+    padding: 3mm;
+    border: 0.5mm solid var(--print-rule);
+  }
+
+  .print-emergency__title {
+    font-size: 14pt;
+  }
+
+  .print-emergency__number {
+    font-size: 24pt;
+  }
+
+  .print-emergency__call {
+    text-decoration: none;
+  }
+
+  /* Buzdolabı sayfası: en az 16 pt (§12.2). Temel kurallardan sonra gelir ki
+     aynı öğe için daha yüksek özgüllük kazansın. */
+  .print-doc--fridge {
+    font-size: 16pt;
+  }
+
+  .print-doc--fridge .print-doc__title {
+    font-size: 20pt;
+  }
+
+  .print-doc--fridge .print-section__title {
+    font-size: 16pt;
+  }
+
+  .print-doc--fridge .print-emergency__number {
+    font-size: 28pt;
+  }
+
+  .print-list {
+    padding-inline-start: 6mm;
+  }
+
+  .print-list--large {
+    padding-inline-start: 6mm;
+  }
+
+  .print-checks--spaced .print-check {
+    margin-block-end: 2mm;
+  }
+
+  .print-check__box {
+    inline-size: 4mm;
+    block-size: 4mm;
+    border: 0.3mm solid var(--print-rule);
+    font-size: 9pt;
+    line-height: 1;
+  }
+
+  /* §12 tablo düzeni: ince çizgiler, üst hizalı hücreler. */
+  .print-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+  }
+
+  .print-table th,
+  .print-table td {
+    padding: 1mm 1.5mm;
+    border: 0.2mm solid var(--print-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  /* §12.3 cüzdan kartları: 85,6 × 54 mm, iki yüz yan yana, katlama ve kesme
+     çizgileri; A4'te dört kart. */
+  .wallet-sheet {
+    display: flex;
+    flex-direction: column;
+    gap: 3mm;
+  }
+
+  .wallet-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    inline-size: 175.2mm;
+    margin: 0;
+  }
+
+  .wallet-card {
+    inline-size: 85.6mm;
+    block-size: 54mm;
+    padding: 2mm;
+    border: 0.2mm dashed var(--print-rule);
+    overflow: hidden;
+  }
+
+  .wallet-card__fold {
+    flex: none;
+    inline-size: 4mm;
+    /* Katlama çizgisi: iki yüz arasında ince kesikli çizgi. */
+    border-inline-start: 0.2mm dashed var(--print-rule);
+    text-align: center;
+  }
+
+  .wallet-card__fold-label {
+    font-size: 8pt;
+    writing-mode: vertical-rl;
+  }
+
+  .wallet-card__name {
+    font-size: 11pt;
+    font-weight: 700;
+  }
+
+  .wallet-card__emergency {
+    font-size: 14pt;
+    font-weight: 700;
+  }
+
+  .wallet-card__call {
+    text-decoration: none;
+  }
+
+  .wallet-card__list,
+  .child-card__list {
+    margin: 0;
+    padding-inline-start: 4mm;
+  }
+
+  /* §12.4 çocuk kartları: cüzdan ölçüsü, A4'te dört kart (2 × 2). */
+  .child-sheet {
+    display: grid;
+    grid-template-columns: repeat(2, 85.6mm);
+    gap: 4mm;
+  }
+
+  .child-sheet > .print-note,
+  .child-sheet > .print-foot {
+    grid-column: 1 / -1;
+  }
+
+  .child-card {
+    inline-size: 85.6mm;
+    block-size: 54mm;
+    padding: 2mm;
+    border: 0.2mm dashed var(--print-rule);
+    overflow: hidden;
+  }
+
+  .child-card__name {
+    font-size: 11pt;
+    font-weight: 700;
+  }
+
+  /* §12.6 boş form: elle doldurulacak alt çizgili satırlar. */
+  .print-blank {
+    display: flex;
+    align-items: baseline;
+    gap: 2mm;
+    margin-block-end: 2mm;
+  }
+
+  .print-blank__label {
+    font-weight: 600;
+  }
+
+  .print-blank__line {
+    min-block-size: 6mm;
+    border-block-end: 0.3mm solid var(--print-rule);
+  }
+
+  .print-blank-lines {
+    display: grid;
+    gap: 4mm;
+    margin-block-end: 2mm;
+  }
+
+  .print-blank-group {
+    margin-block-end: 3mm;
+  }
+}

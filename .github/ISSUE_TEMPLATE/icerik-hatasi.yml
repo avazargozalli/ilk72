@@ -1,0 +1,86 @@
+name: "Yanlış veya eskimiş içerik"
+description: "Rehber, çanta veya belge metninde yanlış ya da eskimiş bir bilgi mi var? Kaynak adresi zorunlu."
+title: "[İçerik] "
+labels: ["içerik", "onay bekliyor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        İçerik bildirimi için teşekkürler. Kurallar kısadır:
+
+        - **Resmî kaynak adresi zorunludur.** Yalnızca şu alan adları kabul edilir:
+          `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`,
+          `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`,
+          `kvkk.gov.tr` (ve alt alan adları). Adres `https` ile başlamalıdır.
+        - **Kendi cümlelerinizle yazın.** Kurum metnini kopyalamayın; önerinizi sade Türkçeyle ve
+          en fazla 220 karakterle yazın.
+        - **Kişisel veri yazmayın.** Ad, adres, telefon veya sağlık bilgisi paylaşmayın.
+
+        Güvenlik açıkları bu formun dışındadır; [SECURITY.md](https://github.com/{GITHUB_KULLANICI}/ilk72/blob/main/SECURITY.md)
+        dosyasını izleyin.
+
+  - type: input
+    id: madde
+    attributes:
+      label: "Hangi içerik maddesi?"
+      description: "Mümkünse madde kimliğini (ör. P-04, C-12) ya da metnin kısa bir bölümünü yazın."
+      placeholder: "P-04 — Aile afet ve acil durum planı…"
+    validations:
+      required: true
+
+  - type: input
+    id: kaynak
+    attributes:
+      label: "Resmî kaynak adresi (zorunlu)"
+      description: "https ile başlayan, yukarıdaki izinli alan adlarından birinde resmî sayfa adresi."
+      placeholder: "https://www.afad.gov.tr/..."
+    validations:
+      required: true
+
+  - type: input
+    id: erisim
+    attributes:
+      label: "Kaynağa erişim tarihi"
+      description: "Kaynağı tarayıcıda açtığınız gün; YYYY-AA-GG biçiminde."
+      placeholder: "2026-12-03"
+    validations:
+      required: true
+
+  - type: textarea
+    id: sorun
+    attributes:
+      label: "Nerede yanlış veya eskimiş?"
+      description: "Maddedeki ifadeyi ve resmî kaynaktaki güncel karşılığını kısaca açıklayın."
+      placeholder: "Madde “...” diyor; kaynak sayfada ise “...” yazıyor."
+    validations:
+      required: true
+
+  - type: textarea
+    id: oneri
+    attributes:
+      label: "Önerilen düzeltme (isteğe bağlı)"
+      description: "Kendi cümlelerinizle, en fazla 220 karakter. Kaynağı kopyalamayın."
+    validations:
+      required: false
+
+  - type: textarea
+    id: ek
+    attributes:
+      label: "Ek bilgi (isteğe bağlı)"
+      description: "Sayfanın ekran görüntüsü ya da başka bir resmî bağlantı. Kişisel veri eklemeyin."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: onaylar
+    attributes:
+      label: "Onaylar"
+      options:
+        - label: "Kaynağı tarayıcıda açtım ve maddeyle karşılaştırdım."
+          required: true
+        - label: "Verdiğim kaynak resmî bir alan adında ve https ile başlıyor."
+          required: true
+        - label: "Önerim kendi cümlelerimle yazıldı; kurum metni kopyalanmadı."
+          required: true
+        - label: "Bu bildirimde kişisel veri yok."
+          required: true

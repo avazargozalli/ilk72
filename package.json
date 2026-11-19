@@ -1,0 +1,41 @@
+{
+  "name": "ilk72",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Aile afet ve acil durum planı — çevrimdışı, hesapsız, veri cihazda kalan açık kaynak PWA.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "node scripts/content-gate.ts --prod && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "content:check": "node scripts/content-gate.ts",
+    "check": "biome check . && tsc --noEmit && vitest run --coverage && node scripts/content-gate.ts && vite build && playwright test"
+  },
+  "dependencies": {
+    "preact": "^11.2.0",
+    "qrcode-generator": "^2.0.4"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@biomejs/biome": "^2.6.8",
+    "@playwright/test": "^1.65.1",
+    "@preact/preset-vite": "^2.10.6",
+    "@testing-library/preact": "^3.2.6",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "fake-indexeddb": "^6.2.8",
+    "happy-dom": "^21.0.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.1"
+  }
+}

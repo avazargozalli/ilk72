@@ -1,0 +1,89 @@
+name: Pages
+
+# Şartname §19 — yalnızca `v*` etiketi ve elle tetikleme.
+# `main` dalına her itişte YAYIMLANMAZ; onaysız içerik ve incelenmemiş sürüm
+# canlıya çıkamaz.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  derle:
+    name: Üretim derlemesi ve kapılar
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v7
+
+      - name: pnpm kur
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.28.5
+
+      - name: Node.js kur
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Bağımlılıkları kur (kilit dosyası zorunlu)
+        run: pnpm install --frozen-lockfile
+
+      # Onaysız tek bir madde bile varsa burada durur (§13.4-2).
+      - name: Üretim derlemesi (taslak içerik varsa başarısız)
+        run: pnpm run build:prod
+
+      # §19: "Onay tarihi" satırı dolu değilse yayın yapılmaz.
+      - name: Hukuki inceleme onay tarihini denetle
+        shell: bash
+        run: |
+          dosya="docs/hukuki-inceleme.md"
+          satir="$(grep -m1 'Onay tarihi:' "$dosya" || true)"
+          if [ -z "$satir" ]; then
+            echo "::error file=$dosya::'Onay tarihi:' satırı bulunamadı; yayın yapılmaz (§19, §21.13)."
+            exit 1
+          fi
+          deger="${satir#*Onay tarihi:}"
+          deger="$(printf '%s' "$deger" | sed -E 's/[*_[:space:]]//g')"
+          case "$deger" in
+            ''|'-'|'—'|'...'|'…'|'YYYY-AA-GG'|'GG/AA/YYYY'|'doldurulacak')
+              echo "::error file=$dosya::'Onay tarihi:' boş. Hukuki onay tamamlanmadan yayın yapılmaz (§19, §21.13)."
+              exit 1
+              ;;
+          esac
+          echo "Hukuki inceleme onay tarihi: $deger"
+
+      - name: Pages yapıtını hazırla
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  yayinla:
+    name: GitHub Pages'e yayımla
+    needs: derle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Yayımla
+        id: deployment
+        uses: actions/deploy-pages@v5

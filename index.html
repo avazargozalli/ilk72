@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <!--
+      Şartname §17 — CSP. Bu meta yalnızca üretim derlemesinde etkilidir.
+      `frame-ancestors` meta ile uygulanamaz; barındırma başlığıyla verilmelidir
+      (docs/kararlar.md, K-4). Geliştirme sunucusunda Vite'ın satır içi
+      stilleri için vite.config.ts dev-modunda style-src'e 'unsafe-inline'
+      ekler; üretim çıktısı bu dizeden sapmaz (docs/kararlar.md, K-5).
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'"
+    />
+    <title>İlk 72 — Aile Afet Planı</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

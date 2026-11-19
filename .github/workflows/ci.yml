@@ -1,0 +1,82 @@
+name: CI
+
+# Şartname §19 — her itişte ve pull request'te kalite kapısı.
+# K-1: npm yerine pnpm; `npm ci` yerine `pnpm install --frozen-lockfile`.
+on:
+  push:
+  pull_request:
+
+# Aynı dal için yeni bir itiş eskisinin işini iptal eder.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# En dar izin: iş akışı yalnızca depoyu okur.
+permissions:
+  contents: read
+
+jobs:
+  kalite:
+    name: Kalite kapısı
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v7
+
+      - name: pnpm kur
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.28.5
+
+      - name: Node.js kur
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Bağımlılıkları kur (kilit dosyası zorunlu)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Tip denetimi
+        run: pnpm run typecheck
+
+      - name: Testler ve kapsam
+        run: pnpm run coverage
+
+      - name: İçerik onay kapısı
+        run: pnpm run content:check
+
+      - name: Geliştirme derlemesi
+        run: pnpm run build
+
+      - name: Playwright tarayıcılarını kur
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Uçtan uca testler
+        run: pnpm run e2e
+
+      # K-1: npm'in `--omit=dev` seçeneğinin pnpm karşılığı `--prod`'dur.
+      # Yalnızca çalışma zamanı bağımlılıkları denetlenir; yüksek/kritik açıkta düşer.
+      - name: Bağımlılık güvenlik denetimi (üretim)
+        run: pnpm audit --prod --audit-level=high
+
+      # İ11 ve §4.1 satır 8: para toplama aracı depoda bulunmaz.
+      - name: FUNDING.yml bulunmadığını denetle
+        shell: bash
+        run: |
+          hata=0
+          for dosya in FUNDING.yml .github/FUNDING.yml; do
+            if [ -e "$dosya" ]; then
+              echo "::error file=$dosya::FUNDING.yml depoda bulunmamalı (İ11, §4.1 satır 8)."
+              hata=1
+            fi
+          done
+          if [ "$hata" -ne 0 ]; then
+            exit 1
+          fi
+          echo "FUNDING.yml yok; İ11 korunuyor."

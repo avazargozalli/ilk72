@@ -1,0 +1,17 @@
+# pnpm 11 ayarları (package.json'daki "pnpm" alanı artık okunmuyor).
+#
+# K-11: `workbox-build → glob → path-scurry` zinciri `lru-cache@11` isterken
+# pnpm'in hoisted kopyası `lru-cache@5.1.1` (başka bir bağımlılıktan) çözülüyordu
+# ve Node 24 / Windows'ta CJS require realpath'e çevirmediği için build
+# "LRUCache is not a constructor" ile düşüyordu. Aşağıdaki override, çakışan
+# sürümü yalnızca path-scurry için sabitler; elle junction onarımı gerekmez.
+packages: []
+
+# K-11: Windows + Node 24, sembolik/junction tabanlı sanal depoda ESM paket
+# çözümlemesi yapamıyor (vite → rolldown örneği: "Cannot find package 'rolldown'"
+# ve workbox → path-scurry → lru-cache çakışması). Düz (hoisted) bağlama bu iki
+# sorunu da ortadan kaldırır; node_modules npm düzenine benzer.
+nodeLinker: hoisted
+
+overrides:
+  path-scurry>lru-cache: ^11.5.3

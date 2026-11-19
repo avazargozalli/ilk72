@@ -1,0 +1,24 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ilk72//TR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:3f0c2d5e-0000-4000-8000-000000000001@ilk72
+DTSTAMP:20261119T080000Z
+DTSTART;VALUE=DATE:20270519
+DTEND;VALUE=DATE:20270520
+RRULE:FREQ=MONTHLY;INTERVAL=6
+SUMMARY:Aile afet planını gözden geçir
+DESCRIPTION:Çantadaki su\, gıda ve ilaçların tarihlerini kontrol edin\;
+  telefon numaralarını güncelleyin\; buluşma yerlerini ailece tekrar ed
+ in.\nPlanınız: cihazınızdaki İlk 72 uygulaması.
+URL:https://kullanici.github.io/ilk72/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Aile afet planını gözden geçir
+TRIGGER:PT9H
+END:VALARM
+END:VEVENT
+END:VCALENDAR

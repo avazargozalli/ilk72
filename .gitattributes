@@ -1,0 +1,11 @@
+# Satır sonları: depo LF tutar, Windows çalışma kopyası da LF yazar.
+# Böylece Windows ve Linux CI aynı içeriği görür (K-1, K-6).
+* text=auto eol=lf
+
+# İkili dosyalar dönüştürülmez.
+*.png binary
+*.ico binary
+*.jpg binary
+*.webp binary
+*.woff binary
+*.woff2 binary

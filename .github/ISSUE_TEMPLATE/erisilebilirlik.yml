@@ -1,0 +1,106 @@
+name: "Erişilebilirlik engeli"
+description: "Bir sayfayı veya akışı klavyeyle, ekran okuyucuyla ya da büyütmeyle kullanamıyor musunuz?"
+title: "[Erişilebilirlik] "
+labels: ["erişilebilirlik"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        İlk 72'nin hedefi **WCAG 2.2 AA** düzeyidir (İ10). Karşılaştığınız engeli bildirmeniz
+        önemlidir. Lütfen kişisel plan verisi yazmayın.
+
+        Bu form bir erişilebilirlik belgesi ya da resmî logo talebi değildir; uygulama gönüllü
+        bir projedir ve resmî bir kurum uygulaması değildir (İ5). Bildirimlere en geç 14 gün
+        içinde yanıt vermeye çalışırız.
+
+  - type: dropdown
+    id: engel
+    attributes:
+      label: "Engel türü"
+      options:
+        - "Görme (ekran okuyucu / büyütme / kontrast)"
+        - "İşitme"
+        - "Motor / hareket (klavye, dokunma)"
+        - "Bilişsel / öğrenme"
+        - "Birden fazla"
+        - "Diğer"
+    validations:
+      required: true
+
+  - type: input
+    id: sayfa
+    attributes:
+      label: "Hangi sayfa veya adım?"
+      description: "Ör. “Sihirbaz 5. adım”, “Ayarlar”, “#/rehber”."
+      placeholder: "Sihirbaz 5. adım"
+    validations:
+      required: true
+
+  - type: input
+    id: teknoloji
+    attributes:
+      label: "Tarayıcı ve yardımcı teknoloji"
+      description: "Tarayıcı sürümü ve varsa ekran okuyucu / büyütme aracı."
+      placeholder: "Firefox 145 + NVDA 2026.1, Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: ne-oldu
+    attributes:
+      label: "Ne oldu?"
+      description: "Hangi işlemi yapamadınız? Ekran okuyucu ne okudu ya da ne okumadı?"
+      placeholder: "Tab ile ilerlerken odak görünmüyor; ekran okuyucu düğmenin adını okumuyor."
+    validations:
+      required: true
+
+  - type: textarea
+    id: beklenen
+    attributes:
+      label: "Ne olmasını bekliyordunuz?"
+      placeholder: "Odak görünür olmalı ve düğme “Kaydet” olarak okunmalıydı."
+    validations:
+      required: true
+
+  - type: textarea
+    id: adimlar
+    attributes:
+      label: "Yeniden üretme adımları (isteğe bağlı)"
+      placeholder: |
+        1. Uygulamayı aç
+        2. Tab ile “Plan” bağlantısına gel
+        3. ...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: onem
+    attributes:
+      label: "Sizin için ne kadar engelleyici?"
+      options:
+        - "Bu bölümü hiç kullanamıyorum"
+        - "Ciddi: büyük zorlukla kullanıyorum"
+        - "Orta: bir kısmını kullanamıyorum"
+        - "Küçük: rahatsız edici ama kullanabiliyorum"
+    validations:
+      required: true
+
+  - type: input
+    id: iletisim
+    attributes:
+      label: "İletişim (isteğe bağlı)"
+      description: "Yanıt için e-posta adresiniz. Herkese açık sorunda görünür; istemiyorsanız boş bırakın."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: onaylar
+    attributes:
+      label: "Onaylar"
+      options:
+        - label: "Bu bildirimde gerçek kişisel plan verisi yok."
+          required: true
+        - label: "Bu bir güvenlik açığı değil; güvenlik için SECURITY.md yolunu kullanacağım."
+          required: true
+        - label: "Davranış kurallarını okudum."
+          required: true

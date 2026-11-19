@@ -1,0 +1,110 @@
+name: "Hata bildirimi"
+description: "Beklediğiniz gibi çalışmayan bir şey mi var? Hatayı bildirin."
+title: "[Hata] "
+labels: ["hata"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hata bildirimi için teşekkürler. Lütfen **gerçek plan verisi, ad, adres, telefon veya
+        sağlık bilgisi yazmayın**; örnekleri uydurun.
+
+        Bir **güvenlik açığı** bulduysanız bu formu kullanmayın; [SECURITY.md](https://github.com/{GITHUB_KULLANICI}/ilk72/blob/main/SECURITY.md)
+        dosyasındaki özel bildirim yolunu izleyin.
+
+        Türkçe yazın; sade ve kısa cümleler yeterlidir.
+
+  - type: dropdown
+    id: kapsam
+    attributes:
+      label: "Hangi bölüm?"
+      description: "Sorunun görüldüğü bölümü seçin."
+      options:
+        - "İlk açılış / sihirbaz"
+        - "Özet / plan doluluğu"
+        - "Acil durum ekranı"
+        - "Rehber"
+        - "Çanta listesi"
+        - "Yazdırma / çıktılar"
+        - "Paylaşım / içe alma"
+        - "Ayarlar / yedek / kilit"
+        - "Çevrimdışı / PWA"
+        - "Erişilebilirlik"
+        - "Diğer"
+    validations:
+      required: true
+
+  - type: input
+    id: sayfa
+    attributes:
+      label: "Sayfa veya adım"
+      description: "Ör. “Ayarlar”, “Sihirbaz 3. adım”, “#/paylas”."
+      placeholder: "Sihirbaz 3. adım"
+    validations:
+      required: true
+
+  - type: textarea
+    id: ne-oldu
+    attributes:
+      label: "Ne oldu?"
+      description: "Gördüğünüz davranışı ve varsa hata mesajını yazın."
+      placeholder: "Düğmeye basınca sayfa boş kaldı; konsolda şu hata göründü: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: beklenen
+    attributes:
+      label: "Ne olmasını bekliyordunuz?"
+      placeholder: "Kaydet düğmesi planı kaydetmeli ve “Kaydedildi” yazmalıydı."
+    validations:
+      required: true
+
+  - type: textarea
+    id: adimlar
+    attributes:
+      label: "Yeniden üretme adımları"
+      description: "Numaralı adımlar hâlinde yazın; sorun her seferinde oluyor mu?"
+      placeholder: |
+        1. Uygulamayı aç
+        2. Sihirbazda 3. adıma gel
+        3. “Kaydet” düğmesine bas
+    validations:
+      required: true
+
+  - type: input
+    id: tarayici
+    attributes:
+      label: "Tarayıcı ve sürüm"
+      placeholder: "Chrome 142, Firefox 145, Safari 26…"
+    validations:
+      required: true
+
+  - type: input
+    id: cihaz
+    attributes:
+      label: "Cihaz ve işletim sistemi (isteğe bağlı)"
+      placeholder: "Windows 11 masaüstü, Android 15 telefon…"
+    validations:
+      required: false
+
+  - type: textarea
+    id: ek
+    attributes:
+      label: "Ek bilgi (isteğe bağlı)"
+      description: "Ekran görüntüsü, konsol çıktısı veya denediğiniz çözümler. Kişisel veri eklemeyin."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: onaylar
+    attributes:
+      label: "Onaylar"
+      description: "Devam etmek için aşağıdaki maddeleri işaretleyin."
+      options:
+        - label: "Bu bildirimde gerçek kişisel plan verisi (ad, adres, telefon, sağlık bilgisi) yok."
+          required: true
+        - label: "Bu bir güvenlik açığı değil; güvenlik için SECURITY.md yolunu kullanacağım."
+          required: true
+        - label: "Katkı rehberini ve davranış kurallarını okudum."
+          required: true

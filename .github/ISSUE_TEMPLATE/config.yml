@@ -1,0 +1,13 @@
+# GitHub sorun şablonları yapılandırması.
+# Yayın öncesi: {GITHUB_KULLANICI} yer tutucusu sahibi tarafından doldurulacak.
+blank_issues_enabled: false
+contact_links:
+  - name: "Güvenlik açığı bildirimi (özel)"
+    url: "https://github.com/{GITHUB_KULLANICI}/ilk72/security/advisories/new"
+    about: "Açıkları herkese açık sorun olarak bildirmeyin; SECURITY.md dosyasını izleyin."
+  - name: "Katkı rehberi"
+    url: "https://github.com/{GITHUB_KULLANICI}/ilk72/blob/main/CONTRIBUTING.md"
+    about: "Kurulum, kalite kapısı, içerik ve çeviri katkısı kuralları."
+  - name: "Davranış kuralları"
+    url: "https://github.com/{GITHUB_KULLANICI}/ilk72/blob/main/CODE_OF_CONDUCT.md"
+    about: "Topluluk kuralları ve bildirim yolu."

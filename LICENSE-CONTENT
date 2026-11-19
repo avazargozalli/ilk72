@@ -1,0 +1,57 @@
+# İçerik Lisansı — CC BY 4.0
+
+İlk 72'nin **rehber metinleri, belgeleri ve diğer içeriği** Creative Commons Atıf 4.0 Uluslararası
+(CC BY 4.0) lisansı altındadır.
+
+Telif hakkı sahibi: **Azar Gozalli ve ilk72 katkıcıları** (2026).
+
+- Lisans özeti (Türkçe): <https://creativecommons.org/licenses/by/4.0/deed.tr>
+- Tam lisans metni (Türkçe): <https://creativecommons.org/licenses/by/4.0/legalcode.tr>
+- Kanonik adres: <https://creativecommons.org/licenses/by/4.0/>
+
+## Kapsam
+
+Bu lisans aşağıdakileri kapsar:
+
+- `src/content/` altındaki rehber ve çanta metinleri (kaynak kayıtları hariç; kaynaklar kendi
+  sahiplerine aittir).
+- `docs/` altındaki belgeler (şartname, mimari, kararlar, hukuki inceleme, içerik onayı vb.).
+- `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md` ve benzeri
+  kök belgeler.
+- Uygulama arayüzündeki Türkçe metinler (`src/i18n/`), hukuki metinler dahil.
+
+**Kapsam dışı:**
+
+- `src/` altındaki kaynak kodu ve yapılandırma dosyaları — bunlar MIT lisansı altındadır
+  (bkz. [LICENSE](LICENSE)).
+- Üçüncü taraf bağımlılıklar — kendi lisansları geçerlidir (bkz.
+  [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)).
+- Kurum adları, amblemleri, logoları ve tescilli işaretler. Bu lisans marka hakkı vermez; kurum
+  adları yalnızca kaynak gösterme amacıyla düz metin olarak anılır.
+- Başka bir yerden alınmış (varsa) alıntılar; bunlar kendi lisanslarına tabidir ve kaynağında
+  belirtilir.
+
+## Atıf nasıl verilir
+
+CC BY 4.0, aşağıdaki koşullarla yeniden kullanıma izin verir:
+
+1. **Atıf verin:** "İlk 72 — Aile Afet Planı, Azar Gozalli ve ilk72 katkıcıları, CC BY 4.0"
+   biçiminde bir atıf ekleyin.
+2. **Bağlantı verin:** mümkünse kaynak depoya (`https://github.com/{GITHUB_KULLANICI}/ilk72`) ve
+   lisans metnine (<https://creativecommons.org/licenses/by/4.0/>) bağlantı verin.
+3. **Değişiklikleri belirtin:** metni değiştirdiyseniz, değiştirdiğinizi açıkça yazın.
+4. **Ek kısıtlama getirmeyin:** yeniden kullanıcıların lisansın izin verdiği haklarını
+   sınırlandırmayın.
+5. **Resmî görünüm vermeyin:** atıf, projenin sizin kullanımınızı onayladığı ya da resmî bir
+   kurumla bağlantılı olduğu izlenimini vermemelidir.
+
+`{GITHUB_KULLANICI}` yayın öncesi doldurulacak yer tutucudur.
+
+## Garanti reddi
+
+İçerik "olduğu gibi" sunulur; doğruluğu, güncelliği veya belirli bir amaca uygunluğu garanti
+edilmez. Ayrıntılı sorumluluk reddi uygulama içindeki Kullanım Koşulları sayfasında ve şartnamenin
+§14.2 bölümünde yer alır; bu dosya o metinlerin yerini tutmaz.
+
+Bu dosya, CC BY 4.0 lisansının tam metni yerine geçmez; lisansın hükümleri yukarıdaki kanonik
+adresteki metne göre uygulanır. Çelişki olursa lisans metni esas alınır.

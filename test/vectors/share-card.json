@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "h": "Yılmaz ailesi",
+  "u": "2026-11-19",
+  "k": [
+    {
+      "a": "Ayşe Yılmaz",
+      "t": "05550000001"
+    },
+    {
+      "a": "Mehmet Yılmaz",
+      "t": "05550000002"
+    },
+    {
+      "a": "Elif Yılmaz",
+      "t": ""
+    },
+    {
+      "a": "Hatice Yılmaz",
+      "t": "05550000003"
+    }
+  ],
+  "i": [
+    {
+      "a": "Fatma Demir (teyze)",
+      "t": "05550000004",
+      "d": true,
+      "s": "İzmir"
+    },
+    {
+      "a": "Ali Kaya (komşu)",
+      "t": "05550000005",
+      "d": false,
+      "s": ""
+    }
+  ],
+  "b": {
+    "e": "Apartmanın karşısındaki park, çınar ağacının altı",
+    "m": "Mahalle pazaryeri girişi",
+    "d": "İzmir, Fatma teyzenin evi",
+    "t": "Cumhuriyet İlkokulu bahçesi"
+  },
+  "n": "Elif okuldaysa öğretmeninden teslim alınacak. Hatice Hanım yürüteç kullanıyor."
+}

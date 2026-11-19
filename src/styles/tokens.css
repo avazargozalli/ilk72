@@ -1,0 +1,64 @@
+/**
+ * Şartname §15 — tasarım belirteçleri (design tokens).
+ *
+ * Sistem yazı tipi yığını kullanılır; dış yazı tipi istenmez (İ2). Gövde
+ * 18 px, "Büyük yazı" ayarıyla 22 px; satır yüksekliği 1,5. Tek vurgu rengi
+ * vardır; alarm kırmızısı yalnızca 112 için ayrı tutulur. Boşluk ölçeği 8 px
+ * katlarıdır ve dokunma hedefi 44 × 44 CSS pikselinin altına inmez.
+ */
+:root {
+  color-scheme: light dark;
+
+  --font-family-base:
+    system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
+  --font-size-body: 18px;
+  --font-size-large: 22px;
+  --line-height-body: 1.5;
+  --measure: 65ch;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-7: 64px;
+
+  --touch-target: 44px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --ring-width: 3px;
+
+  --color-bg: #f7f7f5;
+  --color-surface: #ffffff;
+  --color-text: #1b1b19;
+  --color-text-muted: #4b4b47;
+  --color-border: #b8b8b2;
+  --color-accent: #005a87;
+  --color-accent-contrast: #ffffff;
+  --color-emergency: #b3261e;
+  --color-emergency-contrast: #ffffff;
+  --color-focus: #004f78;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #121513;
+    --color-surface: #1b1f1d;
+    --color-text: #f1f2ee;
+    --color-text-muted: #c3c7c0;
+    --color-border: #6b716a;
+    --color-accent: #82c8f0;
+    --color-accent-contrast: #0a2733;
+    --color-emergency: #ffb4ab;
+    --color-emergency-contrast: #4d0904;
+    --color-focus: #a7d8f5;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+  }
+}
+
+/* "Büyük yazı" ayarı (§15): gövde metni 22 px'e çıkar. */
+[data-large-text="true"] {
+  --font-size-body: var(--font-size-large);
+}
