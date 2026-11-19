@@ -16,7 +16,7 @@ body:
           en fazla 220 karakterle yazın.
         - **Kişisel veri yazmayın.** Ad, adres, telefon veya sağlık bilgisi paylaşmayın.
 
-        Güvenlik açıkları bu formun dışındadır; [SECURITY.md](https://github.com/{GITHUB_KULLANICI}/ilk72/blob/main/SECURITY.md)
+        Güvenlik açıkları bu formun dışındadır; [SECURITY.md](https://github.com/avazargozalli/ilk72/blob/main/SECURITY.md)
         dosyasını izleyin.
 
   - type: input
