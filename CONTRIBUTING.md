@@ -4,13 +4,7 @@
 kaynak bir aile afet planı uygulamasıdır. Katkı vermeden önce lütfen bu rehberi ve
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) dosyasını okuyun.
 
-> **Yayın öncesi doldurulacak yer tutucular:** `{GITHUB_KULLANICI}` (GitHub kullanıcı adı),
-> `{ILETISIM_EPOSTA}` (iletişim e-postası), `{BARINDIRMA_SAGLAYICISI}` (barındırma sağlayıcısı).
-> Bu değerler `src/config.ts` içinde tek yerde durur; depo adresi ve iletişim bilgisi sahibi
-> tarafından doldurulmadan yayın yapılmaz.
->
-> Depo: `https://github.com/{GITHUB_KULLANICI}/ilk72` · Sorunlar:
-> `https://github.com/{GITHUB_KULLANICI}/ilk72/issues` · İletişim: `{ILETISIM_EPOSTA}`
+[GitHub sorunları](https://github.com/avazargozalli/ilk72/issues) · [Proje iletişimi](mailto:gozelliazer@gmail.com)
 
 ## 1. Ortam ve kurulum
 
@@ -50,7 +44,7 @@ Tek tek komutlar:
 | `pnpm run content:check` | İçerik onay kapısı denetimi |
 | `pnpm run build` | Geliştirme derlemesi (taslak içeriğe izin verir, "TASLAK" şeridi gösterir) |
 | `pnpm run build:prod` | Üretim derlemesi; onaysız içerik varsa **başarısız olur** |
-| `pnpm run e2e` | Playwright uçtan uca testleri (önce `pnpm exec playwright install` gerekir) |
+| `pnpm run e2e` | Playwright uçtan uca testleri (önce `pnpm exec playwright install chrome msedge` gerekir) |
 
 `pnpm run build:prod` bu geliştirme sürümünde taslak içerik nedeniyle başarısız olur; bu beklenen
 durumdur ve içerik onaylanana kadar sürer.
@@ -81,7 +75,7 @@ Ayrıntılı mimari: `docs/mimari.md`. Tek doğruluk kaynağı: `docs/sartname.m
   kod eklemeyin. Uygulama yalnızca kendi kökeninden yüklenir ve çevrimdışı çalışır (İ2).
 - **Kullanıcıya görünen metinler `src/i18n/` altında durur.** Bileşenlere sabit Türkçe metin
   gömmeyin (şartname §0 kural 7). Hukuki metinlerin (`src/i18n/legal.ts`) anlamı değiştirilemez;
-  yalnızca `src/config.ts` kaynaklı yer tutucular doldurulur.
+  proje kimliği ve iletişim bilgileri `src/config.ts` üzerinden güncellenir.
 - **`dangerouslySetInnerHTML` ve `innerHTML` yasaktır.** Kullanıcı verisi DOM'a yalnızca Preact'in
   metin düğümleriyle girer (güvenlik, §17).
 - **Erişilebilirlik:** WCAG 2.2 AA hedefi. Anlamlı HTML, etiketler, klavye erişimi, görünür odak,
@@ -100,7 +94,7 @@ Rehber, çanta listesi ve belge metinleri resmî tavsiyelerin **kendi cümleleri
    ile başlamalı ve şu alan adlarından birinde olmalıdır (ve alt alan adlarında):
    `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`,
    `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`,
-   `kvkk.gov.tr`.
+   `kvkk.gov.tr`, `mebakub.meb.gov.tr`.
 2. **Kendi cümlelerinizle yazın.** Kurum metinlerini, afişlerini, görsellerini kopyalamayın;
    alıntı yapmayın. Kaynak adı yalnızca düz metin olarak anılır (İ4, İ5).
 3. **Kısa ve sade olun.** Metin en fazla **220 karakter** olabilir; sade Türkçe, kısa cümle,
@@ -168,4 +162,4 @@ delmeden çözülemeyen bir sorun varsa lütfen önce sorun açıp tartışın; 
   sahibinin GitHub deposunda yürür. CI iş akışları `pnpm` kullanır (K-1).
 - CI; lint, typecheck, kapsam, `content:check`, derleme, Playwright uçtan uca testleri ve
   `pnpm audit --omit=dev --audit-level=high` adımlarını koşar; `FUNDING.yml` bulunmadığını denetler.
-- Sorularınız için: `{ILETISIM_EPOSTA}` (yayın öncesi doldurulacak).
+- Sorularınız için: `gozelliazer@gmail.com`.

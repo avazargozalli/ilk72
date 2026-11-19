@@ -25,7 +25,7 @@ Ailelerin afet ve acil durum planını on dakikada hazırlayıp yazdırabildiği
 
 | İş | Açıklama |
 |---|---|
-| Yer tutucular | `{GITHUB_KULLANICI}`, `{ILETISIM_EPOSTA}`. Sahip adı: **Azar Gozalli** (yazımı sahibince teyit edilecek). |
+| Proje sahibi | **Azar Gozalli** · `avazargozalli` · `gozelliazer@gmail.com` |
 | Ad kontrolü | "İlk 72" çalışma adıdır. Yayından önce marka ve alan adı araması yapılmalı. Ad `src/config.ts` içinde tek yerde durur. |
 | İçerik onayı | Bölüm 13.3'teki her içerik satırını resmî kaynağın **güncel** sayfasıyla karşılaştırıp `onayli` yapmak. AFAD siteleri otomatik erişimi engellediği için bunu bir insan tarayıcıdan yapmalıdır. Mümkünse bir afet eğitmeni ya da AFAD il müdürlüğü görüşü alınmalı. |
 | Hukuki inceleme | Bölüm 4.4'teki sorular ve Bölüm 14'teki metinler bir avukata onaylatılmalı. |
@@ -576,7 +576,7 @@ interface Source {
 }
 ```
 
-İzinli alan adları (ve alt alan adları): `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`, `kvkk.gov.tr`. Uygulamadaki **bütün** dış bağlantılar bu listeden olmak zorundadır (depo ve lisans bağlantıları hariç: `github.com`, `creativecommons.org`, `opensource.org`).
+İzinli alan adları (ve alt alan adları): `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`, `kvkk.gov.tr`, `mebakub.meb.gov.tr`. Uygulamadaki **bütün** dış bağlantılar bu listeden olmak zorundadır (depo ve lisans bağlantıları hariç: `github.com`, `creativecommons.org`, `opensource.org`).
 
 ### 13.2 İçerik kaydı (`registry.ts`)
 
@@ -777,7 +777,7 @@ Bu metinler `src/i18n/tr.ts` içinde durur ve ilgili sayfalarda gösterilir. Avu
 >
 > **Çerez ve izleme.** Çerez, analitik, reklam ya da izleme aracı kullanmıyoruz. Tarayıcı deposunu yalnızca planınızı ve ayarlarınızı saklamak için kullanıyoruz.
 >
-> **Barındırma.** Uygulamanın dosyaları {BARINDIRMA_SAGLAYICISI} üzerinden sunulur. Her internet sitesinde olduğu gibi, barındırma sağlayıcısı sayfayı açtığınızda IP adresinizi ve tarayıcı bilginizi kendi kayıtlarına yazabilir. Bu kayıtlara biz erişemeyiz; ayrıntı için sağlayıcının gizlilik politikasına bakabilirsiniz. Uygulamayı bir kez açtıktan sonra internet olmadan da kullanabilirsiniz.
+> **Barındırma.** Uygulamanın dosyaları GitHub Pages üzerinden sunulur. Her internet sitesinde olduğu gibi, barındırma sağlayıcısı sayfayı açtığınızda IP adresinizi ve tarayıcı bilginizi kendi kayıtlarına yazabilir. Bu kayıtlara biz erişemeyiz; ayrıntı için sağlayıcının gizlilik politikasına bakabilirsiniz. Uygulamayı bir kez açtıktan sonra internet olmadan da kullanabilirsiniz.
 >
 > **Paylaşım.** Bir özeti bağlantı ya da kare kodla paylaşırsanız bilgiler o bağlantının içinde taşınır; sunucuya gönderilmez. Bağlantıyı gören herkes içeriğini okuyabilir. Parola koyarsanız yalnızca parolayı bilenler okuyabilir. Bağlantıyı kimle paylaştığınız sizin sorumluluğunuzdadır.
 >
@@ -787,7 +787,7 @@ Bu metinler `src/i18n/tr.ts` içinde durur ve ilgili sayfalarda gösterilir. Avu
 >
 > **Silme.** Ayarlar sayfasındaki "Bütün verilerimi sil" düğmesi bu cihazdaki her şeyi kalıcı olarak siler. Yazdırdığınız kâğıtlar ve paylaştığınız bağlantılar sizdedir.
 >
-> **İletişim.** {SAHIP_ADI} — {ILETISIM_EPOSTA}
+> **İletişim.** Azar Gozalli — gozelliazer@gmail.com
 >
 > Son güncelleme: {TARIH}
 
@@ -805,17 +805,17 @@ Bu metinler `src/i18n/tr.ts` içinde durur ve ilgili sayfalarda gösterilir. Avu
 >
 > **Lisans.** Kaynak kodu MIT lisansı, rehber metinleri CC BY 4.0 lisansı altındadır.
 >
-> **Hata bildirimi.** Yanlış ya da eskimiş bir bilgi görürseniz lütfen bildirin: {DEPO_ADRESI}/issues ya da {ILETISIM_EPOSTA}
+> **Hata bildirimi.** Yanlış ya da eskimiş bir bilgi görürseniz lütfen bildirin: https://github.com/avazargozalli/ilk72/issues ya da gozelliazer@gmail.com
 >
 > Son güncelleme: {TARIH}
 
 ### 14.3 Künye ve İletişim (`#/kunye`)
 
-> Sorumlu: {SAHIP_ADI} · E-posta: {ILETISIM_EPOSTA} · Kaynak kodu: {DEPO_ADRESI} · Barındırma: {BARINDIRMA_SAGLAYICISI} · Uygulama sürümü: {SURUM} · İçerik sürümü: {ICERIK_SURUMU} · Ticari amaç taşımaz; bağış ya da ödeme kabul etmez.
+> Sorumlu: Azar Gozalli · E-posta: gozelliazer@gmail.com · Kaynak kodu: https://github.com/avazargozalli/ilk72 · Barındırma: GitHub Pages · Uygulama sürümü: {SURUM} · İçerik sürümü: {ICERIK_SURUMU} · Ticari amaç taşımaz; bağış ya da ödeme kabul etmez.
 
 ### 14.4 Erişilebilirlik Beyanı (`#/erisilebilirlik`)
 
-> Bu uygulamayı herkesin kullanabilmesini istiyoruz. Hedefimiz WCAG 2.2 AA düzeyidir. Uygulama klavyeyle kullanılabilir, ekran okuyucularla denenmiştir, metin boyutu büyütülebilir. Bilinen eksikler: {BILINEN_EKSIKLER}. Bir engelle karşılaşırsanız {ILETISIM_EPOSTA} adresine yazın; en geç 14 gün içinde yanıt vermeye çalışırız. Bu beyan gönüllüdür; resmî bir erişilebilirlik belgesi ya da logosu anlamına gelmez. Son değerlendirme: {TARIH}
+> Bu uygulamayı herkesin kullanabilmesini istiyoruz. Hedefimiz WCAG 2.2 AA düzeyidir. Uygulama klavyeyle kullanılabilir, ekran okuyucularla denenmiştir, metin boyutu büyütülebilir. Bilinen eksikler: {BILINEN_EKSIKLER}. Bir engelle karşılaşırsanız gozelliazer@gmail.com adresine yazın; en geç 14 gün içinde yanıt vermeye çalışırız. Bu beyan gönüllüdür; resmî bir erişilebilirlik belgesi ya da logosu anlamına gelmez. Son değerlendirme: {TARIH}
 
 ### 14.5 Her sayfanın alt bilgisi
 

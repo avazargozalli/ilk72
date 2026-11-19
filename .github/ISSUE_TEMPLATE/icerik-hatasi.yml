@@ -11,7 +11,7 @@ body:
         - **Resmî kaynak adresi zorunludur.** Yalnızca şu alan adları kabul edilir:
           `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`,
           `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`,
-          `kvkk.gov.tr` (ve alt alan adları). Adres `https` ile başlamalıdır.
+          `kvkk.gov.tr`, `mebakub.meb.gov.tr` (ve alt alan adları). Adres `https` ile başlamalıdır.
         - **Kendi cümlelerinizle yazın.** Kurum metnini kopyalamayın; önerinizi sade Türkçeyle ve
           en fazla 220 karakterle yazın.
         - **Kişisel veri yazmayın.** Ad, adres, telefon veya sağlık bilgisi paylaşmayın.

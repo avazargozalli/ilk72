@@ -8,6 +8,8 @@
  */
 
 export const shell = {
+  draft: 'Taslak sürüm · Rehber içeriği henüz uzman onayından geçmedi.',
+  navigation: 'Ana menü',
   booting: 'Yükleniyor…',
 
   /** §9.2 — depo açılamadığında kalıcı uyarı (birebir metin). */

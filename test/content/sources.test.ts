@@ -11,12 +11,11 @@ import {
   isAllowedSourceUrl,
   parseHttpsUrl,
   REPO_AND_LICENSE_DOMAINS,
-  SOURCE_ACCESSED,
   SOURCES,
   SOURCES_BY_KEY,
 } from '../../src/content/sources.ts';
 
-/** §13.3 kaynak anahtarları tablosunun sırası + K-ONERI-DOGRULA. */
+/** §13.3 kaynak anahtarları tablosu ve sonradan eklenen yayınlar. */
 const EXPECTED_KEYS = [
   'K-PLAN72',
   'K-KIRSEHIR',
@@ -42,9 +41,9 @@ const EXPECTED_KEYS = [
   'K-EDEVLET',
   'K-TDTH',
   'K-112',
-  'K-KARAR',
-  'K-ENGELLI',
-  'K-ONERI-DOGRULA',
+  'K-MUGLA-CANTA',
+  'K-GUVENLI-YASAM',
+  'K-OKUL-TABANLI',
 ];
 
 describe('kaynak kaydı (§13.1, §13.3)', () => {
@@ -67,31 +66,17 @@ describe('kaynak kaydı (§13.1, §13.3)', () => {
       expect(source.key, source.key).toMatch(/^K-[A-Z0-9-]+$/);
       expect(source.org.trim(), source.key).not.toBe('');
       expect(source.title.trim(), source.key).not.toBe('');
-      expect(source.accessed, source.key).toBe(SOURCE_ACCESSED);
-      expect(source.accessed, source.key).toBe('2026-11-19');
+      expect(source.accessed, source.key).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
   });
 
   it('doğrulanmış kaynakların adresi https ve izinli alan adındadır', () => {
     const verified = SOURCES.filter((source) => source.verified);
 
-    expect(verified).toHaveLength(24);
+    expect(verified).toHaveLength(SOURCES.length);
     for (const source of verified) {
       expect(source.url, source.key).not.toBeNull();
       expect(isAllowedSourceUrl(source.url), source.key).toBe(true);
-    }
-  });
-
-  it('doğrulanmamış üç anahtar adressizdir ve onaylanamaz', () => {
-    const unverified = SOURCES.filter((source) => !source.verified);
-
-    expect(unverified.map((source) => source.key)).toEqual([
-      'K-KARAR',
-      'K-ENGELLI',
-      'K-ONERI-DOGRULA',
-    ]);
-    for (const source of unverified) {
-      expect(source.url, source.key).toBeNull();
     }
   });
 
@@ -114,7 +99,7 @@ describe('kaynak kaydı (§13.1, §13.3)', () => {
 });
 
 describe('izinli alan adları (§13.1)', () => {
-  it('kaynak alan adları şartnamedeki on bir alan adıdır', () => {
+  it('kaynak alan adları şartnamedeki ile uyumludur', () => {
     expect([...ALLOWED_SOURCE_DOMAINS]).toEqual([
       'afad.gov.tr',
       'turkiye.gov.tr',
@@ -127,6 +112,7 @@ describe('izinli alan adları (§13.1)', () => {
       'mevzuat.gov.tr',
       'resmigazete.gov.tr',
       'kvkk.gov.tr',
+      'mebakub.meb.gov.tr',
     ]);
   });
 

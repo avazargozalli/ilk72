@@ -1,23 +1,19 @@
-/**
- * Şartname §0.1, §14, §20 — tek yerde duran yapılandırma.
- * Yer tutucular ({GITHUB_KULLANICI}, {ILETISIM_EPOSTA}, {BARINDIRMA_SAGLAYICISI})
- * sahibi tarafından doldurulur; kod bunları okur, başka yerde tekrarlamaz.
- */
+/** Proje kimliği, iletişim bilgileri ve uygulama ayarları. */
 
 export const APP_NAME = 'İlk 72';
 export const APP_VERSION = '0.1.0';
 
-/** Yer tutucular — yayın öncesi sahibi doldurur (§0.1). */
-export const PLACEHOLDERS = {
-  githubUser: '{GITHUB_KULLANICI}',
-  contactEmail: '{ILETISIM_EPOSTA}',
+export const PROJECT = {
+  githubUser: 'avazargozalli',
+  contactEmail: 'gozelliazer@gmail.com',
   ownerName: 'Azar Gozalli',
-  hostingProvider: '{BARINDIRMA_SAGLAYICISI}',
+  hostingProvider: 'GitHub Pages',
 } as const;
 
-export const REPO_URL = `https://github.com/${PLACEHOLDERS.githubUser}/ilk72`;
+export const REPO_URL = `https://github.com/${PROJECT.githubUser}/ilk72`;
 export const ISSUES_URL = `${REPO_URL}/issues`;
-export const CONTACT_EMAIL = PLACEHOLDERS.contactEmail;
+export const CONTENT_ISSUE_URL = `${ISSUES_URL}/new?template=icerik-hatasi.yml`;
+export const CONTACT_EMAIL = PROJECT.contactEmail;
 
 /**
  * Uygulamanın kök adresi. Yalnızca paylaşım bağlantılarının önekini ve

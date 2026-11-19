@@ -10,13 +10,13 @@
  * - 1–2 cümlelik metin **birebir** içerik kaydından (`src/content/registry.ts`, İ4),
  * - `Kaynak: <kurum> — <sayfa> (erişim: GG.AA.YYYY)` satırı (`SourceLine`),
  * - durumu `taslak` ise "TASLAK — onaylanmadı" etiketi (§13.4),
- * - "Hata bildir" bağlantısı (depo sorun şablonu, `ISSUES_URL`; §13.4-5).
+ * - "Hata bildir" bağlantısı (depo sorun şablonu, `CONTENT_ISSUE_URL`; §13.4-5).
  *
  * Sayfa başında §11.10'daki uyarı gösterilir. Kartlara tavsiye cümlesi
  * eklenmez; metin yalnızca kayıttan gelir.
  */
 
-import { ISSUES_URL, ROUTES } from '../../config.ts';
+import { CONTENT_ISSUE_URL, ROUTES } from '../../config.ts';
 import { contentByCategory } from '../../content/registry.ts';
 import { formatText, tr } from '../../i18n/tr.ts';
 import { Notice } from '../components/index.ts';
@@ -78,7 +78,7 @@ export function Guide({ part = 'once' }: GuideProps) {
                   ))}
                 </div>
                 <p class="guide__report">
-                  <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={CONTENT_ISSUE_URL} target="_blank" rel="noopener noreferrer">
                     {tr.pages.guide.reportIssue}
                     <span class="visually-hidden">
                       {formatText(tr.pages.guide.reportIssueFor, { title })}

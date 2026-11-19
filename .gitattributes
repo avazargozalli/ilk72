@@ -9,3 +9,6 @@
 *.webp binary
 *.woff binary
 *.woff2 binary
+
+# RFC 5545 test vektörü bayt düzeyinde CRLF kullanır.
+test/vectors/expected.ics -text whitespace=cr-at-eol

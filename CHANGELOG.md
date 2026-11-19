@@ -2,11 +2,15 @@
 
 Bu dosya proje sürümlerindeki kullanıcıya görünen değişiklikleri listeler. Biçim
 [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) yaklaşımını izler; sürüm numarası
-`package.json` içindeki `version` alanıyla aynıdır. Proje henüz yayımlanmamıştır.
+`package.json` içindeki `version` alanıyla aynıdır. Geliştirme sürümleri GitHub Releases üzerinde ön sürüm olarak işaretlenir.
 
 ## [0.1.0] — 2026-11-19
 
 İlk geliştirme sürümü; içerik taslak.
+
+### İçerik sürümü 2
+
+- Kaynak adresi eksik olan 20 madde resmî yayınlarla eşleştirildi. Planı gözden geçirme sıklığı ile tatbikat sıklığı ayrıldı.
 
 ### Eklendi
 
@@ -31,5 +35,5 @@ Bu dosya proje sürümlerindeki kullanıcıya görünen değişiklikleri listele
   onaysız içeriğin yayımlanmasını engelleyen kasıtlı kapıdır (§13.4).
 - Hukuki metinler avukat incelemesi bekler; `docs/hukuki-inceleme.md` içindeki **Onay tarihi**
   satırı boştur ve Pages yayını bu satır dolmadan yapılmaz.
-- Uygulama henüz yayımlanmamıştır; canlı adres ve ekran görüntüsü yayın öncesi eklenecektir.
+- Ana ekranın gerçek görüntüsü README’ye eklendi. Uygulamanın üretim yayını inceleme bekliyor.
 - İçerik incelemesi tamamlanana kadar uygulama geliştirme sürümü olarak kalır.

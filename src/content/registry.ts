@@ -1,14 +1,4 @@
-/**
- * İlk 72 — içerik kaydı (Şartname §13.2, §13.3).
- *
- * §13.3'teki metinler resmî sayfaların arama alıntılarına dayanan **taslaklardır**
- * ve burada birebir korunur. Hiçbir cümle yeniden yazılmaz, kısaltılmaz,
- * düzeltilmez, sıralama değiştirilmez; madde eklenmez/çıkarılmaz (§0 kural 5).
- * Onay sırasında kaynağında karşılığı bulunamayan madde **silinir**, düzeltilmez.
- *
- * Bütün maddeler `status: 'taslak'` olarak girer. Onay sahibinin işidir (§0.1).
- */
-
+/** Rehber maddeleri ve kaynakları. Uzman incelemesi her madde için ayrı kaydedilir. */
 export type ContentCategory = 'plan' | 'canta' | 'belge' | 'tehlike' | 'once' | 'an' | 'sonra';
 
 export interface ContentItem {
@@ -25,7 +15,7 @@ export interface ContentItem {
 export const CONTENT_TEXT_MAX = 220;
 
 /** Metinler değiştikçe artar; "Hakkında" sayfasında gösterilir (§13.2). */
-export const CONTENT_VERSION = 1;
+export const CONTENT_VERSION = 2;
 
 /** Kategoriler §13.2'deki sırayla. */
 export const CONTENT_CATEGORIES: readonly ContentCategory[] = [
@@ -63,22 +53,22 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'P-03',
     category: 'plan',
-    text: 'Afet anında aile bireyleri arasındaki görev dağılımını önceden belirleyin.',
-    sources: ['K-KARAR'],
+    text: 'Evde devrilebilecek eşyaları belirlerken ailece görev paylaşın.',
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'P-04',
     category: 'plan',
     text: 'Şehir içinde ve şehir dışında birer destek noktası ve irtibat kişisi belirleyin.',
-    sources: ['K-KARAR'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'P-05',
     category: 'plan',
     text: 'Evden çıkış için birden fazla yol düşünün.',
-    sources: ['K-KARAR'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
@@ -112,15 +102,15 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'P-10',
     category: 'plan',
-    text: 'Planınızı düzenli olarak güncelleyin ve ailece uygulayın; en az altı ayda bir tatbikat yapın.',
-    sources: ['K-MUGLA', 'K-KARAR'],
+    text: 'Planınızı altı ayda bir gözden geçirin. Ailece düzenli tatbikat yapın.',
+    sources: ['K-ONLEM2', 'K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'P-11',
     category: 'plan',
     text: 'Çocuk, yaşlı, engelli ve düzenli ilaç kullanan bireylerin ihtiyaçlarını ayrıca planlayın.',
-    sources: ['K-ENGELLI'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
@@ -255,7 +245,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
     id: 'C-18',
     category: 'canta',
     text: 'Battaniye ya da uyku tulumu',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
 
@@ -263,71 +253,71 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'C-20',
     category: 'canta',
-    text: 'Bebek maması',
-    sources: ['K-ONERI-DOGRULA'],
+    text: 'Bebeğiniz kullanıyorsa kendi maması',
+    sources: ['K-OKUL-TABANLI'],
     status: 'taslak',
   },
   {
     id: 'C-21',
     category: 'canta',
     text: 'Bebek bezi',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-OKUL-TABANLI'],
     status: 'taslak',
   },
   {
     id: 'C-22',
     category: 'canta',
-    text: 'Biberon',
-    sources: ['K-ONERI-DOGRULA'],
+    text: 'Bebeğiniz kullanıyorsa biberonu',
+    sources: ['K-OKUL-TABANLI'],
     status: 'taslak',
   },
   {
     id: 'C-23',
     category: 'canta',
     text: 'Bebek için yedek giysi',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'C-24',
     category: 'canta',
-    text: 'Çocuk için küçük bir oyuncak ya da kitap',
-    sources: ['K-ONERI-DOGRULA'],
+    text: 'Çocuğunuzun sevdiği küçük bir oyuncak',
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'C-30',
     category: 'canta',
-    text: 'Kullanılan yardımcı cihazların yedek pili ya da parçası',
-    sources: ['K-ONERI-DOGRULA'],
+    text: 'Pille çalışan yardımcı cihazlar için yedek pil',
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'C-31',
     category: 'canta',
     text: 'Özel ihtiyaçlara yönelik malzemeler',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'C-32',
     category: 'canta',
     text: 'Reçete ve ilaç listesinin kopyası',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-GUVENLI-YASAM', 'K-OKUL-TABANLI'],
     status: 'taslak',
   },
   {
     id: 'C-40',
     category: 'canta',
     text: 'Evcil hayvan için mama ve su',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-OKUL-TABANLI'],
     status: 'taslak',
   },
   {
     id: 'C-41',
     category: 'canta',
     text: 'Evcil hayvan için tasma ya da taşıma çantası',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
 
@@ -343,7 +333,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
     id: 'C-91',
     category: 'canta',
     text: 'Çantadaki gıda, su ve ilaçların tarihlerini düzenli olarak kontrol edin.',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-OKUL-TABANLI'],
     status: 'taslak',
   },
   {
@@ -394,14 +384,14 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
     id: 'B-04',
     category: 'belge',
     text: 'Sigorta belgelerinin kopyası',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
     id: 'B-05',
     category: 'belge',
     text: 'Diploma ve benzeri önemli belgelerin kopyası',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-MUGLA-CANTA'],
     status: 'taslak',
   },
 
@@ -473,7 +463,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
     id: 'H-10',
     category: 'tehlike',
     text: 'Elektrik şalterinin, gaz ve su vanalarının yerini evdeki herkes bilsin.',
-    sources: ['K-ONERI-DOGRULA'],
+    sources: ['K-OKUL-TABANLI'],
     status: 'taslak',
   },
 

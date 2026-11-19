@@ -8,20 +8,17 @@ incelenmelidir. Bir açık bulduğunuzu düşünüyorsanız lütfen **herkese a�
 
 | Sürüm | Durum | Güvenlik düzeltmesi |
 |---|---|---|
-| `0.1.x` (geliştirme) | Aktif geliştirme; yayımlanmadı | En son geliştirme sürümüne çaba gösterilir |
+| `0.1.x` (geliştirme) | Ön sürüm, aktif geliştirme | En son geliştirme sürümüne çaba gösterilir |
 | `0.1.0` öncesi | Yok | — |
 
-Yayımlanmış bir sürüm henüz yoktur. Bir sürüm yayımlandığında bu tablo güncellenir.
+GitHub üzerindeki ilk kaynak kodu ön sürümü `gelistirme-0.1.0` etiketini taşır. Üretim yayını uzman incelemesini bekliyor.
 
 ## Açık nasıl bildirilir
 
 Tercih edilen yol **GitHub Güvenlik Bildirimleri**'dir (özel):
 
-`https://github.com/{GITHUB_KULLANICI}/ilk72/security/advisories/new`
-
-GitHub üzerinden bildiremiyorsanız `{ILETISIM_EPOSTA}` adresine yazın. Bu iki yer tutucu
-(`{GITHUB_KULLANICI}`, `{ILETISIM_EPOSTA}`) yayın öncesi sahibi tarafından doldurulacaktır; o zamana
-kadar bildirimi depo sahibine doğrudan ulaştırın.
+[Özel güvenlik bildirimi oluşturun](https://github.com/avazargozalli/ilk72/security/advisories/new).
+E-posta ile bildirmek için [proje sahibine yazın](mailto:gozelliazer@gmail.com).
 
 Bildiriminizde şunlar olsun:
 
@@ -46,7 +43,7 @@ Bir güvenlik açığı için para ödülü (bounty) yoktur; proje gönüllü y�
 - Uygulamanın kendi kökeni dışına istek yapması (İ2); gizlilik ihlali.
 - Şifreleme zarfı (PBKDF2-HMAC-SHA256 600.000 tur, AES-256-GCM), parola işleme veya yedek
   biçimindeki hatalar.
-- Bağımlılık zincirinde bilinen, yüksek/kritik bir açık (`pnpm audit --omit=dev`).
+- Bağımlılık zincirinde bilinen, yüksek/kritik bir açık (`pnpm audit --prod`).
 - Kilitli olmayan ya da doğrulanmamış dış bağlantı üretimi (`tel:` ve `https:` dışı).
 
 Kapsam dışı:
@@ -79,6 +76,6 @@ Kapsam dışı:
   yasaktır.
 - İçe aktarma ve paylaşım girdileri güvenilmez kabul edilir: boyut sınırı, sıkıştırma bombası
   sınırı ve şema temizliği uygulanır.
-- Bağımlılıklar kilitlidir (`pnpm-lock.yaml`) ve CI'da `pnpm audit --omit=dev --audit-level=high`
+- Bağımlılıklar kilitlidir (`pnpm-lock.yaml`) ve CI'da `pnpm audit --prod --audit-level=high`
   ile denetlenir.
 - Ayrıntılı tehdit modeli ve savunmalar: `docs/sartname.md` §17 ve `docs/mimari.md`.

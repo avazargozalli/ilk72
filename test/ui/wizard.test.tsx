@@ -133,8 +133,8 @@ describe('sihirbaz — adım 8 ve 9', () => {
     };
     render(<Harness initialPlan={plan} initialStep={8} />);
     expect(screen.getByText(tr.wizard.fields.bagItemsLegend)).toBeTruthy();
-    // C-20 "Bebek maması" maddesi, bebek grubu olduğu için listede olmalı.
-    expect(screen.getByLabelText('Bebek maması')).toBeTruthy();
+    // C-20 "Bebeğiniz kullanıyorsa kendi maması" maddesi, bebek grubu olduğu için listede olmalı.
+    expect(screen.getByLabelText('Bebeğiniz kullanıyorsa kendi maması')).toBeTruthy();
   });
 
   it('9. adımda sonraki gözden geçirme tarihi varsayılan olarak altı ay sonrasıdır', () => {

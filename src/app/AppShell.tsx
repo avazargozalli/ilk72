@@ -10,8 +10,10 @@
  * kalıcı bir uyarı gösterir. Kilit açıkken 112 düğmesi parolasız erişilebilir
  * kalır (§9.3): kilit ekranı `tel:112` bağlantısını her zaman gösterir.
  */
+
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { APP_ORIGIN, ROUTES } from '../config.ts';
+import { CONTENT_ITEMS } from '../content/registry.ts';
 import { tr } from '../i18n/tr.ts';
 import { createEmptyPlan } from '../model/defaults.ts';
 import { computeProgress } from '../model/progress.ts';
@@ -318,6 +320,13 @@ export function AppShell() {
 
   return (
     <>
+      <nav class="main-nav" aria-label={tr.shell.navigation}>
+        {(['home', 'guide', 'emergency', 'settings', 'about'] as const).map((key) => (
+          <a key={key} href={ROUTES[key]} aria-current={route.id === key ? 'page' : undefined}>
+            {tr.nav[key]}
+          </a>
+        ))}
+      </nav>
       {/* §16 — çevrimdışıyken küçük not; plan kullanılabilir kalır. */}
       {offline ? (
         <div class="shell-banner">
@@ -357,6 +366,9 @@ export function AppShell() {
       ) : null}
 
       <main id="main-content" tabIndex={-1}>
+        {CONTENT_ITEMS.some((item) => item.status === 'taslak') && (
+          <Notice tone="info">{tr.shell.draft}</Notice>
+        )}
         {renderRoute(route, {
           plan,
           settings,

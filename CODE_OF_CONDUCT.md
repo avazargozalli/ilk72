@@ -28,8 +28,8 @@ pull request'ler, tartışmalar ve proje adına yapılan iletişim için geçerl
 
 Kural ihlalini gördüğünüzde ya da yaşadığınızda:
 
-- **Sorumlu kişi:** `{SAHIP_ADI}` (yayın öncesi doldurulacak; şu anki sahip: Azar Gozalli)
-- **E-posta:** `{ILETISIM_EPOSTA}` (yayın öncesi doldurulacak)
+- **Sorumlu kişi:** Azar Gozalli
+- **E-posta:** `gozelliazer@gmail.com`
 
 Bildirimi özelden yapın; herkese açık sorun açmayın. Bildiriminizde ne olduğunu, nerede olduğunu
 (bağlantı, tarih) ve varsa tanıkları belirtin. Bildirimi yapanın kimliği, açıkça izin verilmedikçe

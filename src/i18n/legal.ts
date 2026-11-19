@@ -23,7 +23,7 @@
  * yer tutucular ve `{TARIH}` doldurulur (§0 kural 5, §14). Metinler avukat
  * onayına kadar taslaktır (bkz. `docs/hukuki-inceleme.md`).
  */
-import { APP_NAME, APP_VERSION, ISSUES_URL, PLACEHOLDERS, REPO_URL, ROUTES } from '../config.ts';
+import { APP_NAME, APP_VERSION, ISSUES_URL, PROJECT, REPO_URL, ROUTES } from '../config.ts';
 import { CONTENT_VERSION } from '../content/registry.ts';
 
 /**
@@ -78,7 +78,7 @@ export const legal = {
       {
         heading: 'Barındırma.',
         paragraphs: [
-          `Uygulamanın dosyaları ${PLACEHOLDERS.hostingProvider} üzerinden sunulur. Her internet sitesinde olduğu gibi, barındırma sağlayıcısı sayfayı açtığınızda IP adresinizi ve tarayıcı bilginizi kendi kayıtlarına yazabilir. Bu kayıtlara biz erişemeyiz; ayrıntı için sağlayıcının gizlilik politikasına bakabilirsiniz. Uygulamayı bir kez açtıktan sonra internet olmadan da kullanabilirsiniz.`,
+          `Uygulamanın dosyaları ${PROJECT.hostingProvider} üzerinden sunulur. GitHub, Pages ziyaretçilerinin IP adresini güvenlik amacıyla kaydeder. Proje sahibi bu kayıtlara erişemez. Uygulamayı bir kez açtıktan sonra internet olmadan da kullanabilirsiniz.`,
         ],
       },
       {
@@ -105,7 +105,7 @@ export const legal = {
       },
       {
         heading: 'İletişim.',
-        paragraphs: [`${PLACEHOLDERS.ownerName} — ${PLACEHOLDERS.contactEmail}`],
+        paragraphs: [`${PROJECT.ownerName} — ${PROJECT.contactEmail}`],
       },
       {
         paragraphs: [`Son güncelleme: ${UPDATED_AT}`],
@@ -154,7 +154,7 @@ export const legal = {
       {
         heading: 'Hata bildirimi.',
         paragraphs: [
-          `Yanlış ya da eskimiş bir bilgi görürseniz lütfen bildirin: ${ISSUES_URL} ya da ${PLACEHOLDERS.contactEmail}`,
+          `Yanlış ya da eskimiş bir bilgi görürseniz lütfen bildirin: ${ISSUES_URL} ya da ${PROJECT.contactEmail}`,
         ],
       },
       {
@@ -169,7 +169,7 @@ export const legal = {
     sections: [
       {
         paragraphs: [
-          `Sorumlu: ${PLACEHOLDERS.ownerName} · E-posta: ${PLACEHOLDERS.contactEmail} · Kaynak kodu: ${REPO_URL} · Barındırma: ${PLACEHOLDERS.hostingProvider} · Uygulama sürümü: ${APP_VERSION} · İçerik sürümü: ${CONTENT_VERSION} · Ticari amaç taşımaz; bağış ya da ödeme kabul etmez.`,
+          `Sorumlu: ${PROJECT.ownerName} · E-posta: ${PROJECT.contactEmail} · Kaynak kodu: ${REPO_URL} · Barındırma: ${PROJECT.hostingProvider} · Uygulama sürümü: ${APP_VERSION} · İçerik sürümü: ${CONTENT_VERSION} · Ticari amaç taşımaz; bağış ya da ödeme kabul etmez.`,
         ],
       },
     ],
@@ -181,7 +181,7 @@ export const legal = {
     sections: [
       {
         paragraphs: [
-          `Bu uygulamayı herkesin kullanabilmesini istiyoruz. Hedefimiz WCAG 2.2 AA düzeyidir. Uygulama klavyeyle kullanılabilir, ekran okuyucularla denenmiştir, metin boyutu büyütülebilir. Bilinen eksikler: ${KNOWN_ACCESSIBILITY_GAPS}. Bir engelle karşılaşırsanız ${PLACEHOLDERS.contactEmail} adresine yazın; en geç 14 gün içinde yanıt vermeye çalışırız. Bu beyan gönüllüdür; resmî bir erişilebilirlik belgesi ya da logosu anlamına gelmez. Son değerlendirme: ${UPDATED_AT}`,
+          `Bu uygulamayı herkesin kullanabilmesini istiyoruz. Hedefimiz WCAG 2.2 AA düzeyidir. Klavye kullanımını ve metin boyutunu büyütmeyi destekliyoruz. Bilinen eksikler: ${KNOWN_ACCESSIBILITY_GAPS}. Bir engelle karşılaşırsanız ${PROJECT.contactEmail} adresine yazın; en geç 14 gün içinde yanıt vermeye çalışırız. Bu beyan gönüllüdür; resmî bir erişilebilirlik belgesi ya da logosu anlamına gelmez. Son değerlendirme: ${UPDATED_AT}`,
         ],
       },
     ],

@@ -49,19 +49,11 @@ jobs:
         shell: bash
         run: |
           dosya="docs/hukuki-inceleme.md"
-          satir="$(grep -m1 'Onay tarihi:' "$dosya" || true)"
-          if [ -z "$satir" ]; then
-            echo "::error file=$dosya::'Onay tarihi:' satırı bulunamadı; yayın yapılmaz (§19, §21.13)."
+          deger="$(sed -nE 's/^- \*\*Onay tarihi:\*\*[[:blank:]]*([0-9]{4}-[0-9]{2}-[0-9]{2})[[:blank:]]*$/\1/p' "$dosya")"
+          if [[ -z "$deger" || "$(date -u -d "$deger" +%F 2>/dev/null)" != "$deger" || "$deger" > "$(date -u +%F)" ]]; then
+            echo "::error file=$dosya::Geçerli bir avukat onay tarihi gerekiyor (YYYY-AA-GG)."
             exit 1
           fi
-          deger="${satir#*Onay tarihi:}"
-          deger="$(printf '%s' "$deger" | sed -E 's/[*_[:space:]]//g')"
-          case "$deger" in
-            ''|'-'|'—'|'...'|'…'|'YYYY-AA-GG'|'GG/AA/YYYY'|'doldurulacak')
-              echo "::error file=$dosya::'Onay tarihi:' boş. Hukuki onay tamamlanmadan yayın yapılmaz (§19, §21.13)."
-              exit 1
-              ;;
-          esac
           echo "Hukuki inceleme onay tarihi: $deger"
 
       - name: Pages yapıtını hazırla

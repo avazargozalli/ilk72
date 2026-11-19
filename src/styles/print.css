@@ -225,6 +225,7 @@
   /* Yalnızca seçilen belgeler basılır: gezinme, düğmeler, alt bilgi ve ekran
      denetimleri kâğıda çıkmaz (§12). */
   nav,
+  .main-nav,
   footer,
   .skip-link,
   .button,

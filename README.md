@@ -3,34 +3,19 @@
 Ailelerin afet ve acil durum planını on dakikada hazırlayıp yazdırabildiği, çevrimdışı çalışan,
 hesap gerektirmeyen ve hiçbir veriyi cihaz dışına göndermeyen açık kaynak bir web uygulaması.
 
-> **Durum:** `0.1.0` geliştirme sürümü. Rehber içeriği **taslaktır**; hukuki metinler avukat
-> incelemesi bekler ve henüz yayımlanmış bir sürüm yoktur. Üretim derlemesi (`pnpm run build:prod`)
-> onaysız içerik varken bilinçli olarak başarısız olur.
->
-> **Yayın öncesi doldurulacak yer tutucular (sahibin işi):** `{GITHUB_KULLANICI}` (GitHub
-> kullanıcı adı), `{ILETISIM_EPOSTA}` (iletişim e-postası), `{BARINDIRMA_SAGLAYICISI}` (barındırma
-> sağlayıcısı). Bu değerler `src/config.ts` içinde tek yerde durur; `{GITHUB_KULLANICI}` ile
-> `{ILETISIM_EPOSTA}` doldurulmadan depo adresi, künye ve yasal metinlerdeki iletişim eksik kalır.
+**0.1.0 geliştirme sürümü.** [Geliştirme sürümünün kaynak kodu](https://github.com/avazargozalli/ilk72/releases/tag/gelistirme-0.1.0) katkıya açıktır. Aile planlayıcısını yerelde deneyebilir,
+boş formu yazdırabilir ve içerik düzeltmesi önerebilirsiniz. Rehberdeki 83 madde afet uzmanının
+incelemesini, hukuki metinler avukat görüşünü bekliyor. Taslaklar varken üretim derlemesi durur.
 
 ## Ekran görüntüsü
 
-<!-- Yayın öncesi: gerçek ekran görüntüsünü `docs/ekran-goruntusu.png` olarak ekleyin ve bu
-     yer tutucu bloğunu aşağıdaki görselle değiştirin:
-     ![İlk 72 ana ekranı](docs/ekran-goruntusu.png)
--->
+![İlk 72 ana ekranında plan hazırlamaya başlama ve boş formu yazdırma seçenekleri](docs/ekran-goruntusu.png)
 
-> **Yer tutucu:** Ekran görüntüsü yayın öncesi eklenecek — `docs/ekran-goruntusu.png` (henüz yok).
-> Görsel eklenince bu blok kaldırılır; başka bir yerden görsel kullanılmaz (İ5).
+## Uygulama yayını
 
-## Canlı adres
-
-Yayın öncesi doldurulacak: `https://{GITHUB_KULLANICI}.github.io/ilk72/`
-
-Uygulama GitHub Pages üzerinde yalnızca `v*` etiketiyle yayımlanır; `main` dalına yapılan her itiş
-canlıya çıkmaz. Yayın için önce `docs/hukuki-inceleme.md` içindeki **Onay tarihi** satırı
-doldurulmalı ve bütün rehber içeriği onaylanmalıdır (bkz. §19 ve `docs/icerik-onay.md`).
-Barındırma sağlayıcısı kesinleşince `{BARINDIRMA_SAGLAYICISI}` doldurulur ve gizlilik bildirimi
-buna göre güncellenir.
+Barındırma için GitHub Pages seçildi. İncelemeler tamamlandığında uygulama
+`https://avazargozalli.github.io/ilk72/` adresinde yayımlanacak.
+[İçerik inceleme süreci](docs/icerik-onay.md) · [Hukuki inceleme kaydı](docs/hukuki-inceleme.md)
 
 ## Ne olduğu
 
@@ -89,8 +74,8 @@ bağımsız bir araçtır.
 
 1. Uygulamayı tarayıcıda açın. İlk açılışta kısa bir bilgilendirme kutusu çıkar; kabul edince
    sihirbaz başlar.
-2. Dokuz adımı sırayla doldurun: hane bilgileri, kişiler, acil kişiler, buluşma yerleri, toplanma
-   alanı, evin güvenli yerleri, vana ve şalter, görev dağılımı, özel ihtiyaçlar.
+2. Dokuz adımı izleyin: haneniz, kişiler, özel ihtiyaçlar, acil kişiler, buluşma yerleri, eviniz,
+   görevler, çanta ve belgeler, gözden geçirme.
 3. Özet sayfasında planın hangi bölümlerinin dolu olduğunu görün. Eksik bölümler için sihirbaza
    dönebilirsiniz.
 4. **Yazdır** sayfasından aile planını, cüzdan ve çocuk kartlarını, buzdolabı sayfasını, çanta
@@ -108,9 +93,7 @@ bağımsız bir araçtır.
 - Planınıza yazdığınız her şey (adlar, telefonlar, adres, isterseniz sağlık bilgileri) **yalnızca bu
   cihazdaki tarayıcı deposunda** saklanır. Bize ya da başka birine gönderilmez.
 - Sunucumuz, üyelik sistemimiz, veritabanımız, çerezimiz, analitiğimiz ya da izleme aracımız yoktur.
-- Uygulamanın dosyaları bir barındırma sağlayıcısı üzerinden sunulur. Her internet sitesinde olduğu
-  gibi sağlayıcı, sayfayı açtığınızda IP adresinizi ve tarayıcı bilginizi kendi kayıtlarına
-  yazabilir; bu kayıtlara erişemeyiz. Sağlayıcı ve bu kayıtlar gizlilik bildiriminde yazılıdır.
+- GitHub Pages, ziyaretçilerin IP adresini güvenlik amacıyla kaydeder. Proje sahibi bu kayıtlara erişemez. [GitHub Pages veri toplama bilgileri](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
 - Paylaşım bağlantısındaki bilgiler bağlantının `#` sonrasındaki parçasında taşınır; bu parça
   sunucuya gönderilmez. Bağlantıyı gören herkes içeriğini okuyabilir; parola koyabilirsiniz.
 - Ayrıntılı metin: uygulama içindeki **Gizlilik Bildirimi** (`#/gizlilik`) ve
@@ -125,7 +108,7 @@ bağımsız bir araçtır.
 - **İzinli alan adları.** Dış bağlantılar yalnızca şu resmî alan adlarına ve alt alan adlarına
   verilir: `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`,
   `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`,
-  `kvkk.gov.tr`.
+  `kvkk.gov.tr`, `mebakub.meb.gov.tr`.
 - **Onay kapısı.** Her madde, kaynağıyla karşılaştırılıp `onayli` yapılana kadar `taslak` dur.
   `content:check` kaynak zorunluluğunu, adres kurallarını, metin uzunluğunu ve inceleme
   alanlarını denetler; `build:prod` taslak madde kaldıysa başarısız olur.

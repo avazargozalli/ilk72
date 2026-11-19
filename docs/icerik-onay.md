@@ -57,7 +57,14 @@ Ek kapılar:
   verir; 18 ay geçen maddeler `build:prod`'u **başarısız** kılar.
 - **İzinli alan adları:** `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`,
   `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`,
-  `resmigazete.gov.tr`, `kvkk.gov.tr` (ve alt alan adları).
+  `resmigazete.gov.tr`, `kvkk.gov.tr`, `mebakub.meb.gov.tr` (ve alt alan adları).
+
+## Uzman incelemesine hazırlanan kaynaklar
+
+İçerik sürümü 2’de önceki kayıtta adresi eksik olan 20 maddeye kaynak eklendi.
+Aile planı, yardımcı cihazlar ve hane çantası için [Güvenli Yaşam 1 Eğitimi](https://cankiri.afad.gov.tr/kurumlar/cankiri.afad/dOKUMANLAR/Guvenli_Yasam_Klavuzu/gy_1_egitim_kitapcigi.pdf) içindeki aile planı ve çanta bölümlerine bakın.
+Bebek ihtiyaçları, son kullanma tarihleri ve tesisatın yerini bilme maddeleri için [Okul Tabanlı Afet Eğitimi, Kitap 1](https://mebakub.meb.gov.tr/eskisite/wp-content/uploads/2024/03/okul-tabanli-afet-egitimi_kitap_1.pdf) içinde 65–67. sayfaları kullanın.
+Altı aylık süre planın gözden geçirilmesi için geçerlidir. Kaynak eşleştirmeleri aşağıdaki uzman onayına hazırlıktır.
 
 ## 3. Adım adım onay
 
@@ -149,7 +156,7 @@ sonucu (değişiklik yok / güncellendi / silindi) commit mesajında ve Onay kay
 
 - Rehber kartlarındaki **"Hata bildir"** bağlantısı, depodaki "Yanlış veya eskimiş içerik" sorun
   şablonuna gider; şablonda **resmî kaynak adresi zorunludur**.
-- Künye sayfasındaki `{ILETISIM_EPOSTA}` (yayın öncesi doldurulacak) üzerinden de bildirim
+- Künye sayfasındaki `gozelliazer@gmail.com` üzerinden de bildirim
   yapılabilir.
 - Bildirilen hata doğrulanırsa:
   - Metin düzeltilir, `CONTENT_VERSION` artırılır ve gerekliyse `reviewedAt` yenilenir.

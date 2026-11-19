@@ -62,20 +62,20 @@ aktarım yaparlar (K-15).
 
 ## 3. Sahibinin tamamlayacakları (yayın öncesi zorunlu)
 
-Bunlar **bilerek açık bırakıldı**; ajan yapamaz (şartname §0.1, §21.13).
+İlk teslimden sonra tamamlanan işler tabloda ayrıca belirtilmiştir.
 
 | # | İş | Nerede |
 |---|---|---|
 | 1 | §13.3'teki **83 maddenin** onayı (kaynağı tarayıcıda açıp karşılaştırma, `status: 'onayli'`, `reviewedBy`, `reviewedAt`) ya da silinmesi; sonra `build:prod` | `src/content/registry.ts`, süreç: `docs/icerik-onay.md` |
-| 2 | Bu 83 maddeden **20'si** doğrulanmamış kaynak taşıyor (`K-KARAR`, `K-ENGELLI`, `K-ONERI-DOGRULA`); önce resmî adres bulunmalı | `src/content/sources.ts` |
+| 2 | Tamamlandı. Önceden kaynak adresi eksik olan 20 madde resmî yayınlara bağlandı. İçerik onayı ayrıca gerekir. | `src/content/sources.ts`, `src/content/registry.ts` |
 | 3 | `docs/hukuki-inceleme.md` doldurulacak, **"Onay tarihi:"** yazılacak; §4.4'teki S1–S10 yanıtlanacak | `docs/hukuki-inceleme.md` |
 | 4 | Ad ve marka araması ("İlk 72") | — |
-| 5 | Barındırma seçimi (§4.3) ve gizlilik/künye metinlerinin buna göre doldurulması | `src/config.ts` |
-| 6 | Yer tutucular: `{GITHUB_KULLANICI}`, `{ILETISIM_EPOSTA}`, `{BARINDIRMA_SAGLAYICISI}` | `src/config.ts` (`PLACEHOLDERS`) |
+| 5 | Tamamlandı. GitHub Pages seçildi. | `src/config.ts` |
+| 6 | Tamamlandı. Depo sahibi ve proje e-postası uygulama ile belgelere işlendi. | `src/config.ts` |
 | 7 | `frame-ancestors 'none'` başlığının verilmesi (meta ile uygulanamaz) | barındırma yapılandırması (K-4, K-14) |
 | 8 | Elle erişilebilirlik: bir ekran okuyucu, gerçek telefon, %200 yakınlaştırma, 320 px, en az üç kişi (biri 65 yaş üstü) | `docs/mimari.md` §7 |
 | 9 | Baskı çıktılarının cetvelle ölçümü (85,6 × 54 mm kart, A4 taşma) | `docs/mimari.md` §7 |
-| 10 | GitHub deposu + Pages kaynağı "GitHub Actions" | `.github/workflows/` |
+| 10 | Tamamlandı. Açık kaynak deposu ve GitHub Actions yayın kaynağı | `.github/workflows/` |
 
 ## 4. Bilinen sınırlar (README'de aynen)
 

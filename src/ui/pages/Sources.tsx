@@ -3,7 +3,7 @@
  *
  * Bütün dış bağlantılar `SourceLink` üzerinden kurulur; bu bileşen yalnızca
  * izinli alan adlarına (`https`) bağlantı üretir (§13.1, §17). Adresi
- * doğrulanmamış anahtarlar (K-KARAR, K-ENGELLI, K-ONERI-DOGRULA) bağlantı
+ * doğrulanmamış kaynaklar bağlantı
  * olarak değil, "doğrulanmadı" notuyla listelenir (İ4: kaynaksız tavsiye yok).
  */
 import { SOURCES } from '../../content/sources.ts';

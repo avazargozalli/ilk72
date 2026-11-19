@@ -11,7 +11,7 @@
  */
 import { render, screen } from '@testing-library/preact';
 import { describe, expect, it } from 'vitest';
-import { ISSUES_URL, ROUTES } from '../../src/config.ts';
+import { CONTENT_ISSUE_URL, ROUTES } from '../../src/config.ts';
 import { contentByCategory } from '../../src/content/registry.ts';
 import { tr } from '../../src/i18n/tr.ts';
 import { Guide, type GuidePart } from '../../src/ui/pages/Guide.tsx';
@@ -90,12 +90,12 @@ describe('Guide — kartlar', () => {
   it('taslak kartları "TASLAK — onaylanmadı" etiketiyle işaretler (§13.4)', () => {
     render(<Guide part="sonra" />);
 
-    const drafts = screen.getAllByText(tr.pages.guide.draft);
-    expect(tr.pages.guide.draft).toBe('TASLAK — onaylanmadı');
-    expect(drafts).toHaveLength(contentByCategory('sonra').length);
-
-    const section = sectionByHeading(tr.pages.guide.parts.sonra);
-    expect(normalizeText(section.textContent)).toContain(tr.pages.guide.draft);
+    const cards = sectionByHeading(tr.pages.guide.parts.sonra).querySelectorAll('li');
+    for (const [index, item] of contentByCategory('sonra').entries()) {
+      expect(cards[index]?.textContent?.includes(tr.pages.guide.draft)).toBe(
+        item.status === 'taslak',
+      );
+    }
   });
 
   it('kart başlığını ve kısa konu adını gösterir', () => {
@@ -139,7 +139,7 @@ describe('Guide — kaynak ve hata bildirimi', () => {
 
     const section = sectionByHeading(tr.pages.guide.parts.once);
     const cards = Array.from(section.querySelectorAll('li'));
-    const issueLinks = Array.from(section.querySelectorAll(`a[href="${ISSUES_URL}"]`));
+    const issueLinks = Array.from(section.querySelectorAll(`a[href="${CONTENT_ISSUE_URL}"]`));
 
     expect(issueLinks).toHaveLength(contentByCategory('once').length);
     for (const link of issueLinks) {

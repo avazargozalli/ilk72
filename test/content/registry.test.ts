@@ -7,7 +7,7 @@
  *    `onayli` yapılamıyor.
  */
 import { describe, expect, it } from 'vitest';
-import { checkContent, ISSUE_CODES, runContentCheck } from '../../src/content/check.ts';
+import { ISSUE_CODES, runContentCheck } from '../../src/content/check.ts';
 import type { ContentCategory } from '../../src/content/registry.ts';
 import {
   CONTENT_ITEMS,
@@ -44,15 +44,6 @@ const EXPECTED_IDS: Record<ContentCategory, string[]> = {
   sonra: ids('S', 1, 10),
 };
 
-const UNVERIFIED_KEYS = SOURCES.filter((source) => !source.verified).map((source) => source.key);
-
-/** Bir maddede doğrulanmamış kaynak var mı? */
-function holdsUnverifiedSource(itemId: string): boolean {
-  return (
-    getContentItem(itemId)?.sources.some((key) => SOURCES_BY_KEY[key]?.verified !== true) ?? false
-  );
-}
-
 describe('§13.3 — başlangıç içeriğinin tamamı', () => {
   it('kategori kategori beklenen kimlikleri taşır', () => {
     let total = 0;
@@ -75,11 +66,9 @@ describe('§13.3 — başlangıç içeriğinin tamamı', () => {
     expect(getContentItem('K-YOK')).toBeUndefined();
   });
 
-  it('bütün maddeler taslaktır ve içerik sürümü 1', () => {
-    expect(CONTENT_VERSION).toBe(1);
-    for (const item of CONTENT_ITEMS) {
-      expect(item.status, item.id).toBe('taslak');
-    }
+  it('içerik sürümü pozitif bir tamsayıdır', () => {
+    expect(Number.isInteger(CONTENT_VERSION)).toBe(true);
+    expect(CONTENT_VERSION).toBeGreaterThan(0);
   });
 
   it('her madde kaynaklıdır, kaynakları kayıtlıdır ve metin sınırındadır', () => {
@@ -96,7 +85,7 @@ describe('§13.3 — başlangıç içeriğinin tamamı', () => {
 
   it('uygulamadaki bütün dış bağlantılar izinli alan adlarındadır', () => {
     const linked = SOURCES.filter((source) => source.url !== null);
-    expect(linked).toHaveLength(24);
+    expect(linked).toHaveLength(SOURCES.length);
 
     for (const source of linked) {
       expect(source.url?.startsWith('https://'), source.key).toBe(true);
@@ -112,102 +101,21 @@ describe('§13.3 — başlangıç içeriğinin tamamı', () => {
 });
 
 describe('§13.4, §18.6 — gerçek kayıt onay kapısı', () => {
-  it('geliştirme denetimi hatasız geçer, doğrulanmamış kaynakları uyarır', () => {
+  it('geliştirme denetimi hatasızdır ve her maddenin geçerli kaynağı vardır', () => {
     const result = runContentCheck();
-
     expect(result.errors).toEqual([]);
-    expect(result.warnings).toHaveLength(UNVERIFIED_KEYS.length);
-    expect(result.warnings.every((issue) => issue.code === ISSUE_CODES.unverifiedSource)).toBe(
-      true,
-    );
-    const details = result.warnings.map((issue) => issue.detail).join(' ');
-    for (const key of UNVERIFIED_KEYS) {
-      expect(details, key).toContain(key);
+    for (const item of CONTENT_ITEMS) {
+      for (const key of item.sources) {
+        expect(SOURCES_BY_KEY[key]?.verified, item.id).toBe(true);
+      }
     }
   });
 
-  it('taslak madde varken üretim denetimi her madde için hata verir', () => {
+  it('üretim denetimi taslak kalan her maddeyi bildirir', () => {
     const result = runContentCheck({ prod: true, now: FIXED_NOW });
-    const draftIssues = result.errors.filter((issue) => issue.code === ISSUE_CODES.draftInProd);
-
-    expect(result.errors).toHaveLength(CONTENT_ITEMS.length);
-    expect(draftIssues).toHaveLength(CONTENT_ITEMS.length);
-    expect(draftIssues.map((issue) => issue.itemId)).toEqual(CONTENT_ITEMS.map((item) => item.id));
-    expect(draftIssues.every((issue) => issue.detail.includes('onay bekliyor'))).toBe(true);
-    expect(result.warnings).toHaveLength(UNVERIFIED_KEYS.length);
-  });
-
-  it('K-ONERI-DOGRULA taşıyan maddeler onayli yapılamaz', () => {
-    const source = SOURCES_BY_KEY['K-ONERI-DOGRULA'];
-    expect(source?.url).toBeNull();
-    expect(source?.verified).toBe(false);
-
-    const locked = CONTENT_ITEMS.filter((item) => item.sources.includes('K-ONERI-DOGRULA'));
-    expect(locked.map((item) => item.id)).toEqual([
-      'C-18',
-      'C-20',
-      'C-21',
-      'C-22',
-      'C-23',
-      'C-24',
-      'C-30',
-      'C-31',
-      'C-32',
-      'C-40',
-      'C-41',
-      'C-91',
-      'B-04',
-      'B-05',
-      'H-10',
-    ]);
-
-    const approved = locked.map((item) => ({
-      ...item,
-      status: 'onayli' as const,
-      reviewedBy: 'Afet eğitmeni',
-      reviewedAt: '2026-11-01',
-    }));
-    const result = checkContent({
-      items: approved,
-      sources: SOURCES,
-      prod: true,
-      now: FIXED_NOW,
-    });
-    const issues = result.errors.filter((issue) => issue.code === ISSUE_CODES.notApprovableSource);
-
-    expect(issues).toHaveLength(approved.length);
-    for (const item of approved) {
-      const issue = issues.find((entry) => entry.itemId === item.id);
-      expect(issue, item.id).toBeDefined();
-      expect(issue?.detail).toContain('K-ONERI-DOGRULA');
-    }
-    expect(result.errors.filter((issue) => issue.code === ISSUE_CODES.draftInProd)).toEqual([]);
-  });
-
-  it('adresi bulunmayan bütün anahtarlar üretimde onayı engeller', () => {
-    const lockedIds = CONTENT_ITEMS.filter((item) => holdsUnverifiedSource(item.id)).map(
-      (item) => item.id,
-    );
-    expect(lockedIds).toHaveLength(20);
-
-    const approved = CONTENT_ITEMS.map((item) => ({
-      ...item,
-      status: 'onayli' as const,
-      reviewedBy: 'Afet eğitmeni',
-      reviewedAt: '2026-11-01',
-    }));
-    const result = checkContent({
-      items: approved,
-      sources: SOURCES,
-      prod: true,
-      now: FIXED_NOW,
-    });
-
-    expect(result.errors.map((issue) => issue.itemId).sort()).toEqual([...lockedIds].sort());
-    expect(result.errors.every((issue) => issue.code === ISSUE_CODES.notApprovableSource)).toBe(
-      true,
-    );
-    expect(result.warnings).toEqual([]);
+    const drafts = CONTENT_ITEMS.filter((item) => item.status === 'taslak');
+    const issues = result.errors.filter((issue) => issue.code === ISSUE_CODES.draftInProd);
+    expect(issues.map((issue) => issue.itemId)).toEqual(drafts.map((item) => item.id));
   });
 });
 

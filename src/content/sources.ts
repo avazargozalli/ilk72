@@ -1,22 +1,4 @@
-/**
- * İlk 72 — kaynak kaydı (Şartname §13.1, §13.3 kaynak anahtarları tablosu).
- *
- * Tablodaki **bütün** anahtarlar burada durur. `url` alanı `string | null`:
- * adresi henüz bulunmamış anahtarlar `null` taşır ve `verified: false` olur.
- * `check.ts` bu anahtarları "onaylanamaz" sayar (§13.3 son paragraf, §18.6).
- *
- * - `K-ONERI-DOGRULA` gerçek bir kaynak **değildir**; resmî kaynak
- *   doğrulanamamıştır. Sahibi kaynak bulursa anahtarı değiştirir, bulamazsa
- *   maddeyi siler (Şartname §13.3).
- * - `K-KARAR` ve `K-ENGELLI` "doğrulanacak" anahtarlardır; resmî adresleri
- *   yoktur. Adres bağlanana kadar `verified: false` kalırlar.
- *
- * `accessed`, metnin kaynakla karşılaştırıldığı tarihtir. Doğrulanmamış üç
- * anahtarda karşılaştırma yapılmadığı için bu alan yalnızca şartnamenin
- * hazırlık tarihini taşır; arayüz kaynağı `verified` alanıyla birlikte
- * değerlendirmelidir.
- */
-
+/** Rehber ve kontrol listeleri için resmî kaynaklar. */
 export interface Source {
   key: string; // "K-ANINDA"
   org: string; // "AFAD"
@@ -45,6 +27,7 @@ export const ALLOWED_SOURCE_DOMAINS = [
   'mevzuat.gov.tr',
   'resmigazete.gov.tr',
   'kvkk.gov.tr',
+  'mebakub.meb.gov.tr',
 ] as const;
 
 /**
@@ -57,13 +40,6 @@ export const REPO_AND_LICENSE_DOMAINS = [
   'opensource.org',
 ] as const;
 
-/**
- * Şartname §13.3 — kaynak anahtarları tablosunun tamamı.
- *
- * Sıra tablodaki sıradır. `K-ONERI-DOGRULA` tabloda yer almaz; §13.3'teki
- * "gerçek kaynak değildir" notu gereği kayıtlı bir yer tutucu olarak sonda
- * durur.
- */
 export const SOURCES: readonly Source[] = [
   {
     key: 'K-PLAN72',
@@ -257,33 +233,29 @@ export const SOURCES: readonly Source[] = [
     accessed: SOURCE_ACCESSED,
     verified: true,
   },
-  // --- "Doğrulanacak" anahtarlar: resmî adres bulunana kadar onaylanamaz. ---
   {
-    key: 'K-KARAR',
-    org: 'AFAD (doğrulanacak)',
-    title:
-      'Altı ayda bir tatbikat, görev dağılımı, destek noktaları ve alternatif kaçış yolları için resmî sayfa bulunacak',
-    url: null,
+    key: 'K-MUGLA-CANTA',
+    org: 'Muğla İl AFAD',
+    title: 'Afet ve Acil Durum Çantası',
+    url: 'https://mugla.afad.gov.tr/afet-ve-acil-durum-cantasi',
     accessed: SOURCE_ACCESSED,
-    verified: false,
+    verified: true,
   },
   {
-    key: 'K-ENGELLI',
-    org: 'İstanbul Valiliği İPKB / İSMEP (doğrulanacak)',
-    title: 'Engelli Bireyler İçin Afet ve Acil Durum rehberi — resmî yayın sayfası bulunacak',
-    url: null,
+    key: 'K-GUVENLI-YASAM',
+    org: 'Çankırı İl AFAD',
+    title: 'Güvenli Yaşam 1 Eğitimi — Aile Afet Planı ve Afet ve Acil Durum Çantası',
+    url: 'https://cankiri.afad.gov.tr/kurumlar/cankiri.afad/dOKUMANLAR/Guvenli_Yasam_Klavuzu/gy_1_egitim_kitapcigi.pdf',
     accessed: SOURCE_ACCESSED,
-    verified: false,
+    verified: true,
   },
-  // --- Gerçek kaynak değildir: resmî kaynak bulunamayan maddelerin yer tutucusu. ---
   {
-    key: 'K-ONERI-DOGRULA',
-    org: 'Doğrulanacak',
-    title:
-      'Resmî kaynak bulunacak (ilk bakılacak yer: AFAD — Afet ve Acil Durum Çantası Hazırlayın)',
-    url: null,
+    key: 'K-OKUL-TABANLI',
+    org: 'Millî Eğitim Bakanlığı',
+    title: 'Okul Tabanlı Afet Eğitimi, Kitap 1 — Afet Öncesi Yapılacaklar',
+    url: 'https://mebakub.meb.gov.tr/eskisite/wp-content/uploads/2024/03/okul-tabanli-afet-egitimi_kitap_1.pdf',
     accessed: SOURCE_ACCESSED,
-    verified: false,
+    verified: true,
   },
 ];
 

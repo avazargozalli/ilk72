@@ -31,7 +31,7 @@ Avukatın en azından aşağıdaki belgeleri ve mevcut sürümü incelemesi bekl
 - `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `LICENSE`, `LICENSE-CONTENT`,
   `THIRD_PARTY_LICENSES.md`.
 - Barındırma seçenekleri (`docs/sartname.md` §4.3) ve seçilen sağlayıcı
-  (`{BARINDIRMA_SAGLAYICISI}`, yayın öncesi doldurulacak).
+  (GitHub Pages). [GitHub Pages veri toplama bilgileri](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection).
 
 İncelemenin sınırı: bu dosya, afet/rehber içeriğinin doğruluğunun tıbbi veya teknik incelemesini
 kapsamaz; o inceleme `docs/icerik-onay.md` sürecine aittir.
