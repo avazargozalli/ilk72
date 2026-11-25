@@ -191,6 +191,13 @@
   font-size: 6pt;
 }
 
+.wallet-card__qr {
+  float: inline-end;
+  inline-size: 30mm;
+  block-size: 30mm;
+  margin-inline-start: 2mm;
+}
+
 .print-blank__line {
   flex: 1;
   min-inline-size: 40mm;
@@ -228,8 +235,14 @@
   .main-nav,
   footer,
   .skip-link,
+  .shell-banner,
+  .shell-notice,
+  .first-run,
   .button,
   button,
+  .import__intro,
+  .import__controls,
+  .print > h1,
   .print__controls,
   .print__intro,
   .print__hint,
@@ -438,10 +451,12 @@
     flex-wrap: nowrap;
     align-items: stretch;
     inline-size: 175.2mm;
+    gap: 0;
     margin: 0;
   }
 
   .wallet-card {
+    flex: none;
     inline-size: 85.6mm;
     block-size: 54mm;
     padding: 2mm;

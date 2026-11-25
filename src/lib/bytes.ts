@@ -85,7 +85,10 @@ async function pipe(
     const { done, value } = await reader.read();
     if (done) break;
     total += value.length;
-    if (total > limit) throw new Error('cok-buyuk');
+    if (total > limit) {
+      await reader.cancel().catch(() => undefined);
+      throw new Error('cok-buyuk');
+    }
     chunks.push(value);
   }
   await wrote;

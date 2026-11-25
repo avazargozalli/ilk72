@@ -5,6 +5,7 @@
  * yalnızca tam plan çıktısında yer aldığı alan ipucunda belirtilir; ev adresi
  * paylaşılan özet karta girmez (§10.1). Doğrulama sınırları §8.2'dedir.
  */
+import { useRef } from 'preact/hooks';
 import { tr } from '../../../i18n/tr.ts';
 import type { Plan } from '../../../model/types.ts';
 import { PLAN_LIMITS } from '../../../model/validate.ts';
@@ -14,8 +15,12 @@ import type { WizardStepProps } from './stepProps.ts';
 
 export function StepHousehold({ plan, onPatch, errorOf, onFieldBlur }: WizardStepProps) {
   const household = plan.household;
+  const latest = useRef(household);
+  latest.current = household;
   const patch = (changes: Partial<Plan['household']>): void => {
-    onPatch({ household: { ...household, ...changes } });
+    const next = { ...latest.current, ...changes };
+    latest.current = next;
+    onPatch({ household: next });
   };
 
   return (

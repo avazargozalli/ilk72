@@ -26,14 +26,25 @@ export const shell = {
     forgot: 'Parolamı unuttum',
     forgotTitle: 'Parola kurtarılamaz',
     forgotBody:
-      'Parola yalnızca bu cihazda, bellekte tutulur ve hiçbir yere kaydedilmez. Parolayı hatırlamıyorsanız plan açılamaz. Tek yol, planı silip sıfırdan başlamaktır.',
+      'Parolayı hatırlamıyorsanız kayıtlı planı açamazsınız. Sıfırlama planı ve ayarları siler. İndirdiğiniz dosyalar, basılı kopyalar ve paylaştığınız bağlantılar korunur. Eski plan görünüyorsa diğer İlk 72 sekmelerini kapatın veya yenileyin.',
     forgotCancel: 'Vazgeç',
     forgotConfirm: 'Planı sil ve sıfırdan başla',
     emergencyHint: 'Acil durumda 112’yi parola olmadan arayabilirsiniz:',
+    storageErrorTitle: 'Kayıtlı plan okunamadı',
+    storageErrorIntro:
+      'Tarayıcı depoya erişemedi veya uygulama bu kaydı okuyamadı. Sayfayı yeniden açarak tekrar deneyebilir ya da aşağıdaki seçenekle cihazdaki kaydı silebilirsiniz.',
+    resetBody:
+      'Bu işlem bu tarayıcıdaki İlk 72 planını ve ayarlarını siler. İndirdiğiniz dosyalar, basılı kopyalar ve paylaştığınız bağlantılar korunur. Eski plan görünüyorsa diğer İlk 72 sekmelerini kapatın veya yenileyin.',
+    resetError: 'Plan silinemedi. Sayfayı yeniden açıp tekrar deneyin.',
   },
 
   /** Otomatik kayıt hatası (§11.4). */
   saveError: 'Plan kaydedilemedi. Yazdırmayı ya da yedek dosyası indirmeyi deneyin.',
+  concurrentEdit:
+    'Plan başka bir sekmede değiştiği için buradaki değişiklikler kaydedilemedi. Bu sekmeyi yenilemeden önce değişikliklerinizi yazdırın veya bir yedek indirin.',
+  settingsError:
+    'Ayarlar kaydedilemedi. Tarayıcıyı yeniden açtığınızda önceki ayarlar görünebilir.',
+  planReplacing: 'Plan güncelleniyor…',
 
   /** Plan yokken plan gerektiren sayfaların gösterdiği yönlendirme (§11.3). */
   noPlan: {
@@ -49,6 +60,10 @@ export const shell = {
     offline: 'Çevrimdışı — planınız kullanılabilir',
     updateReady: 'Yeni sürüm hazır.',
     updateAction: 'Yenile',
+    updateError: 'Yeni sürüm uygulanamadı. Tekrar deneyin.',
+    updateMemoryTitle: 'Planı yedeklemeden sürüm yenilensin mi?',
+    updateMemoryBody:
+      'Plan bu oturumda tarayıcıya kaydedilemiyor. Yenilemeden önce planı yazdırabilir veya bir yedek dosyası indirebilirsiniz.',
   },
 
   /** §16 — "Ana ekrana nasıl eklenir?" kısa açıklaması (ayarlar sayfasında). */
@@ -62,6 +77,7 @@ export const shell = {
     granted: 'Tarayıcı, planınızı kalıcı olarak saklamayı kabul etti.',
     denied:
       'Tarayıcı kalıcı saklama izni vermedi. Yedek dosyası ve basılı kopya bu yüzden önemlidir.',
+    pending: 'Kalıcı saklama izni henüz doğrulanmadı.',
     unavailable: 'Bu tarayıcı kalıcı saklama iznini desteklemiyor.',
   },
 } as const;

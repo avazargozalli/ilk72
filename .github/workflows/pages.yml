@@ -50,7 +50,8 @@ jobs:
         run: |
           dosya="docs/hukuki-inceleme.md"
           deger="$(sed -nE 's/^- \*\*Onay tarihi:\*\*[[:blank:]]*([0-9]{4}-[0-9]{2}-[0-9]{2})[[:blank:]]*$/\1/p' "$dosya")"
-          if [[ -z "$deger" || "$(date -u -d "$deger" +%F 2>/dev/null)" != "$deger" || "$deger" > "$(date -u +%F)" ]]; then
+          bugun="$(TZ=Europe/Istanbul date +%F)"
+          if [[ -z "$deger" || "$(date -u -d "$deger" +%F 2>/dev/null)" != "$deger" || "$deger" > "$bugun" ]]; then
             echo "::error file=$dosya::Geçerli bir avukat onay tarihi gerekiyor (YYYY-AA-GG)."
             exit 1
           fi

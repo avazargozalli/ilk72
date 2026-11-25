@@ -12,6 +12,7 @@
  * - Belgeler (`B-*`) ve evcil hayvanlar (en çok `PLAN_LIMITS.pets`) aynı
  *   desende toplanır; sigorta sorusu yalnızca denetim maddesidir (§4.1 satır 17).
  */
+import { getSource } from '../../../content/sources.ts';
 import { formatText, tr } from '../../../i18n/tr.ts';
 import {
   buildBagItemIds,
@@ -30,7 +31,7 @@ import {
   SourceLink,
 } from '../../components/index.ts';
 import { appendItem, removeAt, replaceAt } from './collections.ts';
-import { bagItemText, DOCUMENT_IDS, daskSource, documentItemText } from './contentLists.ts';
+import { bagItemText, DOCUMENT_IDS, documentItemText } from './contentLists.ts';
 import { FIELD_IDS } from './fieldIds.ts';
 import { CompactNoteField, TextField } from './fields.tsx';
 import { INSURANCE_OPTIONS, isYesNoUnknown } from './options.ts';
@@ -119,7 +120,7 @@ export function StepBag({ plan, onPatch, errorOf, onFieldBlur, onDownloadIcs }: 
     };
   });
 
-  const dask = daskSource();
+  const dask = getSource('K-DASK');
 
   return (
     <>
@@ -246,13 +247,15 @@ export function StepBag({ plan, onPatch, errorOf, onFieldBlur, onDownloadIcs }: 
           if (isYesNoUnknown(value)) onPatch({ insurance: { dask: value } });
         }}
       />
-      <p>
-        <SourceLink
-          url={dask.url}
-          label={formatText(tr.wizard.sources.label, { org: dask.org, title: dask.title })}
-          accessed={dask.accessed}
-        />
-      </p>
+      {dask ? (
+        <p>
+          <SourceLink
+            url={dask.url}
+            label={formatText(tr.wizard.sources.label, { org: dask.org, title: dask.title })}
+            accessed={dask.accessed}
+          />
+        </p>
+      ) : null}
 
       {onDownloadIcs ? (
         <p>

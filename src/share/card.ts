@@ -13,8 +13,8 @@
  * - **Ev adresi ve sağlık alanı şemada yoktur.** `household.address`,
  *   `household.buildingNote` ve `member.health` hiçbir koşulda karta girmez
  *   (§10.1, §4.2, İ8). `ShareCardOptions.includeHealth` çağrı yerinde yazdırma
- *   seçenekleriyle simetriyi korumak için alınır ve **bilerek okunmaz**; karta
- *   sağlık bilgisi ekleyen bir yol yoktur.
+ *   seçenekleriyle simetriyi korumak için alınır ve **bilerek okunmaz**. Serbest
+ *   metin alanları kullanıcının yazdığı sağlık veya adres bilgilerini içerebilir.
  * - `k[].o` yalnızca `includeNeedsNotes` true **ve** kişinin özel ihtiyaç notu
  *   boş değilse eklenir; 120 karaktere indirilir (§10.1).
  * - Üretilen kart her zaman `validateCard` süzgecinden **değişmeden** geçer
@@ -144,7 +144,7 @@ function placeLine(place: Place): string {
   const detail = cleanText(place.detail, SHARE_CARD_LIMITS.placeLength);
   if (label === '') return detail;
   if (detail === '') return label;
-  return clampText(`${label}, ${detail}`, SHARE_CARD_LIMITS.placeLength);
+  return clampText(`${label}, ${detail}`, SHARE_CARD_LIMITS.placeLength).trimEnd();
 }
 
 function sharePerson(
@@ -179,7 +179,7 @@ function shareContact(contact: Plan['contacts'][number]): ShareContact | null {
 }
 
 /**
- * §10.1 — plandan özet kart üretir. Ev adresi ve sağlık bilgisi karta girmez.
+ * §10.1 — plandan özet kart üretir. Yapılandırılmış ev adresi ve sağlık alanları çıkarılır.
  * `options.includeHealth` bilerek okunmaz (bkz. dosya başlığı).
  */
 export function buildShareCard(plan: Plan, options: ShareCardOptions): ShareCard {

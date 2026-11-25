@@ -4,6 +4,18 @@ Bu dosya proje sürümlerindeki kullanıcıya görünen değişiklikleri listele
 [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) yaklaşımını izler; sürüm numarası
 `package.json` içindeki `version` alanıyla aynıdır. Geliştirme sürümleri GitHub Releases üzerinde ön sürüm olarak işaretlenir.
 
+## [Yayımlanmamış]
+
+- Gizlilik Bildirimi, Kullanım Koşulları, Künye ve Erişilebilirlik Beyanı güncellendi.
+  Türk mevzuatına ve sağlayıcı açıklamalarına dayalı yayın incelemesi kayda alındı.
+- Plan, kilit ve yedekten geri yükleme işlemlerinde yerel kayıt tutarlılığı güçlendirildi.
+  Bir sürüm güncellemesi, açık sekmedeki plan değişiklikleri kaydedilene kadar bekler.
+- Cüzdan kartına isteğe bağlı kare kod eklendi. Paylaşım ve içe alma özetinde, sınırı aşan ve
+  çakışan kayıtlar için kullanıcıya bilgi veriliyor.
+- İçerik sürümü 3. Resmî kaynak kaydı güncellendi. 83 madde afet uzmanı incelemesini bekliyor.
+- Lisans bildirimleri derleme paketine eklendi. CI, Chromium, Firefox, WebKit ve mobil profili
+  çalıştırıyor.
+
 ## [0.1.0] — 2026-11-19
 
 İlk geliştirme sürümü; içerik taslak.

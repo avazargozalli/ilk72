@@ -13,6 +13,7 @@
 import { useEffect } from 'preact/hooks';
 import { tr } from '../../../i18n/tr.ts';
 import { PLAN_LIMITS } from '../../../model/validate.ts';
+import { dateOnly } from '../pages/shared.ts';
 import { contentItemText } from './contentLists.ts';
 import { defaultReviewDate } from './dates.ts';
 import { FIELD_IDS } from './fieldIds.ts';
@@ -45,7 +46,7 @@ export function StepReview({
         id={FIELD_IDS.lastDrillAt}
         label={tr.wizard.fields.lastDrillAt}
         hint={tr.wizard.hints.lastDrillAt}
-        value={review.lastDrillAt ?? ''}
+        value={dateOnly(review.lastDrillAt ?? '')}
         error={errorOf(FIELD_IDS.lastDrillAt)}
         onInput={(value) =>
           onPatch({ review: { ...review, lastDrillAt: value === '' ? null : value } })
@@ -57,7 +58,7 @@ export function StepReview({
         id={FIELD_IDS.nextReviewAt}
         label={tr.wizard.fields.nextReviewAt}
         hint={tr.wizard.hints.nextReviewAt}
-        value={review.nextReviewAt ?? ''}
+        value={dateOnly(review.nextReviewAt ?? '')}
         error={errorOf(FIELD_IDS.nextReviewAt)}
         onInput={(value) =>
           onPatch({ review: { ...review, nextReviewAt: value === '' ? null : value } })

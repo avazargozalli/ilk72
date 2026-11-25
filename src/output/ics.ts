@@ -55,7 +55,7 @@ export function icsEscape(value: string): string {
     .replace(/\\/g, '\\\\')
     .replace(/;/g, '\\;')
     .replace(/,/g, '\\,')
-    .replace(/\r?\n/g, '\\n');
+    .replace(/\r\n?|\n/g, '\\n');
 }
 
 /**
@@ -100,10 +100,11 @@ export function buildIcs(event: IcsEvent): string {
   if (!isCalendarDate(date)) throw new Error('gecersiz-tarih');
 
   const start = date.replace(/-/g, '');
-  const next = new Date(
-    Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)) - 1, Number(date.slice(8, 10)) + 1),
-  );
-  const end = next.toISOString().slice(0, 10).replace(/-/g, '');
+  const next = new Date(`${date}T00:00:00.000Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  const endDate = next.toISOString().split('T')[0] ?? '';
+  if (!DATE_PATTERN.test(endDate)) throw new Error('gecersiz-tarih');
+  const end = endDate.replace(/-/g, '');
 
   return [
     'BEGIN:VCALENDAR',
@@ -112,7 +113,7 @@ export function buildIcs(event: IcsEvent): string {
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${uid}`,
+    `UID:${icsEscape(uid)}`,
     `DTSTAMP:${stamp}`,
     `DTSTART;VALUE=DATE:${start}`,
     `DTEND;VALUE=DATE:${end}`,

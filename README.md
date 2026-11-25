@@ -1,7 +1,7 @@
 # İlk 72 — Aile Afet Planı
 
-Ailelerin afet ve acil durum planını on dakikada hazırlayıp yazdırabildiği, çevrimdışı çalışan,
-hesap gerektirmeyen ve hiçbir veriyi cihaz dışına göndermeyen açık kaynak bir web uygulaması.
+Ailelerin afet ve acil durum planını hazırlayıp yazdırabildiği, çevrimdışı çalışan açık kaynak
+bir web uygulaması. Hesap gerektirmez ve planı kendiliğinden başka bir yere göndermez.
 
 **0.1.0 geliştirme sürümü.** [Geliştirme sürümünün kaynak kodu](https://github.com/avazargozalli/ilk72/releases/tag/gelistirme-0.1.0) katkıya açıktır. Aile planlayıcısını yerelde deneyebilir,
 boş formu yazdırabilir ve içerik düzeltmesi önerebilirsiniz. Rehberdeki 83 madde afet uzmanının
@@ -41,7 +41,7 @@ bağımsız bir araçtır.
 
 | # | İlke |
 |---|---|
-| İ1 | **Veri cihazda kalır.** Sunucu, hesap, senkronizasyon, analitik, hata raporlama servisi, çerez yok. Proje sahibi hiçbir kullanıcı verisini göremez. |
+| İ1 | **Veri cihazda kalır.** Sunucu, hesap, senkronizasyon, analitik, hata raporlama servisi, çerez yok. Proje sahibi uygulamaya yazılan plan verisini görmez. |
 | İ2 | **Sıfır dış istek.** Uygulama kendi kökeni dışına ağ isteği yapmaz; dış siteler yalnızca tıklanan bağlantıyla yeni sekmede açılır. |
 | İ3 | **Kâğıt önceliklidir.** Afet anında telefon ve şebeke çalışmayabilir; her akış yazdırmaya ya da PDF kaydetmeye götürür. |
 | İ4 | **Kaynaksız tavsiye yok.** Her afet tavsiyesi resmî bir kaynağa bağlıdır, kendi cümlelerimizle yazılır, kaynağı ve erişim tarihi gösterilir. |
@@ -86,18 +86,29 @@ bağımsız bir araçtır.
 6. Planı aile üyeleriyle paylaşmak için özet kartı bağlantı ya da kare kod olarak gönderin. Özet,
    paylaşıldığı andaki hâlin kopyasıdır. Tam plan için yedek dosyasını indirin.
 7. Planı altı ayda bir gözden geçirin; takvim dosyasını indirerek hatırlatma ekleyin.
-8. Ayarlar sayfasındaki "Bütün verilerimi sil" düğmesi bu cihazdaki her şeyi kalıcı olarak siler.
+8. Ayarlar’daki “Bütün verilerimi sil” düğmesi bu tarayıcı profilindeki planı ve ayarları temizler.
 
 ## Gizlilik özeti
 
-- Planınıza yazdığınız her şey (adlar, telefonlar, adres, isterseniz sağlık bilgileri) **yalnızca bu
-  cihazdaki tarayıcı deposunda** saklanır. Bize ya da başka birine gönderilmez.
-- Sunucumuz, üyelik sistemimiz, veritabanımız, çerezimiz, analitiğimiz ya da izleme aracımız yoktur.
-- GitHub Pages, ziyaretçilerin IP adresini güvenlik amacıyla kaydeder. Proje sahibi bu kayıtlara erişemez. [GitHub Pages veri toplama bilgileri](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
-- Paylaşım bağlantısındaki bilgiler bağlantının `#` sonrasındaki parçasında taşınır; bu parça
-  sunucuya gönderilmez. Bağlantıyı gören herkes içeriğini okuyabilir; parola koyabilirsiniz.
-- Ayrıntılı metin: uygulama içindeki **Gizlilik Bildirimi** (`#/gizlilik`) ve
-  `LICENSE`/`LICENSE-CONTENT` dosyaları.
+- Plan ve ayarlar tarayıcının yerel deposunda saklanır. Uygulama kilidini etkinleştirirseniz
+  kayıtlı plan şifrelenir. Uygulama çerez veya analitik kullanmaz.
+- GitHub Pages, çevrimiçi ziyaretçilerin IP adresini güvenlik amacıyla kaydettiğini bildirir.
+  [GitHub Pages veri toplama bilgileri](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)
+- Özet bağlantısındaki plan parçası normal sayfa isteğinde sunucuya iletilmez. Parolasız
+  bağlantı ile kare kodu alan herkes özeti açabilir. Yedek, baskı, PDF ve takvim kopyaları
+  kullandığınız cihazlarda ve seçtiğiniz hizmetlerde kalabilir.
+- Proje e-postasına veya GitHub bildirimlerine kendiniz gönderdiğiniz bilgiler proje
+  sorumlusu Azar Gozalli tarafından sorun inceleme, yanıt ve proje güvenliği için işlenir.
+  Gerekli ve ölçülü işlemler KVKK m.5/2-f kapsamındaki meşru menfaate dayanır. E-posta Gmail
+  üzerinden, depo bildirimleri GitHub üzerinden alınır. Sağlayıcılar verileri yurt dışında
+  işleyebilir. Herkese açık bildirim, PR ve eklerde örnek veriler kullanın.
+  [Google gizlilik politikası](https://policies.google.com/privacy?hl=tr) ·
+  [GitHub gizlilik bildirimi](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+- KVKK haklarınızı kullanmak için usule uygun başvuru kanalını proje e-postasından öğrenebilirsiniz.
+  Kişisel başvurunuzu açık depoda yayımlamayın.
+  [Proje e-postası](mailto:gozelliazer@gmail.com) ·
+  [KVKK başvuru rehberi](https://www.kvkk.gov.tr/Icerik/2062/Basvuru-Hakki)
+- Ayrıntılar [Gizlilik Bildirimi metninde](src/i18n/legal.ts) ve [hukuki inceleme kaydında](docs/hukuki-inceleme.md) yer alır.
 
 ## İçerik ve kaynak politikası
 
@@ -105,10 +116,10 @@ bağımsız bir araçtır.
   bir içerik maddesidir; her maddede kaynağın adı, adresi ve erişim tarihi gösterilir.
 - **Kendi cümlelerimizle.** Kurum metinleri, görselleri, afişleri ve amblemleri kopyalanmaz;
   metinler kendi cümlelerimizle özetlenir. Kaynak yalnızca düz metin olarak anılır.
-- **İzinli alan adları.** Dış bağlantılar yalnızca şu resmî alan adlarına ve alt alan adlarına
+- **İzinli alan adları.** İçerik kaydındaki kaynak bağlantıları şu resmî alan adlarına ve alt alan adlarına
   verilir: `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`,
   `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`,
-  `kvkk.gov.tr`, `mebakub.meb.gov.tr`.
+  `kvkk.gov.tr`, `mebakub.meb.gov.tr`, `hazirim.gov.tr`.
 - **Onay kapısı.** Her madde, kaynağıyla karşılaştırılıp `onayli` yapılana kadar `taslak` dur.
   `content:check` kaynak zorunluluğunu, adres kurallarını, metin uzunluğunu ve inceleme
   alanlarını denetler; `build:prod` taslak madde kaldıysa başarısız olur.
@@ -133,6 +144,7 @@ Yerel geliştirme kısa yolu:
 
 ```powershell
 pnpm install --frozen-lockfile
+pnpm exec playwright install chromium firefox webkit
 pnpm run dev
 pnpm run check
 ```

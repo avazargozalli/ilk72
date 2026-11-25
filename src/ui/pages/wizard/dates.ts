@@ -6,8 +6,6 @@
  *   (31 Ağustos + 6 ay = 28/29 Şubat). Saat dilimi kaydırması olmaması için
  *   hesaplama UTC üzerinden yapılır ve `Date` yalnızca takvim aritmetiğinde
  *   kullanılır.
- * - `isIsoDateString`: §8.2'deki ISO tarih denetimi; `sanitizePlan` ile aynı
- *   kuralları (takvimsel geçerlilik) uygular.
  * - `defaultReviewDate`: §11.5/9'daki varsayılan — bugünden altı ay sonrası.
  */
 /** §11.5/9 — bir sonraki gözden geçirme aralığı (ay). */
@@ -32,18 +30,6 @@ function parseIsoDate(value: string): { year: number; month: number; day: number
   if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return null;
   if (month < 1 || month > 12 || day < 1 || day > 31) return null;
   return { year, month, day };
-}
-
-/** §8.2 — ISO tarih (takvimsel olarak da geçerli) mi? */
-export function isIsoDateString(value: string): boolean {
-  const parts = parseIsoDate(value);
-  if (parts === null) return false;
-  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
-  return (
-    date.getUTCFullYear() === parts.year &&
-    date.getUTCMonth() === parts.month - 1 &&
-    date.getUTCDate() === parts.day
-  );
 }
 
 /** `YYYY-AA-GG` tarihine ay ekler; ay sonu taşmasını hedef ayın sonuna indirger. */

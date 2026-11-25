@@ -102,6 +102,7 @@ describe('buildIcs — alanlar ve kaçışlar', () => {
     expect(icsEscape('a\\b;c,d')).toBe('a\\\\b\\;c\\,d');
     expect(icsEscape('birinci\nikinci')).toBe('birinci\\nikinci');
     expect(icsEscape('birinci\r\nikinci')).toBe('birinci\\nikinci');
+    expect(icsEscape('birinci\rikinci')).toBe('birinci\\nikinci');
     expect(icsEscape('düz metin')).toBe('düz metin');
     const content = buildIcs({ ...B2_EVENT, summary: 'a;b,c\\d', description: 'x\ny' });
     expect(content).toContain('SUMMARY:a\\;b\\,c\\\\d');
@@ -120,6 +121,7 @@ describe('buildIcs — alanlar ve kaçışlar', () => {
     expect(buildIcs({ ...B2_EVENT, date: '2027-12-31' })).toContain('DTEND;VALUE=DATE:20280101');
     expect(buildIcs({ ...B2_EVENT, date: '2028-02-28' })).toContain('DTEND;VALUE=DATE:20280229');
     expect(buildIcs({ ...B2_EVENT, date: '2027-02-28' })).toContain('DTEND;VALUE=DATE:20270301');
+    expect(buildIcs({ ...B2_EVENT, date: '0099-12-31' })).toContain('DTEND;VALUE=DATE:01000101');
   });
 
   it('olay gövdesi sabittir: UID, DTSTAMP, altı aylık yineleme, anımsatıcı', () => {
@@ -137,7 +139,7 @@ describe('buildIcs — alanlar ve kaçışlar', () => {
   });
 
   it('geçersiz tarihte gecersiz-tarih fırlatır', () => {
-    for (const date of ['', '2027-13-01', '2027-02-30', '19.05.2027', '2027-5-9']) {
+    for (const date of ['', '2027-13-01', '2027-02-30', '19.05.2027', '2027-5-9', '9999-12-31']) {
       expect(() => buildIcs({ ...B2_EVENT, date }), date).toThrow('gecersiz-tarih');
     }
   });

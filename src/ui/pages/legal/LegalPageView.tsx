@@ -1,15 +1,4 @@
-/**
- * Şartname §14 — yasal ve bilgi sayfalarının ortak gövdesi.
- *
- * Metinler `src/i18n/legal.ts` içinde §14'e birebir uygun biçimde durur;
- * bu bileşen yalnızca çizer: sayfa başlığı (`h1`), bölüm başlıkları (`h2`) ve
- * paragraflar. Metni kısaltmaz, yeniden yazmaz, sırasını değiştirmez
- * (§0 kural 5, §14).
- *
- * Sayfalar arası bağlantılar `tr.legal.footer.links` üzerinden kurulur; §14.5'te
- * zorunlu kılınan alt bilgi cümlesi ise `Footer` bileşeninde tek yerde durur ve
- * uygulama kabuğunda her sayfada çizilir (İ5).
- */
+/** Hukuki ve bilgi sayfalarının başlık, paragraf ve bağlantı düzeni. */
 import { ROUTES } from '../../../config.ts';
 import type { LegalPage } from '../../../i18n/legal.ts';
 import { tr } from '../../../i18n/tr.ts';
@@ -24,12 +13,26 @@ export function LegalPageView({ page }: LegalPageViewProps) {
       <h1 tabIndex={-1}>{page.title}</h1>
 
       {page.sections.map((section, index) => (
-        // Metin sırası normatiftir; anahtar olarak sıra kullanılır (§14).
         <section class="legal__section" key={`section-${index}`}>
           {section.heading ? <h2>{section.heading}</h2> : null}
           {section.paragraphs.map((paragraph, paragraphIndex) => (
             <p key={`paragraph-${paragraphIndex}`}>{paragraph}</p>
           ))}
+          {section.links?.length ? (
+            <ul>
+              {section.links.map((link) => (
+                <li key={link.href}>
+                  {link.href.startsWith('https://') ? (
+                    <a href={link.href} target="_blank" rel="noopener noreferrer">
+                      {link.label}
+                    </a>
+                  ) : (
+                    <a href={link.href}>{link.label}</a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </section>
       ))}
 

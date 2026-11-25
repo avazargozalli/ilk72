@@ -5,6 +5,7 @@
  * değişmediğini kilitler. Ayrıca §18.6'daki yasaklı ifadeler taranır.
  */
 import { describe, expect, it } from 'vitest';
+import { formatText } from '../../src/i18n/format.ts';
 import { share } from '../../src/i18n/share.ts';
 
 /** `tr.share` altındaki bütün metin yaprakları. */
@@ -75,7 +76,9 @@ describe('takvim metinleri (§12, Ek B.2)', () => {
     expect(share.calendar.summary).toBe('Aile afet planını gözden geçir');
     expect(share.calendar.description).toContain('Çantadaki su, gıda ve ilaçların');
     expect(share.calendar.description).toContain('\n');
-    expect(share.calendar.note).toBe('Takvim dosyasında kişisel bilginiz yer almaz.');
+    expect(share.calendar.note).toBe(
+      'Takvim dosyasında ad, telefon, adres veya sağlık bilgisi yer almaz.',
+    );
   });
 });
 
@@ -85,7 +88,8 @@ describe('metin kalitesi', () => {
     for (const { path, text } of all) {
       expect(text.trim(), path).toBe(text);
       expect(text.length, path).toBeGreaterThan(0);
-      expect(text, path).not.toContain('{');
+      const message = path === 'share.receive.mergeLimit' ? formatText(text, { count: 2 }) : text;
+      expect(message, path).not.toContain('{');
       expect(text, path).not.toContain('  ');
     }
   });

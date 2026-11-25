@@ -38,7 +38,7 @@ export const tr = {
     name: APP_NAME,
     description: 'Aile afet ve acil durum planı; çevrimdışı çalışır, hesap gerektirmez.',
     tagline: 'Aile afet ve acil durum planı',
-    privacyNote: 'Yazdıklarınız yalnızca bu cihazda saklanır; bize ya da başkasına gönderilmez.',
+    privacyNote: 'Planınız bu tarayıcıda saklanır. Uygulama planınızı kendiliğinden göndermez.',
   },
   ...common,
   ...components,

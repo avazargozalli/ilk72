@@ -1,31 +1,31 @@
 # Üçüncü Taraf Lisansları — İlk 72
 
-Bu dosya, İlk 72'nin doğrudan bağımlılıklarının lisanslarını ve lisans uyarılarını listeler.
-Lisans bilgileri **2026-11-19** tarihinde her paketin `node_modules/<paket>/package.json`
-dosyasındaki `license` alanından okunmuştur; sürümler `package.json` / `pnpm-lock.yaml` ile
-uyumludur.
+Bu dosya, İlk 72'nin tarayıcıya dağıttığı üçüncü taraf kodunun lisans bildirimlerini ve doğrudan
+geliştirme bağımlılıklarının lisanslarını içerir. Dağıtılan kod, paket lisansları ve lisans
+bildirimleri **2026-11-25** tarihinde kilitli bağımlılıklar ve derleme çıktısı üzerinden kontrol
+edilmiştir. Derleme bu dosyayı `LICENSE` ve `LICENSE-CONTENT` ile birlikte çıktı dizinine ekler.
 
-> **Özet:** Çalışma zamanı bağımlılıkları (`preact`, `qrcode-generator`) MIT'tir. Geliştirme
-> bağımlılıklarının 12'si MIT, Apache-2.0 ya da bu ikisinin çift lisansıdır. **Bir doğrudan
-> bağımlılık (`@axe-core/playwright`) MPL-2.0 taşır ve şartnamenin izin verdiği lisans listesinin
-> (MIT, ISC, BSD, Apache-2.0) dışındadır.** Bu paket değiştirilmedi; karar sahibine/Lead'e aittir
-> (aşağıdaki "Uyarılar" bölümü). Ayrıca birkaç transitive geliştirme aracı MPL-2.0 ve
-> BlueOak-1.0.0 taşır; bunlar üretim çıktısına girmez.
+> Tarayıcıya dağıtılan üçüncü taraf kodu MIT lisanslıdır. Erişilebilirlik testinde kullanılan
+> `@axe-core/playwright` MPL-2.0 lisanslıdır. Aşağıda doğrudan geliştirme bağımlılıkları ile
+> şartnamedeki listenin dışında kalan dolaylı geliştirme bağımlılıkları gösterilir.
 
-## 1. Çalışma zamanı bağımlılıkları
+## 1. Tarayıcıya dağıtılan kod
 
-| Paket | Sürüm | Lisans (SPDX) | Kaynak |
+| Paket veya bileşen | Sürüm | Lisans (SPDX) | Kaynak |
 |---|---|---|---|
 | `preact` | 11.2.0 | MIT | <https://github.com/preactjs/preact> |
 | `qrcode-generator` | 2.0.4 | MIT | <https://github.com/kazuhikoarase/qrcode-generator> |
+| `workbox-core`, `workbox-precaching`, `workbox-routing`, `workbox-strategies`, `workbox-window` | 7.4.1 | MIT | <https://github.com/GoogleChrome/workbox/blob/v7.4.1/LICENSE> |
+| Vite'ın modül ön yükleme ve dinamik içe aktarma yardımcıları | 8.3.8 | MIT | <https://github.com/vitejs/vite/blob/v8.3.8/LICENSE> |
 
-Bu iki paket uygulama paketine girer; lisans metinleri aşağıda "Çalışma zamanı lisans metinleri"
-bölümündedir.
+Workbox kodu hizmet çalışanının yanında, `workbox-window` ise uygulamanın tarayıcı paketinde
+dağıtılır. Vite, uygulama koduna tarayıcıda çalışan ön yükleme yardımcılarını ekler. Tam
+bildirimler §4'tedir.
 
 ## 2. Geliştirme bağımlılıkları
 
-Bu paketler yalnızca geliştirme, test ve derleme sırasında kullanılır; son kullanıcıya dağıtılan
-uygulama çıktısına girmez.
+Bu paketler geliştirme, test ve derleme sırasında kullanılır. Derleme araçlarından tarayıcıya
+dağıtılan bileşenler §1'de gösterilmiştir.
 
 | Paket | Sürüm | Lisans (SPDX) | Kaynak |
 |---|---|---|---|
@@ -56,8 +56,8 @@ uygulama çıktısına girmez.
   (b) aynı işi yapan izinli lisanslı bir araç bulmak; (c) erişilebilirlik testini elle kontrol
   listesine indirmek (axe sıfır ihlal ölçütünden feragat anlamına gelir).
 - **Etki:** Paket yalnızca test aracıdır, üretim paketine girmez. MPL-2.0, dosya düzeyinde
-  copyleft uygular; bu pakette değişiklik yapılmadığı sürece kaynak kodu yayımlama yükümlülüğü
-  doğurmaz. Yine de izinli liste ile çelişki açıktır ve yayın öncesi kapatılmalıdır.
+  copyleft uygular. MPL kapsamındaki yazılım dağıtılırsa lisansın kaynak kodu erişimi ve
+  bildirim yükümlülükleri ayrıca değerlendirilir.
 
 ### 3.2 Transitive paketler (doğrudan bağımlılık değil)
 
@@ -85,10 +85,9 @@ seçeneklerden biriyle uyumludur.
 
 ### 3.3 `qrcode-generator` lisans dosyası
 
-`qrcode-generator@2.0.4` paketinde ayrı bir `LICENSE` dosyası **yoktur**; lisans, paketin
-`package.json` dosyasında `"license": "MIT"` olarak beyan edilmiştir. Paketin kaynak deposunda
-lisans dosyasının bulunup bulunmadığı yayın öncesi doğrulanmalıdır; bulunamazsa bu durum
-`docs/kararlar.md` içine not edilmelidir.
+`qrcode-generator@2.0.4` paketinin `package.json` dosyası MIT lisansını, dağıtılan `dist/qrcode.mjs`
+dosyası ise lisans ile telif sahibini bildirir. Tam lisans metni projenin kaynak deposundadır.
+[qrcode-generator lisansı](https://github.com/kazuhikoarase/qrcode-generator/blob/master/LICENSE)
 
 ## 4. Çalışma zamanı lisans metinleri
 
@@ -120,14 +119,10 @@ SOFTWARE.
 
 ### 4.2 `qrcode-generator` — MIT
 
-`qrcode-generator` (Kazuhiko Arase) MIT lisansı altındadır. Aşağıdaki metin paketin
-`package.json` beyanına dayanır; pakette ayrı lisans dosyası bulunmadığı için yukarıdaki not
-geçerlidir. MIT koşulları gereği telif bildirimi ve izin bildirimi korunmalıdır:
-
 ```
 MIT License
 
-Copyright (c) Kazuhiko Arase
+Copyright (c) 2009 Kazuhiko Arase
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -148,8 +143,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-`qrcode-generator` README'sinde "QR Code" ifadesinin DENSO WAVE INCORPORATED'ın tescilli markası
-olduğu belirtilir; marka hakkı bu lisansla verilmez.
+`qrcode-generator` kaynak dosyasındaki bildirime göre “QR Code”, DENSO WAVE INCORPORATED'ın tescilli
+markasıdır. Marka hakları saklıdır.
+
+### 4.3 Workbox — MIT
+
+```
+Copyright 2018 Google LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+### 4.4 Vite tarayıcı yardımcıları — MIT
+
+```
+MIT License
+
+Copyright (c) 2019-present, VoidZero Inc. and Vite contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## 5. Geliştirme lisans metinleri nerede?
 
@@ -173,7 +218,8 @@ Lisans denetimini yeniden çalıştırmak için (PowerShell):
 $paks = @(
   'preact','qrcode-generator','typescript','vite','@preact/preset-vite','vite-plugin-pwa',
   'vitest','@vitest/coverage-v8','@testing-library/preact','happy-dom','fake-indexeddb',
-  '@playwright/test','@axe-core/playwright','@biomejs/biome','@types/node'
+  '@playwright/test','@axe-core/playwright','@biomejs/biome','@types/node',
+  'workbox-core','workbox-precaching','workbox-routing','workbox-strategies','workbox-window'
 )
 foreach ($p in $paks) {
   $j = Get-Content "node_modules/$p/package.json" -Raw | ConvertFrom-Json
@@ -181,6 +227,5 @@ foreach ($p in $paks) {
 }
 ```
 
-Bu dosya, bağımlılık eklendiğinde veya sürüm yükseltildiğinde güncellenmelidir. CI'daki
-`pnpm audit --omit=dev --audit-level=high` adımı güvenlik açıklarını; bu dosya ise lisans
-uyumunu izler.
+Bağımlılık eklendiğinde veya sürüm yükseltildiğinde paket lisanslarını ve üretim çıktısına giren
+kodu karşılaştırın. Dağıtılan bileşenler için telif ve lisans bildirimlerini bu dosyada güncelleyin.

@@ -15,7 +15,7 @@
  * - Adım ziyareti `onVisit` ile bildirilir; "Özel ihtiyaçlar" bölümünün doluluk
  *   ölçütü bu izi kullanır (§11.8).
  */
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { WIZARD_STEP_COUNT } from '../../config.ts';
 import { tr } from '../../i18n/tr.ts';
 import type { Plan } from '../../model/types.ts';
@@ -48,6 +48,8 @@ export interface WizardProps {
   onPatch: (patch: Partial<Plan>) => void;
   /** Adım ziyaretini bildirir (§11.8). */
   onVisit: (step: number) => void;
+  /** Uygulama kabuğunda adımın adres ve tarayıcı geçmişini günceller. */
+  onNavigate?: (step: WizardStep) => void;
   /** Son adım tamamlandığında çağrılır (§11.5 sonu: `#/ozet`). */
   onFinish: () => void;
   /** `#/plan/<n>` yolundan gelen başlangıç adımı. */
@@ -97,6 +99,7 @@ export function Wizard({
   plan,
   onPatch,
   onVisit,
+  onNavigate,
   onFinish,
   initialStep,
   saveState = 'idle',
@@ -113,7 +116,7 @@ export function Wizard({
     onVisit(step);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     headingRef.current?.focus();
   }, [step]);
 
@@ -129,6 +132,10 @@ export function Wizard({
   };
 
   const goToStep = (next: WizardStep): void => {
+    if (onNavigate !== undefined) {
+      onNavigate(next);
+      return;
+    }
     setStep(next);
     setTouched(new Set());
     setSubmitted(false);

@@ -35,7 +35,7 @@ describe('FirstRunNotice', () => {
 
     expect(text).toContain('bağımsız bir açık kaynak projesidir');
     expect(text).toContain('112');
-    expect(text).toContain('yalnızca bu cihazda saklanır');
+    expect(text).toContain('bu tarayıcıda saklanır');
   });
 
   it('koşullar ve gizlilik bağlantılarını doğru yollara koyar', () => {

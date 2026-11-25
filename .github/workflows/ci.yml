@@ -55,7 +55,7 @@ jobs:
         run: pnpm run build
 
       - name: Playwright tarayıcılarını kur
-        run: pnpm exec playwright install --with-deps chrome msedge
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
 
       - name: Uçtan uca testler
         run: pnpm run e2e

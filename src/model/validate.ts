@@ -223,7 +223,7 @@ function sanitizeText(value: string, path: string, spec: TextSpec, warn: Warn): 
   const characters = [...text];
   if (characters.length > spec.max) {
     warn('sinir-asildi', path);
-    return characters.slice(0, spec.max).join('');
+    return characters.slice(0, spec.max).join('').trimEnd();
   }
   return text;
 }
@@ -321,7 +321,7 @@ function daysInMonth(year: number, month: number): number {
 }
 
 /** §8.2 — ISO 8601 tarih ya da tarih-saat; takvimsel geçerlilik de denetlenir. */
-function isIsoDate(value: string): boolean {
+export function isIsoDate(value: string): boolean {
   const match = ISO_DATE_PATTERN.exec(value);
   if (match === null) return false;
   const year = toComponent(match[1]);

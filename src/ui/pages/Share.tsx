@@ -28,17 +28,19 @@ import {
   type ShareQr,
 } from '../../share/index.ts';
 import { Checkbox, Field, Notice } from '../components/index.ts';
+import { ShareQrImage } from '../components/ShareQrImage.tsx';
 
 export interface ShareProps {
   /** Özet kartı üretilecek plan (uygulama kabuğunda sanitize edilmiş). */
   plan: Plan;
 }
 
-type CopyState = 'idle' | 'copied' | 'failed';
+type ShareStatus = 'idle' | 'copied' | 'copy-failed' | 'share-failed';
 
-function copyStatusText(state: CopyState): string {
+function statusText(state: ShareStatus): string {
   if (state === 'copied') return tr.share.link.copied;
-  if (state === 'failed') return tr.share.link.copyFailed;
+  if (state === 'copy-failed') return tr.share.link.copyFailed;
+  if (state === 'share-failed') return tr.share.systemShare.failed;
   return '';
 }
 
@@ -49,7 +51,7 @@ export function Share({ plan }: ShareProps) {
   const [qr, setQr] = useState<ShareQr | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copyState, setCopyState] = useState<CopyState>('idle');
+  const [status, setStatus] = useState<ShareStatus>('idle');
 
   const canSystemShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
@@ -57,24 +59,25 @@ export function Share({ plan }: ShareProps) {
   const resetOutput = (): void => {
     setUrl(null);
     setQr(null);
-    setCopyState('idle');
+    setStatus('idle');
     setError(null);
   };
 
   const handleGenerate = async (): Promise<void> => {
     setBusy(true);
-    setError(null);
-    setCopyState('idle');
+    resetOutput();
     try {
       const card = buildShareCard(plan, { includeNeedsNotes, includeHealth: false });
       const payload = await encodeShare(card, passphrase === '' ? undefined : passphrase);
       const nextUrl = buildShareUrl(payload);
       setUrl(nextUrl);
       setQr(buildShareQr(nextUrl));
-    } catch {
-      setUrl(null);
-      setQr(null);
-      setError(tr.share.send.error);
+    } catch (error) {
+      setError(
+        error instanceof Error && error.message === 'cok-buyuk'
+          ? tr.share.send.tooLong
+          : tr.share.send.error,
+      );
     } finally {
       setBusy(false);
     }
@@ -84,23 +87,24 @@ export function Share({ plan }: ShareProps) {
     if (url === null) return;
     const clipboard = typeof navigator === 'undefined' ? undefined : navigator.clipboard;
     if (clipboard === undefined || typeof clipboard.writeText !== 'function') {
-      setCopyState('failed');
+      setStatus('copy-failed');
       return;
     }
     try {
       await clipboard.writeText(url);
-      setCopyState('copied');
+      setStatus('copied');
     } catch {
-      setCopyState('failed');
+      setStatus('copy-failed');
     }
   };
 
   const handleSystemShare = async (): Promise<void> => {
     if (url === null) return;
+    setStatus('idle');
     try {
       await navigator.share({ title: tr.share.title, text: tr.share.intro, url });
-    } catch {
-      // Kullanıcı paylaşım penceresini kapattıysa yapılacak bir şey yok.
+    } catch (error) {
+      if (!(error instanceof Error && error.name === 'AbortError')) setStatus('share-failed');
     }
   };
 
@@ -114,6 +118,7 @@ export function Share({ plan }: ShareProps) {
         <h2 id="share-card-heading">{tr.share.card.title}</h2>
         <p>{tr.share.card.contents}</p>
         <p class="share__note">{tr.share.card.excluded}</p>
+        <p class="share__note">{tr.share.card.freeTextWarning}</p>
       </section>
 
       <section class="share__section" aria-labelledby="share-options-heading">
@@ -123,6 +128,7 @@ export function Share({ plan }: ShareProps) {
           label={tr.share.options.includeNeedsNotes}
           hint={tr.share.options.includeNeedsNotesWarning}
           checked={includeNeedsNotes}
+          disabled={busy}
           onChange={(checked) => {
             setIncludeNeedsNotes(checked);
             resetOutput();
@@ -136,6 +142,7 @@ export function Share({ plan }: ShareProps) {
             type="password"
             autocomplete="new-password"
             value={passphrase}
+            disabled={busy}
             onInput={(event) => {
               setPassphrase(event.currentTarget.value);
               resetOutput();
@@ -194,7 +201,7 @@ export function Share({ plan }: ShareProps) {
             ) : null}
           </div>
           <p class="share__status" role="status" aria-live="polite">
-            {copyStatusText(copyState)}
+            {statusText(status)}
           </p>
         </section>
       )}
@@ -207,15 +214,7 @@ export function Share({ plan }: ShareProps) {
             <Notice tone="warning">{tr.share.qr.tooLong}</Notice>
           ) : (
             <div class="share__qr">
-              <svg
-                class="share__qr-image"
-                role="img"
-                aria-label={tr.share.qr.label}
-                viewBox={`0 0 ${qr.viewSize} ${qr.viewSize}`}
-              >
-                <rect width={qr.viewSize} height={qr.viewSize} fill="#fff" />
-                <path d={qr.path} fill="#000" />
-              </svg>
+              <ShareQrImage qr={qr} class="share__qr-image" />
             </div>
           )}
         </section>

@@ -29,6 +29,7 @@ pnpm run dev          # http://127.0.0.1:5173
 Kod değiştirmeden önce ve göndermeden önce kalite kapısı:
 
 ```powershell
+pnpm exec playwright install chromium firefox webkit
 pnpm run check        # lint + typecheck + coverage + content:check + build + e2e
 ```
 
@@ -44,7 +45,7 @@ Tek tek komutlar:
 | `pnpm run content:check` | İçerik onay kapısı denetimi |
 | `pnpm run build` | Geliştirme derlemesi (taslak içeriğe izin verir, "TASLAK" şeridi gösterir) |
 | `pnpm run build:prod` | Üretim derlemesi; onaysız içerik varsa **başarısız olur** |
-| `pnpm run e2e` | Playwright uçtan uca testleri (önce `pnpm exec playwright install chrome msedge` gerekir) |
+| `pnpm run e2e` | Playwright uçtan uca testleri (önce `pnpm exec playwright install chromium firefox webkit` gerekir) |
 
 `pnpm run build:prod` bu geliştirme sürümünde taslak içerik nedeniyle başarısız olur; bu beklenen
 durumdur ve içerik onaylanana kadar sürer.

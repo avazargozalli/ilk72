@@ -14,7 +14,7 @@
 import { registerSW } from 'virtual:pwa-register';
 import { render } from 'preact';
 import { AppShell } from './app/AppShell.tsx';
-import { announceUpdateReady, setUpdateApplier } from './app/pwa.ts';
+import { announceUpdateReady, onServiceWorkerControlling, setUpdateApplier } from './app/pwa.ts';
 import { tr } from './i18n/tr.ts';
 import { Footer } from './ui/components/Footer.tsx';
 import './styles/tokens.css';
@@ -51,6 +51,9 @@ function registerServiceWorker(): void {
       onNeedRefresh() {
         // §16 — kullanıcı onaylamadan sayfa yenilenmez.
         announceUpdateReady();
+      },
+      onNeedReload() {
+        void onServiceWorkerControlling();
       },
     }),
   );

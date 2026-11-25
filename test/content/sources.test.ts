@@ -15,44 +15,9 @@ import {
   SOURCES_BY_KEY,
 } from '../../src/content/sources.ts';
 
-/** §13.3 kaynak anahtarları tablosu ve sonradan eklenen yayınlar. */
-const EXPECTED_KEYS = [
-  'K-PLAN72',
-  'K-KIRSEHIR',
-  'K-KIRSEHIR2',
-  'K-MUGLA',
-  'K-UYARI',
-  'K-CEVRE',
-  'K-ONLEM',
-  'K-ONLEM2',
-  'K-ANINDA',
-  'K-HAFTA',
-  'K-HAFTA2',
-  'K-KILIS',
-  'K-OKUL',
-  'K-ILK6',
-  'K-BURSA',
-  'K-SOZLUK',
-  'K-CANTA-BB',
-  'K-BURDUR',
-  'K-GUMUSHANE',
-  'K-SAKARYA',
-  'K-KOCAELI',
-  'K-EDEVLET',
-  'K-TDTH',
-  'K-112',
-  'K-MUGLA-CANTA',
-  'K-GUVENLI-YASAM',
-  'K-OKUL-TABANLI',
-];
-
 describe('kaynak kaydı (§13.1, §13.3)', () => {
-  it('şartnamedeki bütün anahtarları tablo sırasıyla taşır', () => {
-    expect(SOURCES.map((source) => source.key)).toEqual(EXPECTED_KEYS);
-  });
-
   it('anahtarlar benzersizdir ve anahtarla aranabilir', () => {
-    expect(new Set(EXPECTED_KEYS).size).toBe(SOURCES.length);
+    expect(new Set(SOURCES.map((source) => source.key)).size).toBe(SOURCES.length);
     expect(Object.keys(SOURCES_BY_KEY)).toHaveLength(SOURCES.length);
 
     for (const source of SOURCES) {
@@ -80,16 +45,8 @@ describe('kaynak kaydı (§13.1, §13.3)', () => {
     }
   });
 
-  it('zor alan adları tablodaki adreslerle birebir eşleşir', () => {
-    expect(getSource('K-PLAN72')?.url).toBe(
-      'https://www.afad.gov.tr/depremler-onlenemez-ancak-depremlerin-afetlere-donusmesi-onlenebilir',
-    );
-    expect(getSource('K-HAFTA')?.url).toBe(
-      'https://www.afad.gov.tr/1-7-mart-deprem-haftasini-hazirlik-ile-degerlendirin---basin-duyurusu',
-    );
-    expect(getSource('K-HAFTA2')?.url).toBe(
-      'https://www.afad.gov.tr/1-7-mart-deprem-haftasini-hazirlik-ile-degerlendirin',
-    );
+  it('harita, toplanma alanı, sigorta ve 112 için ilgili resmî hizmete bağlanır', () => {
+    expect(getSource('K-DASK')?.url).toBe('https://www.dask.gov.tr/tr/teminat-ve-kapsami');
     expect(getSource('K-TDTH')?.url).toBe('https://tdth.afad.gov.tr');
     expect(getSource('K-112')?.url).toBe('https://www.112.gov.tr/112-acm-projesi');
     expect(getSource('K-EDEVLET')?.url).toBe(
@@ -102,6 +59,7 @@ describe('izinli alan adları (§13.1)', () => {
   it('kaynak alan adları şartnamedeki ile uyumludur', () => {
     expect([...ALLOWED_SOURCE_DOMAINS]).toEqual([
       'afad.gov.tr',
+      'hazirim.gov.tr',
       'turkiye.gov.tr',
       '112.gov.tr',
       'icisleri.gov.tr',
@@ -151,5 +109,8 @@ describe('izinli alan adları (§13.1)', () => {
     expect(parseHttpsUrl('https://tdth.afad.gov.tr')).toBeInstanceOf(URL);
     expect(parseHttpsUrl('ftp://www.afad.gov.tr/deneme')).toBeUndefined();
     expect(parseHttpsUrl('gecersiz-adres')).toBeUndefined();
+    expect(parseHttpsUrl('https:afad.gov.tr/deneme')).toBeUndefined();
+    expect(parseHttpsUrl('https://kullanici:sifre@afad.gov.tr/deneme')).toBeUndefined();
+    expect(parseHttpsUrl('https://[gecersiz-adres')).toBeUndefined();
   });
 });

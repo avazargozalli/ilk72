@@ -6,15 +6,15 @@
  * buluşma yerleri. Arka yüz: şehir dışı kişi ve en çok üç acil telefon; isteğe
  * bağlı kan grubu ve tek satır not — **ayrı onayla** (§4.1 satır 3, İ8).
  *
- * Kare kod (QR) bu aşamada **eklenmez**: üretimi paylaşım katmanına aittir ve
- * `docs/kararlar.md`'ye not düşülmüştür (bkz. aşama 21.9 raporu). Boş bir yer
- * tutucu bırakılmaz.
+ * Kare kod yalnızca yazdırma sayfasında ayrıca seçilirse arka yüze basılır.
  *
  * Ev adresi bu kartta **yoktur** (§4.1 satır 20).
  */
 import { EMERGENCY_NUMBER, EMERGENCY_TEL } from '../../config.ts';
 import { tr } from '../../i18n/tr.ts';
 import type { Contact, Member, Plan } from '../../model/types.ts';
+import type { ShareQr } from '../../share/index.ts';
+import { ShareQrImage } from '../components/ShareQrImage.tsx';
 import { DocHeading, filled, PrintFoot, planDate, printValue } from './parts.tsx';
 
 export interface WalletCardsProps {
@@ -24,6 +24,8 @@ export interface WalletCardsProps {
   includeBloodType?: boolean;
   /** Arka yüze tek satır not bas (§12.3 — ayrı onay, varsayılan kapalı). */
   includeWalletNote?: boolean;
+  /** Ayrı seçimle arka yüze basılan plan özeti kare kodu. */
+  qr?: ShareQr | null;
 }
 
 /** A4 sayfada dört kart (§12). */
@@ -79,11 +81,13 @@ function MemberCard({
   member,
   includeBloodType,
   includeWalletNote,
+  qr,
 }: {
   plan: Plan;
   member: Member;
   includeBloodType: boolean;
   includeWalletNote: boolean;
+  qr: ShareQr | null;
 }) {
   const outOfArea = outOfAreaContact(plan);
   const phones = emergencyPhones(plan);
@@ -118,6 +122,7 @@ function MemberCard({
 
       <div class="wallet-card wallet-card--back">
         <p class="wallet-card__eyebrow">{tr.print.wallet.backTitle}</p>
+        {qr === null ? null : <ShareQrImage qr={qr} class="wallet-card__qr" />}
         <p class="wallet-card__line">
           {tr.print.wallet.outOfAreaContact}:{' '}
           {outOfArea === undefined
@@ -161,6 +166,7 @@ export function WalletCards({
   plan,
   includeBloodType = false,
   includeWalletNote = false,
+  qr = null,
 }: WalletCardsProps) {
   const date = planDate(plan);
   const pages = chunk(plan.members, CARDS_PER_PAGE);
@@ -185,6 +191,7 @@ export function WalletCards({
                 member={member}
                 includeBloodType={includeBloodType}
                 includeWalletNote={includeWalletNote}
+                qr={qr}
               />
             ))}
             <PrintFoot date={date} />

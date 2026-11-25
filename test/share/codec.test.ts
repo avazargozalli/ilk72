@@ -138,6 +138,20 @@ describe('decodeShare — payload biçimi', () => {
 });
 
 describe('encodeShare — biçim', () => {
+  it('alıcı tarafından açılamayacak boyutta kart üretmez', async () => {
+    await expect(encodeShare({ ...card, n: 'İ'.repeat(SHARE_MAX_JSON) })).rejects.toThrow(
+      'cok-buyuk',
+    );
+
+    let state = 19;
+    const text = Array.from({ length: 10_000 }, () => {
+      state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
+      return String.fromCharCode(33 + ((state >>> 16) % 90));
+    }).join('');
+    expect(utf8Encode(JSON.stringify({ ...card, n: text })).length).toBeLessThan(SHARE_MAX_JSON);
+    await expect(encodeShare({ ...card, n: text })).rejects.toThrow('cok-buyuk');
+  });
+
   it('yük `<sürüm><kip>.<base64url>` kalıbına uyar (Ek A)', async () => {
     for (const payload of [await plainPayload(), await encodeShare(card, PASS_PHRASE)]) {
       expect(SHARE_PAYLOAD_PATTERN.test(payload)).toBe(true);

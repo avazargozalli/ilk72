@@ -17,7 +17,6 @@ import {
   getContentItem,
 } from '../../src/content/registry.ts';
 import { isAllowedSourceUrl, SOURCES, SOURCES_BY_KEY } from '../../src/content/sources.ts';
-import { FIXED_NOW } from './fixtures.ts';
 
 function ids(prefix: string, from: number, to: number): string[] {
   return Array.from({ length: to - from + 1 }, (_, index) => {
@@ -112,10 +111,11 @@ describe('§13.4, §18.6 — gerçek kayıt onay kapısı', () => {
   });
 
   it('üretim denetimi taslak kalan her maddeyi bildirir', () => {
-    const result = runContentCheck({ prod: true, now: FIXED_NOW });
+    const result = runContentCheck({ prod: true });
     const drafts = CONTENT_ITEMS.filter((item) => item.status === 'taslak');
     const issues = result.errors.filter((issue) => issue.code === ISSUE_CODES.draftInProd);
     expect(issues.map((issue) => issue.itemId)).toEqual(drafts.map((item) => item.id));
+    expect(result.errors).toEqual(issues);
   });
 });
 

@@ -208,7 +208,7 @@ describe('geçerli plan korunur', () => {
 
   it('ikinci geçiş uyarı üretmez (idempotent)', () => {
     const raw = cloneRaw(validPlanRecord());
-    setRawPath(raw, 'household.label', 'a'.repeat(80));
+    setRawPath(raw, 'household.label', `${'a'.repeat(59)} son`);
     setRawPath(raw, 'members.0.name', 42);
     setRawPath(raw, 'contacts.0.phone', '12');
     setRawPath(raw, 'healthOptIn', false);

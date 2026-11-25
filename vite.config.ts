@@ -6,6 +6,7 @@
  * önbelleği (runtimeCaching) bilinçli olarak yoktur; uygulama dış istek
  * yapmadığı için gerekmez (§16).
  */
+import { readFile } from 'node:fs/promises';
 import preact from '@preact/preset-vite';
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -29,11 +30,33 @@ function devCspPlugin(): Plugin {
   };
 }
 
+function licenseNoticesPlugin(): Plugin {
+  const notices = ['LICENSE', 'LICENSE-CONTENT', 'THIRD_PARTY_LICENSES.md'];
+
+  return {
+    name: 'ilk72-license-notices',
+    apply: 'build',
+    async generateBundle() {
+      const assets = await Promise.all(
+        notices.map(async (fileName) => ({
+          fileName,
+          source: await readFile(new URL(fileName, import.meta.url)),
+        })),
+      );
+
+      for (const asset of assets) {
+        this.emitFile({ type: 'asset', ...asset });
+      }
+    },
+  };
+}
+
 export default defineConfig({
   base: './',
   plugins: [
     preact(),
     devCspPlugin(),
+    licenseNoticesPlugin(),
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,

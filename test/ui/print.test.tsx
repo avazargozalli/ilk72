@@ -12,6 +12,7 @@ import { fireEvent, render, screen } from '@testing-library/preact';
 import type { ComponentChildren } from 'preact';
 import { describe, expect, it, vi } from 'vitest';
 import { APP_NAME, EMERGENCY_TEL } from '../../src/config.ts';
+import { getSource } from '../../src/content/sources.ts';
 import { formatDate, formatText, tr } from '../../src/i18n/tr.ts';
 import { createEmptyPlan } from '../../src/model/defaults.ts';
 import type { Member, Plan } from '../../src/model/types.ts';
@@ -171,6 +172,17 @@ function installPrintSpy(): ReturnType<typeof vi.fn> {
 }
 
 describe('Print sayfası (§12)', () => {
+  it('cüzdan kartı kare kodunu ancak ayrı seçimden sonra gösterir', async () => {
+    render(<Print plan={createTestPlan()} />);
+    const option = screen.getByRole('checkbox', { name: tr.print.page.includeWalletQr });
+
+    expect(screen.queryByRole('img', { name: tr.share.qr.label })).toBeNull();
+    fireEvent.click(option);
+    expect(await screen.findAllByRole('img', { name: tr.share.qr.label })).toHaveLength(2);
+    fireEvent.click(option);
+    expect(screen.queryByRole('img', { name: tr.share.qr.label })).toBeNull();
+  });
+
   it('altı belgenin kutusunu da gösterir', () => {
     render(<Print plan={createTestPlan()} />);
 
@@ -506,7 +518,9 @@ describe('BagChecklist (§12.5)', () => {
     const text = renderText(<BagChecklist plan={createTestPlan()} />);
 
     expect(text).toContain('Kaynak: AFAD');
-    expect(text).toContain('Erişim tarihi: 19.11.2026');
+    const source = getSource('K-CANTA-BB');
+    if (source === undefined) throw new Error('Çanta kaynağı bulunamadı.');
+    expect(text).toContain(`Erişim tarihi: ${formatDate(source.accessed)}`);
   });
 });
 

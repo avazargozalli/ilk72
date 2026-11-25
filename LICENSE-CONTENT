@@ -1,7 +1,8 @@
 # İçerik Lisansı — CC BY 4.0
 
-İlk 72'nin **rehber metinleri, belgeleri ve diğer içeriği** Creative Commons Atıf 4.0 Uluslararası
-(CC BY 4.0) lisansı altındadır.
+İlk 72'nin aşağıda belirtilen **özgün rehber metinleri, arayüz metinleri ve belgeleri** Creative
+Commons Atıf 4.0 Uluslararası (CC BY 4.0) lisansı altındadır. Bu lisans, söz konusu metinlerin
+uygulama derlemesinde ve çıktılarında dağıtılan kopyaları için de geçerlidir.
 
 Telif hakkı sahibi: **Azar Gozalli ve ilk72 katkıcıları** (2026).
 
@@ -13,27 +14,26 @@ Telif hakkı sahibi: **Azar Gozalli ve ilk72 katkıcıları** (2026).
 
 Bu lisans aşağıdakileri kapsar:
 
-- `src/content/` altındaki rehber ve çanta metinleri (kaynak kayıtları hariç; kaynaklar kendi
-  sahiplerine aittir).
-- `docs/` altındaki belgeler (şartname, mimari, kararlar, hukuki inceleme, içerik onayı vb.).
+- `src/content/` altındaki özgün rehber ve çanta metinleri.
+- `docs/` altındaki özgün proje belgeleri (şartname, mimari, kararlar, hukuki inceleme, içerik onayı vb.).
 - `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md` ve benzeri
   kök belgeler.
 - Uygulama arayüzündeki Türkçe metinler (`src/i18n/`), hukuki metinler dahil.
 
 **Kapsam dışı:**
 
-- `src/` altındaki kaynak kodu ve yapılandırma dosyaları — bunlar MIT lisansı altındadır
-  (bkz. [LICENSE](LICENSE)).
-- Üçüncü taraf bağımlılıklar — kendi lisansları geçerlidir (bkz.
-  [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)).
-- Kurum adları, amblemleri, logoları ve tescilli işaretler. Bu lisans marka hakkı vermez; kurum
-  adları yalnızca kaynak gösterme amacıyla düz metin olarak anılır.
-- Başka bir yerden alınmış (varsa) alıntılar; bunlar kendi lisanslarına tabidir ve kaynağında
-  belirtilir.
+- İlk 72'nin kaynak kodu ve derlenmiş hâli MIT lisansı altındadır. [Kod lisansı](LICENSE)
+- Üçüncü taraf bağımlılıkların kendi lisansları geçerlidir. [Üçüncü taraf lisansları](THIRD_PARTY_LICENSES.md)
+- İlk 72 adı ve simgesi ile üçüncü taraf adlarına, markalarına, logolarına ve amblemlerine ilişkin
+  marka hakları saklıdır. Kurum adları kaynak olarak anılır.
+- Bağlantı verilen dış kaynaklar ve üçüncü taraf alıntıları, kendi hak durumlarına ve kullanım
+  şartlarına tabidir.
+- Planlara kullanıcıların eklediği metinler ve kişisel veriler bu lisansın kapsamı dışındadır.
 
 ## Atıf nasıl verilir
 
-CC BY 4.0, aşağıdaki koşullarla yeniden kullanıma izin verir:
+CC BY 4.0, koşullarına uyulduğunda ticari kullanım da dahil olmak üzere paylaşmaya ve uyarlamaya
+izin verir.
 
 1. **Atıf verin:** "İlk 72 — Aile Afet Planı, Azar Gozalli ve ilk72 katkıcıları, CC BY 4.0"
    biçiminde bir atıf ekleyin.
@@ -42,8 +42,8 @@ CC BY 4.0, aşağıdaki koşullarla yeniden kullanıma izin verir:
 3. **Değişiklikleri belirtin:** metni değiştirdiyseniz, değiştirdiğinizi açıkça yazın.
 4. **Ek kısıtlama getirmeyin:** yeniden kullanıcıların lisansın izin verdiği haklarını
    sınırlandırmayın.
-5. **Resmî görünüm vermeyin:** atıf, projenin sizin kullanımınızı onayladığı ya da resmî bir
-   kurumla bağlantılı olduğu izlenimini vermemelidir.
+5. **Atfı kaynak göstermek için kullanın.** Atıf, projenin kullanımınızı onayladığı veya sizinle
+   resmî bir bağlantısı olduğu izlenimini vermemelidir.
 
 ## Garanti reddi
 

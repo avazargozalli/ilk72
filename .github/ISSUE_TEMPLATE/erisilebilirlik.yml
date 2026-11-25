@@ -6,6 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
+        Bu bildirim herkese açık olur. Dosya, ekran görüntüsü ve bağlantılarda örnek veri kullanın.
+        [Geri bildirim gizliliği ve iletişim](https://github.com/avazargozalli/ilk72#gizlilik-%C3%B6zeti) bilgileri depoda yer alır.
+
         İlk 72'nin hedefi **WCAG 2.2 AA** düzeyidir (İ10). Karşılaştığınız engeli bildirmeniz
         önemlidir. Lütfen kişisel plan verisi yazmayın.
 

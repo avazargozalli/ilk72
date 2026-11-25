@@ -14,8 +14,17 @@
 export const UPDATE_READY_EVENT = 'ilk72:update-ready';
 
 type UpdateApplier = (reloadPage?: boolean) => Promise<void>;
+type ReloadCheck = () => boolean | Promise<boolean>;
 
 let applier: UpdateApplier | null = null;
+let updateReady = false;
+let controllerUpdated = false;
+let reloadCheck: ReloadCheck | null = null;
+
+/** Hizmet çalışanı, kabuk abone olmadan önce de hazır olabilir. */
+export function isUpdateReady(): boolean {
+  return updateReady;
+}
 
 /** `main.tsx` kaydettiği güncelleme işlevini buraya bağlar. */
 export function setUpdateApplier(fn: UpdateApplier): void {
@@ -24,12 +33,34 @@ export function setUpdateApplier(fn: UpdateApplier): void {
 
 /** Yeni sürümün hazır olduğunu kabuğa duyurur (kendiliğinden yenileme yok). */
 export function announceUpdateReady(): void {
+  updateReady = true;
   if (typeof window === 'undefined') return;
   window.dispatchEvent(new CustomEvent(UPDATE_READY_EVENT));
 }
 
+/** Başka bir sekme güncellemeyi etkinleştirse bile yerel onayı bekler. */
+export async function onServiceWorkerControlling(): Promise<void> {
+  controllerUpdated = true;
+  const canReload = reloadCheck;
+  reloadCheck = null;
+  if (canReload !== null && (await canReload())) {
+    window.location.reload();
+    return;
+  }
+  announceUpdateReady();
+}
+
 /** Kullanıcı "Yenile"ye bastığında çağrılır. */
-export function applyServiceWorkerUpdate(): void {
+export async function applyServiceWorkerUpdate(canReload: ReloadCheck): Promise<void> {
   if (applier === null) return;
-  void applier(true);
+  updateReady = false;
+  reloadCheck = canReload;
+  try {
+    if (controllerUpdated) await onServiceWorkerControlling();
+    else await applier(true);
+  } catch (error) {
+    reloadCheck = null;
+    announceUpdateReady();
+    throw error;
+  }
 }

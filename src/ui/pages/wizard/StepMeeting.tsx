@@ -12,6 +12,7 @@ import { formatText, tr } from '../../../i18n/tr.ts';
 import type { Place, Plan } from '../../../model/types.ts';
 import { PLAN_LIMITS } from '../../../model/validate.ts';
 import { SourceLink } from '../../components/index.ts';
+import { dateOnly } from '../pages/shared.ts';
 import { FIELD_IDS } from './fieldIds.ts';
 import { DateField, TextField } from './fields.tsx';
 import type { WizardStepProps } from './stepProps.ts';
@@ -26,7 +27,7 @@ function updateMeetingPlace(
   if (key === 'nearHome') return { ...meeting, nearHome: place };
   if (key === 'neighborhood') return { ...meeting, neighborhood: place };
   if (key === 'outOfArea') return { ...meeting, outOfArea: place };
-  return { ...meeting, assemblyArea: place };
+  return { ...meeting, assemblyArea: place, assemblyCheckedAt: null };
 }
 
 export function StepMeeting({ plan, onPatch, errorOf, onFieldBlur }: WizardStepProps) {
@@ -141,7 +142,7 @@ export function StepMeeting({ plan, onPatch, errorOf, onFieldBlur }: WizardStepP
         id={assemblyCheckedAtId}
         label={tr.wizard.fields.assemblyCheckedAt}
         hint={tr.wizard.hints.assemblyCheckedAt}
-        value={plan.meeting.assemblyCheckedAt ?? ''}
+        value={dateOnly(plan.meeting.assemblyCheckedAt ?? '')}
         error={errorOf(assemblyCheckedAtId)}
         onInput={(value) => patchMeeting({ assemblyCheckedAt: value === '' ? null : value })}
         onBlur={() => onFieldBlur(assemblyCheckedAtId)}

@@ -55,9 +55,13 @@ export function buildShareUrl(payload: string, origin: string = APP_ORIGIN): str
  * Parola verilmezse (ya da boşsa) düz kip kullanılır.
  */
 export async function encodeShare(card: ShareCard, passphrase?: string): Promise<string> {
-  let bytes = await deflate(utf8Encode(JSON.stringify(card)));
+  const json = utf8Encode(JSON.stringify(card));
+  if (json.length > SHARE_MAX_JSON) throw new Error('cok-buyuk');
+  let bytes = await deflate(json);
   if (passphrase) bytes = await encryptBytes(bytes, passphrase);
-  return `1${passphrase ? 'e' : 'p'}.${b64urlEncode(bytes)}`;
+  const encoded = b64urlEncode(bytes);
+  if (encoded.length > SHARE_PAYLOAD_MAX_LENGTH) throw new Error('cok-buyuk');
+  return `1${passphrase ? 'e' : 'p'}.${encoded}`;
 }
 
 /**

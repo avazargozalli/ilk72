@@ -28,7 +28,9 @@ export const share = {
     contents:
       'Kartta hane etiketi, kişilerin adı ve telefonu, acil kişiler, buluşma yerleri ve notunuz yer alır.',
     excluded:
-      'Ev adresi ve sağlık alanları karta girmez. Özel ihtiyaç notu yalnızca aşağıdaki kutuyu işaretlerseniz eklenir.',
+      'Formdaki ev adresi ve sağlık alanları karta girmez. Özel ihtiyaç notu yalnızca aşağıdaki kutuyu işaretlerseniz eklenir.',
+    freeTextWarning:
+      'Paylaşmadan önce hane etiketini, buluşma tariflerini ve notları kontrol edin. Bu alanlara yazdığınız adres, okul adı veya sağlık bilgileri de özete girebilir. Bağlantının ve kare kodun kopyaları alıcılarda kalabilir.',
   },
   options: {
     title: 'Kart seçenekleri',
@@ -63,6 +65,7 @@ export const share = {
     generate: 'Bağlantı oluştur',
     working: 'Bağlantı hazırlanıyor…',
     error: 'Bağlantı oluşturulamadı. Lütfen yeniden deneyin.',
+    tooLong: 'Özet bağlantı için fazla büyük. Metinleri kısaltın veya yedek dosyasıyla paylaşın.',
   },
   receive: {
     title: 'Gönderilen plan özeti',
@@ -85,6 +88,8 @@ export const share = {
     finish: 'Bitir',
     mergeApply: 'Seçilen bilgileri planıma ekle',
     mergeDone: 'Gönderilen bilgiler planınıza eklendi.',
+    mergeFailed: 'Gönderilen bilgiler kaydedilemedi. Önizlemedeki bilgiler korunuyor.',
+    mergeLimit: 'Plandaki kişi sınırı nedeniyle {count} yeni kişi kaydı eklenemeyecek.',
     done: 'İşlem tamamlandı. Bağlantı adres çubuğundan silindi.',
     noPlanNote:
       'Kendi planınıza eklemek için önce bir plan hazırlamanız gerekir. Şimdilik yalnızca görüntüleyebilirsiniz.',
@@ -156,6 +161,7 @@ export const share = {
         'İçe aktarma mevcut planınızın üzerine yazacak. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?',
       overwriteConfirm: 'Üzerine yaz ve içe aktar',
       imported: 'Yedek içe aktarıldı.',
+      saveFailed: 'Yedek tarayıcıya kaydedilemedi. Mevcut planınız korunuyor.',
       noPlanToExport: 'Dışa aktarılacak bir plan yok. Önce planınızı hazırlayın.',
     },
     lock: {
@@ -171,6 +177,7 @@ export const share = {
       disabled: 'Kilit kapalı. Plan bu cihazda şifrelenmeden saklanıyor.',
       tooShort: 'Parola en az 8 karakter olmalı.',
       enableFailed: 'Kilit açılamadı. Lütfen yeniden deneyin.',
+      noPlanToLock: 'Kilidi etkinleştirmek için önce bir plan hazırlayın.',
       disableFailed: 'Kilit kapatılamadı. Lütfen yeniden deneyin.',
       forgot: 'Parolamı unuttum',
       resetNote: 'Parola kurtarılamaz. Tek yol, planı silip sıfırdan başlamaktır.',
@@ -181,7 +188,7 @@ export const share = {
       button: 'Bütün verilerimi sil',
       confirmTitle: 'Bütün veriler silinsin mi?',
       confirmBody:
-        'Planınız, ayarlarınız ve bu cihazdaki bütün uygulama verileri silinecek. Silinen veriler geri getirilemez. Önce yedek dosyası indirmek isterseniz bu iletişim kutusunu kapatın.',
+        'Bu tarayıcıdaki İlk 72 planı ve ayarları silinecek. Eski plan görünüyorsa diğer İlk 72 sekmelerini kapatın veya yenileyin. İndirdiğiniz dosyalar, basılı kopyalar ve paylaştığınız bağlantılar bu işlemden etkilenmez.',
       confirm: 'Evet, bütün verilerimi sil',
       cancel: 'Vazgeç',
       done: 'Bütün veriler silindi.',
@@ -194,7 +201,7 @@ export const share = {
     description:
       'Çantadaki su, gıda ve ilaçların tarihlerini kontrol edin; telefon numaralarını güncelleyin; buluşma yerlerini ailece tekrar edin.\nPlanınız: cihazınızdaki İlk 72 uygulaması.',
     download: 'Takvimime ekle',
-    note: 'Takvim dosyasında kişisel bilginiz yer almaz.',
+    note: 'Takvim dosyasında ad, telefon, adres veya sağlık bilgisi yer almaz.',
     missingDate: 'Önce bir sonraki gözden geçirme tarihini yazın.',
   },
 } as const;

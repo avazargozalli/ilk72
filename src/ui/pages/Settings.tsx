@@ -53,12 +53,15 @@ function backupErrorMessage(code: string): string {
   if (code === 'gecersiz-format') return tr.share.settings.backup.invalidFormat;
   if (code === 'desteklenmeyen-surum') return tr.share.settings.backup.unsupportedVersion;
   if (code === 'cok-buyuk') return tr.share.settings.backup.tooLarge;
+  if (code === 'kayit-basarisiz') return tr.share.settings.backup.saveFailed;
   return errorMessage(code);
 }
 
 function persistenceMessage(value: boolean | null): string {
   if (value === true) return tr.shell.persistent.granted;
   if (value === false) return tr.shell.persistent.denied;
+  if (typeof globalThis.navigator?.storage?.persist === 'function')
+    return tr.shell.persistent.pending;
   return tr.shell.persistent.unavailable;
 }
 
@@ -100,6 +103,7 @@ export function Settings({
   const [forgotOpen, setForgotOpen] = useState(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [clearBusy, setClearBusy] = useState(false);
   const [clearDone, setClearDone] = useState(false);
   const [clearError, setClearError] = useState<string | null>(null);
 
@@ -163,11 +167,13 @@ export function Settings({
       return;
     }
 
+    setImportBusy(true);
     let text: string;
     try {
       text = await file.text();
     } catch {
       setImportError(tr.share.settings.backup.readFailed);
+      setImportBusy(false);
       return;
     }
     await prepareImport(file, text, '');
@@ -227,6 +233,9 @@ export function Settings({
   };
 
   const handleClearAll = async (close: () => void): Promise<void> => {
+    if (clearBusy) return;
+    setClearBusy(true);
+    setClearDone(false);
     setClearError(null);
     try {
       await onClearAll();
@@ -235,6 +244,8 @@ export function Settings({
     } catch {
       setClearError(tr.share.settings.delete.failed);
       close();
+    } finally {
+      setClearBusy(false);
     }
   };
 
@@ -257,7 +268,9 @@ export function Settings({
       <section class="settings__section" aria-labelledby="settings-persistence-heading">
         <h2 id="settings-persistence-heading">{tr.share.settings.persistence.title}</h2>
         <p class="settings__hint">{tr.share.settings.persistence.hint}</p>
-        <p class="settings__status">{persistenceMessage(settings.storagePersisted)}</p>
+        <p class="settings__status" role="status">
+          {persistenceMessage(settings.storagePersisted)}
+        </p>
       </section>
 
       <section class="settings__section" aria-labelledby="settings-backup-heading">
@@ -430,17 +443,21 @@ export function Settings({
                 type="password"
                 autocomplete="new-password"
                 value={lockPassphrase}
+                disabled={plan === null || lockBusy}
                 onInput={(event) => setLockPassphrase(event.currentTarget.value)}
               />
             </Field>
             <button
               class="button button--primary"
               type="button"
-              disabled={lockBusy}
+              disabled={lockBusy || plan === null}
               onClick={() => void handleEnableLock()}
             >
               {tr.share.settings.lock.enable}
             </button>
+            {plan === null ? (
+              <p class="settings__hint">{tr.share.settings.lock.noPlanToLock}</p>
+            ) : null}
           </>
         )}
         {settings.lockEnabled && lockError !== null ? (
@@ -483,12 +500,15 @@ export function Settings({
         open={deleteOpen}
         title={tr.share.settings.delete.confirmTitle}
         description={tr.share.settings.delete.confirmBody}
-        onClose={() => setDeleteOpen(false)}
+        onClose={() => {
+          if (!clearBusy) setDeleteOpen(false);
+        }}
         actions={
           <>
             <button
               class="button button--secondary"
               type="button"
+              disabled={clearBusy}
               onClick={() => setDeleteOpen(false)}
             >
               {tr.share.settings.delete.cancel}
@@ -496,6 +516,7 @@ export function Settings({
             <button
               class="button button--primary"
               type="button"
+              disabled={clearBusy}
               onClick={() => void handleClearAll(() => setDeleteOpen(false))}
             >
               {tr.share.settings.delete.confirm}
@@ -508,12 +529,15 @@ export function Settings({
         open={forgotOpen}
         title={tr.shell.lock.forgotTitle}
         description={tr.shell.lock.forgotBody}
-        onClose={() => setForgotOpen(false)}
+        onClose={() => {
+          if (!clearBusy) setForgotOpen(false);
+        }}
         actions={
           <>
             <button
               class="button button--secondary"
               type="button"
+              disabled={clearBusy}
               onClick={() => setForgotOpen(false)}
             >
               {tr.shell.lock.forgotCancel}
@@ -521,6 +545,7 @@ export function Settings({
             <button
               class="button button--primary"
               type="button"
+              disabled={clearBusy}
               onClick={() => void handleClearAll(() => setForgotOpen(false))}
             >
               {tr.shell.lock.forgotConfirm}

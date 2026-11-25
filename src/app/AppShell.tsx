@@ -11,8 +11,14 @@
  * kalır (§9.3): kilit ekranı `tel:112` bağlantısını her zaman gösterir.
  */
 
-import { useEffect, useRef, useState } from 'preact/hooks';
-import { APP_ORIGIN, ROUTES } from '../config.ts';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
+import {
+  APP_ORIGIN,
+  BACKUP_MAX_BYTES,
+  EMERGENCY_NUMBER,
+  EMERGENCY_TEL,
+  ROUTES,
+} from '../config.ts';
 import { CONTENT_ITEMS } from '../content/registry.ts';
 import { tr } from '../i18n/tr.ts';
 import { createEmptyPlan } from '../model/defaults.ts';
@@ -29,6 +35,7 @@ import {
 import {
   currentRoute,
   focusRouteHeading,
+  type RouteId,
   type RouteMatch,
   subscribeToRouteChanges,
   updateDocumentTitle,
@@ -38,16 +45,19 @@ import {
   clearAllData,
   disableLock,
   enableLock,
+  flushPending,
   getSettings,
   initializeStorage,
   isMemoryMode,
   loadPlan,
+  PERSISTENCE_STATUS_EVENT,
+  replacePlan,
   type Settings,
   savePlan,
   unlockPlan,
   updateSettings,
 } from '../storage/store.ts';
-import { FirstRunNotice, Notice } from '../ui/components/index.ts';
+import { Dialog, FirstRunNotice, Notice, type SaveState } from '../ui/components/index.ts';
 import { About } from '../ui/pages/About.tsx';
 import { Accessibility } from '../ui/pages/Accessibility.tsx';
 import { Bag } from '../ui/pages/Bag.tsx';
@@ -59,6 +69,7 @@ import { Imprint } from '../ui/pages/Imprint.tsx';
 import { NotFound } from '../ui/pages/NotFound.tsx';
 import { Print } from '../ui/pages/Print.tsx';
 import { Privacy } from '../ui/pages/Privacy.tsx';
+import { dateOnly } from '../ui/pages/pages/shared.ts';
 import { Settings as SettingsPage } from '../ui/pages/Settings.tsx';
 import { Share } from '../ui/pages/Share.tsx';
 import { Sources } from '../ui/pages/Sources.tsx';
@@ -68,15 +79,37 @@ import { Wizard } from '../ui/pages/Wizard.tsx';
 import { defaultReviewDate } from '../ui/pages/wizard/dates.ts';
 import { BlankForm } from '../ui/print/BlankForm.tsx';
 
-import { applyServiceWorkerUpdate, UPDATE_READY_EVENT } from './pwa.ts';
+import { applyServiceWorkerUpdate, isUpdateReady, UPDATE_READY_EVENT } from './pwa.ts';
 
-type BootState = 'booting' | 'locked' | 'ready';
+type BootState = 'booting' | 'locked' | 'storage-error' | 'ready';
 
-/** §9.3 — kilit ekranı: parola ister, yanlış parolada veri silinmez. */
-function LockScreen({ onUnlock }: { onUnlock: (passphrase: string) => Promise<void> }) {
+const PUBLIC_ROUTES = new Set<RouteId>([
+  'emergency',
+  'guide',
+  'about',
+  'privacy',
+  'terms',
+  'imprint',
+  'accessibility',
+  'sources',
+  'notFound',
+]);
+
+function LockScreen({
+  storageError,
+  onUnlock,
+  onReset,
+}: {
+  storageError: boolean;
+  onUnlock: (passphrase: string) => Promise<void>;
+  onReset: () => Promise<void>;
+}) {
   const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetBusy, setResetBusy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const submit = async (): Promise<void> => {
     if (busy) return;
@@ -87,71 +120,147 @@ function LockScreen({ onUnlock }: { onUnlock: (passphrase: string) => Promise<vo
     } catch {
       setError(tr.shell.lock.wrongPassword);
       setValue('');
+      inputRef.current?.focus();
     } finally {
       setBusy(false);
     }
   };
 
-  return (
-    <main id="main-content" tabIndex={-1}>
-      <h1 tabIndex={-1}>{tr.shell.lock.title}</h1>
-      <p>{tr.shell.lock.intro}</p>
+  const reset = async (): Promise<void> => {
+    if (resetBusy) return;
+    setResetBusy(true);
+    setError(null);
+    try {
+      await onReset();
+    } catch {
+      setError(tr.shell.lock.resetError);
+    } finally {
+      setResetBusy(false);
+    }
+  };
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submit();
+  return (
+    <>
+      <h1 tabIndex={-1}>{storageError ? tr.shell.lock.storageErrorTitle : tr.shell.lock.title}</h1>
+      <p>{storageError ? tr.shell.lock.storageErrorIntro : tr.shell.lock.intro}</p>
+
+      {storageError ? null : (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit();
+          }}
+        >
+          <label class="field__label" for="unlock-passphrase">
+            {tr.shell.lock.passwordLabel}
+          </label>
+          <input
+            ref={inputRef}
+            class="text-input"
+            id="unlock-passphrase"
+            type="password"
+            autocomplete="current-password"
+            value={value}
+            aria-invalid={error === tr.shell.lock.wrongPassword ? 'true' : undefined}
+            aria-describedby={error === tr.shell.lock.wrongPassword ? 'unlock-error' : undefined}
+            onInput={(event) => setValue(event.currentTarget.value)}
+          />
+          {error === tr.shell.lock.wrongPassword ? (
+            <p class="field__error" id="unlock-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <div class="button-row">
+            <button class="button button--primary" type="submit" disabled={busy}>
+              {tr.shell.lock.submit}
+            </button>
+          </div>
+        </form>
+      )}
+      <button
+        class="button button--quiet"
+        type="button"
+        disabled={busy}
+        onClick={() => {
+          setError(null);
+          setResetOpen(true);
         }}
       >
-        <label class="field__label" for="unlock-passphrase">
-          {tr.shell.lock.passwordLabel}
-        </label>
-        <input
-          class="text-input"
-          id="unlock-passphrase"
-          type="password"
-          autocomplete="current-password"
-          value={value}
-          aria-invalid={error ? 'true' : undefined}
-          aria-describedby={error ? 'unlock-error' : undefined}
-          onInput={(event) => setValue(event.currentTarget.value)}
-        />
-        {error ? (
-          <p class="field__error" id="unlock-error" role="alert">
+        {storageError ? tr.shell.lock.forgotConfirm : tr.shell.lock.forgot}
+      </button>
+      <Dialog
+        open={resetOpen}
+        title={storageError ? tr.shell.lock.forgotConfirm : tr.shell.lock.forgotTitle}
+        description={storageError ? tr.shell.lock.resetBody : tr.shell.lock.forgotBody}
+        onClose={() => {
+          if (!resetBusy) setResetOpen(false);
+        }}
+        actions={
+          <>
+            <button
+              class="button button--secondary"
+              type="button"
+              disabled={resetBusy}
+              onClick={() => setResetOpen(false)}
+            >
+              {tr.shell.lock.forgotCancel}
+            </button>
+            <button
+              class="button button--primary"
+              type="button"
+              disabled={resetBusy}
+              onClick={() => void reset()}
+            >
+              {tr.shell.lock.forgotConfirm}
+            </button>
+          </>
+        }
+      >
+        {error === tr.shell.lock.resetError ? (
+          <Notice tone="error" live="assertive">
             {error}
-          </p>
+          </Notice>
         ) : null}
-        <div class="button-row">
-          <button class="button button--primary" type="submit" disabled={busy}>
-            {tr.shell.lock.submit}
-          </button>
-        </div>
-      </form>
+      </Dialog>
 
       {/* §9.3 — acil durumda 112 her zaman parolasız erişilebilir. */}
       <p>
         {tr.shell.lock.emergencyHint}{' '}
-        <a class="button button--emergency" href="tel:112">
-          112
+        <a class="button button--emergency" href={EMERGENCY_TEL}>
+          {EMERGENCY_NUMBER}
         </a>
       </p>
-    </main>
+    </>
   );
 }
 
 export function AppShell() {
   const [route, setRoute] = useState<RouteMatch>(() => currentRoute());
   const [boot, setBoot] = useState<BootState>('booting');
-  const [plan, setPlan] = useState<Plan | null>(null);
+  const [draftPlan, setDraftPlan] = useState<Plan | null>(null);
+  const draftRef = useRef<Plan | null>(null);
+  const plan = useMemo(
+    () => (draftPlan === null ? null : sanitizePlan(draftPlan).plan),
+    [draftPlan],
+  );
   const [settings, setSettings] = useState<Settings | null>(null);
   const [memoryMode, setMemoryMode] = useState(false);
-  const [saveError, setSaveError] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [settingsError, setSettingsError] = useState(false);
   // §16 — çevrimdışı notu ve "Yeni sürüm hazır" bildirimi.
   const [offline, setOffline] = useState(
     () => typeof navigator !== 'undefined' && navigator.onLine === false,
   );
-  const [updateReady, setUpdateReady] = useState(false);
+  const [updateReady, setUpdateReady] = useState(isUpdateReady);
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateError, setUpdateError] = useState(false);
+  const [updateMemoryConfirm, setUpdateMemoryConfirm] = useState(false);
   const saveTimer = useRef<number | null>(null);
+  const editVersion = useRef(0);
+  const replacement = useRef(false);
+  const [replacing, setReplacing] = useState(false);
+  const unlockRequired = boot !== 'ready' && !PUBLIC_ROUTES.has(route.id);
 
   useEffect(() => {
     const goOnline = (): void => setOffline(false);
@@ -167,6 +276,7 @@ export function AppShell() {
   useEffect(() => {
     const onUpdateReady = (): void => setUpdateReady(true);
     window.addEventListener(UPDATE_READY_EVENT, onUpdateReady);
+    if (isUpdateReady()) onUpdateReady();
     return () => window.removeEventListener(UPDATE_READY_EVENT, onUpdateReady);
   }, []);
 
@@ -174,14 +284,18 @@ export function AppShell() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      await initializeStorage();
-      if (cancelled) return;
-      const loaded = await loadPlan();
-      if (cancelled) return;
-      setMemoryMode(isMemoryMode());
-      setSettings(getSettings());
-      setPlan(loaded.plan);
-      setBoot(loaded.encrypted && loaded.plan === null ? 'locked' : 'ready');
+      try {
+        await initializeStorage();
+        const loaded = await loadPlan();
+        if (cancelled) return;
+        draftRef.current = loaded.plan;
+        setDraftPlan(loaded.plan);
+        setMemoryMode(isMemoryMode());
+        setSettings(getSettings());
+        setBoot(loaded.encrypted && loaded.plan === null ? 'locked' : 'ready');
+      } catch {
+        if (!cancelled) setBoot('storage-error');
+      }
     })();
     return () => {
       cancelled = true;
@@ -191,40 +305,77 @@ export function AppShell() {
   useEffect(() => subscribeToRouteChanges(setRoute), []);
 
   useEffect(() => {
+    const syncPersistenceStatus = (): void => {
+      setSettings((current) =>
+        current === null
+          ? current
+          : { ...current, storagePersisted: getSettings().storagePersisted },
+      );
+    };
+    window.addEventListener(PERSISTENCE_STATUS_EVENT, syncPersistenceStatus);
+    return () => window.removeEventListener(PERSISTENCE_STATUS_EVENT, syncPersistenceStatus);
+  }, []);
+
+  useEffect(() => {
     updateDocumentTitle(route);
-    focusRouteHeading();
   }, [route]);
+
+  useLayoutEffect(() => {
+    focusRouteHeading();
+  }, [route, boot]);
 
   // §15 — "Büyük yazı" ayarı kök öğeye yazılır; token'lar bunu okur.
   useEffect(() => {
     document.documentElement.dataset.largeText = settings?.largeText ? 'true' : 'false';
   }, [settings?.largeText]);
 
-  // Bekleyen yazmayı sayfa kapanırken boşalt (§9.1).
-  useEffect(
-    () => () => {
-      if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
-    },
-    [],
-  );
-
-  const persist = (next: Plan): void => {
-    savePlan(next);
+  const stopSaveTimer = (): void => {
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
-    saveTimer.current = window.setTimeout(() => {
-      // Kaydetme hatası yalnızca burada yüzeye çıkar (store sözleşmesi).
-      setSaveError(false);
-    }, 600);
+    saveTimer.current = null;
+  };
+
+  useEffect(() => stopSaveTimer, []);
+
+  const confirmSave = async (): Promise<boolean> => {
+    stopSaveTimer();
+    const version = editVersion.current;
+    try {
+      await flushPending();
+      if (version !== editVersion.current) return false;
+      setSaveState(isMemoryMode() ? 'idle' : 'saved');
+      setSaveError(null);
+      return true;
+    } catch (error) {
+      if (version === editVersion.current) {
+        setSaveState('error');
+        setSaveError(
+          error instanceof Error && error.message === 'depo-degisti'
+            ? tr.shell.concurrentEdit
+            : tr.shell.saveError,
+        );
+      }
+      return false;
+    }
   };
 
   const patchPlan = (patch: Partial<Plan>): void => {
-    setPlan((current) => {
-      const base = current ?? createEmptyPlan();
-      const candidate: Plan = { ...base, ...patch, updatedAt: new Date().toISOString() };
-      const { plan: sanitized } = sanitizePlan(candidate);
-      persist(sanitized);
-      return sanitized;
-    });
+    if (replacement.current) return;
+    const base = draftRef.current ?? createEmptyPlan();
+    const next = { ...base, ...patch, updatedAt: new Date().toISOString() };
+    draftRef.current = next;
+    setDraftPlan(next);
+    editVersion.current += 1;
+    setSaveState(isMemoryMode() ? 'idle' : 'saving');
+    savePlan(next);
+    stopSaveTimer();
+    saveTimer.current = window.setTimeout(() => void confirmSave(), 500);
+  };
+
+  const writeSettings = (patch: Partial<Settings>): void => {
+    void updateSettings(patch).then(
+      () => setSettingsError(false),
+      () => setSettingsError(true),
+    );
   };
 
   const visitStep = (step: number): void => {
@@ -235,32 +386,27 @@ export function AppShell() {
         ...current,
         visitedSteps: [...current.visitedSteps, step].sort((a, b) => a - b),
       };
-      void updateSettings({ visitedSteps: next.visitedSteps });
+      writeSettings({ visitedSteps: next.visitedSteps });
       return next;
     });
   };
 
   const acceptFirstRun = (): void => {
-    void updateSettings({ firstRunAccepted: true });
+    writeSettings({ firstRunAccepted: true });
     setSettings((current) => (current === null ? current : { ...current, firstRunAccepted: true }));
+    focusRouteHeading();
   };
 
   const handleUnlock = async (passphrase: string): Promise<void> => {
     const unlocked = await unlockPlan(passphrase);
-    setPlan(unlocked);
-    setSettings(getSettings());
-    setBoot('ready');
-  };
-
-  const handleForgotPassword = async (): Promise<void> => {
-    await clearAllData();
-    setPlan(null);
+    draftRef.current = unlocked;
+    setDraftPlan(unlocked);
     setSettings(getSettings());
     setBoot('ready');
   };
 
   const handleSettingsChange = (patch: Partial<Settings>): void => {
-    void updateSettings(patch);
+    writeSettings(patch);
     setSettings((current) => (current === null ? current : { ...current, ...patch }));
   };
 
@@ -270,12 +416,31 @@ export function AppShell() {
     downloadTextFile(filename, text);
   };
 
+  const commitReplacement = async (next: Plan): Promise<void> => {
+    if (replacement.current) throw new Error('kayit-basarisiz');
+    replacement.current = true;
+    setReplacing(true);
+    try {
+      const saved = await replacePlan(next);
+      stopSaveTimer();
+      editVersion.current += 1;
+      draftRef.current = saved;
+      setDraftPlan(saved);
+      setSaveState(isMemoryMode() ? 'idle' : 'saved');
+      setSaveError(null);
+      setSettings(getSettings());
+    } catch {
+      throw new Error('kayit-basarisiz');
+    } finally {
+      replacement.current = false;
+      setReplacing(false);
+    }
+  };
+
   const handleImportBackup = async (file: File, passphrase?: string): Promise<void> => {
-    const text = await file.text();
-    const { plan: imported } = await importBackup(text, passphrase);
-    const { plan: sanitized } = sanitizePlan(imported);
-    setPlan(sanitized);
-    savePlan(sanitized);
+    if (file.size > BACKUP_MAX_BYTES) throw new Error('cok-buyuk');
+    const { plan: imported } = await importBackup(await file.text(), passphrase);
+    await commitReplacement(imported);
   };
 
   const handleEnableLock = async (passphrase: string): Promise<void> => {
@@ -290,8 +455,30 @@ export function AppShell() {
 
   const handleClearAll = async (): Promise<void> => {
     await clearAllData();
-    setPlan(null);
+    stopSaveTimer();
+    editVersion.current += 1;
+    draftRef.current = null;
+    setDraftPlan(null);
     setSettings(getSettings());
+    setSaveState('idle');
+    setSaveError(null);
+    setSettingsError(false);
+    setBoot('ready');
+  };
+
+  const handleUpdate = async (): Promise<void> => {
+    setUpdateBusy(true);
+    setUpdateError(false);
+    try {
+      if (draftRef.current !== null && !(await confirmSave())) return;
+      const version = editVersion.current;
+      await applyServiceWorkerUpdate(() => version === editVersion.current || confirmSave());
+      setUpdateReady(isUpdateReady());
+    } catch {
+      setUpdateError(true);
+    } finally {
+      setUpdateBusy(false);
+    }
   };
 
   if (boot === 'booting') {
@@ -299,22 +486,6 @@ export function AppShell() {
       <main id="main-content" tabIndex={-1}>
         <p role="status">{tr.shell.booting}</p>
       </main>
-    );
-  }
-
-  if (boot === 'locked') {
-    return (
-      <LockScreen
-        onUnlock={async (passphrase) => {
-          try {
-            await handleUnlock(passphrase);
-          } catch (error) {
-            // §9.3 — "Parolamı unuttum" yalnızca bilgilendirir; veri silinmez.
-            void handleForgotPassword;
-            throw error;
-          }
-        }}
-      />
     );
   }
 
@@ -344,14 +515,47 @@ export function AppShell() {
             <button
               class="button button--secondary"
               type="button"
+              disabled={updateBusy || replacing}
               onClick={() => {
-                setUpdateReady(false);
-                applyServiceWorkerUpdate();
+                if (memoryMode && plan !== null) setUpdateMemoryConfirm(true);
+                else void handleUpdate();
               }}
             >
               {tr.shell.pwa.updateAction}
             </button>
           </p>
+          <Dialog
+            open={updateMemoryConfirm}
+            title={tr.shell.pwa.updateMemoryTitle}
+            description={tr.shell.pwa.updateMemoryBody}
+            onClose={() => setUpdateMemoryConfirm(false)}
+            actions={
+              <>
+                <button
+                  class="button button--secondary"
+                  type="button"
+                  onClick={() => setUpdateMemoryConfirm(false)}
+                >
+                  {tr.components.dialog.cancel}
+                </button>
+                <button
+                  class="button button--primary"
+                  type="button"
+                  onClick={() => {
+                    setUpdateMemoryConfirm(false);
+                    void handleUpdate();
+                  }}
+                >
+                  {tr.shell.pwa.updateAction}
+                </button>
+              </>
+            }
+          />
+          {updateError ? (
+            <Notice tone="error" live="polite">
+              {tr.shell.pwa.updateError}
+            </Notice>
+          ) : null}
         </div>
       ) : null}
 
@@ -361,45 +565,71 @@ export function AppShell() {
         </div>
       ) : null}
 
-      {settings !== null && !settings.firstRunAccepted ? (
+      {boot === 'ready' && settings !== null && !settings.firstRunAccepted ? (
         <FirstRunNotice onAccept={acceptFirstRun} />
       ) : null}
 
       <main id="main-content" tabIndex={-1}>
         {CONTENT_ITEMS.some((item) => item.status === 'taslak') && (
-          <Notice tone="info">{tr.shell.draft}</Notice>
+          <Notice class="shell-notice" tone="info">
+            {tr.shell.draft}
+          </Notice>
         )}
-        {renderRoute(route, {
-          plan,
-          settings,
-          saveError,
-          patchPlan,
-          visitStep,
-          downloadIcs: () => {
-            if (plan !== null) downloadCalendar(plan);
-          },
-          onSettingsChange: handleSettingsChange,
-          onExportBackup: handleExportBackup,
-          onImportBackup: handleImportBackup,
-          onEnableLock: handleEnableLock,
-          onDisableLock: handleDisableLock,
-          onClearAll: handleClearAll,
-        })}
+        {saveError === null ? null : (
+          <Notice class="shell-notice" tone="error" live="polite">
+            {saveError}
+          </Notice>
+        )}
+        {settingsError ? (
+          <Notice class="shell-notice" tone="error" live="polite">
+            {tr.shell.settingsError}
+          </Notice>
+        ) : null}
+        {unlockRequired ? (
+          <LockScreen
+            storageError={boot === 'storage-error'}
+            onUnlock={handleUnlock}
+            onReset={handleClearAll}
+          />
+        ) : replacing && (route.id === 'plan' || route.id === 'bag') ? (
+          <h1 tabIndex={-1}>{tr.shell.planReplacing}</h1>
+        ) : (
+          renderRoute(route, {
+            draftPlan,
+            plan,
+            settings,
+            saveState,
+            patchPlan,
+            visitStep,
+            downloadIcs: () => {
+              if (plan !== null) downloadCalendar(plan);
+            },
+            onSettingsChange: handleSettingsChange,
+            onExportBackup: handleExportBackup,
+            onImportBackup: handleImportBackup,
+            onMerge: commitReplacement,
+            onEnableLock: handleEnableLock,
+            onDisableLock: handleDisableLock,
+            onClearAll: handleClearAll,
+          })
+        )}
       </main>
     </>
   );
 }
 
 interface RouteContext {
+  draftPlan: Plan | null;
   plan: Plan | null;
   settings: Settings | null;
-  saveError: boolean;
+  saveState: SaveState;
   patchPlan: (patch: Partial<Plan>) => void;
   visitStep: (step: number) => void;
   downloadIcs: () => void;
   onSettingsChange: (patch: Partial<Settings>) => void;
   onExportBackup: (passphrase?: string) => Promise<void>;
   onImportBackup: (file: File, passphrase?: string) => Promise<void>;
+  onMerge: (next: Plan) => Promise<void>;
   onEnableLock: (passphrase: string) => Promise<void>;
   onDisableLock: () => Promise<void>;
   onClearAll: () => Promise<void>;
@@ -412,13 +642,15 @@ function downloadTextFile(filename: string, text: string, type = 'application/js
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = filename;
+  document.body.append(anchor);
   anchor.click();
-  URL.revokeObjectURL(url);
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 /** §12 — .ics dosyasını tarayıcıda indirir; ağ isteği yoktur. */
 function downloadCalendar(plan: Plan): void {
-  const date = plan.review.nextReviewAt ?? defaultReviewDate();
+  const date = dateOnly(plan.review.nextReviewAt ?? defaultReviewDate());
   const ics = buildIcs({
     uid: reviewIcsUid(plan.id),
     date,
@@ -448,18 +680,22 @@ function PlanRequired() {
 function renderRoute(route: RouteMatch, context: RouteContext) {
   switch (route.id) {
     case 'plan': {
-      const current = context.plan ?? createEmptyPlan();
+      const current = context.draftPlan ?? createEmptyPlan();
       return (
         <Wizard
+          key={route.planStep}
           plan={current}
           visitedSteps={new Set(context.settings?.visitedSteps ?? [])}
           onPatch={context.patchPlan}
           onVisit={context.visitStep}
+          onNavigate={(step) => {
+            location.hash = ROUTES.plan(step);
+          }}
           onFinish={() => {
             location.hash = ROUTES.summary;
           }}
           initialStep={route.planStep}
-          saveState={context.saveError ? 'error' : 'saved'}
+          saveState={context.saveState}
           onDownloadIcs={context.downloadIcs}
         />
       );
@@ -492,10 +728,10 @@ function renderRoute(route: RouteMatch, context: RouteContext) {
       return <Guide part={route.guidePart} />;
     }
     case 'bag': {
-      return context.plan === null ? (
+      return context.draftPlan === null ? (
         <PlanRequired />
       ) : (
-        <Bag plan={context.plan} onChange={context.patchPlan} />
+        <Bag plan={context.draftPlan} onChange={context.patchPlan} />
       );
     }
     case 'print': {
@@ -535,9 +771,10 @@ function renderRoute(route: RouteMatch, context: RouteContext) {
     case 'import': {
       return (
         <Import
+          key={route.importPayload}
           payload={route.importPayload ?? ''}
           plan={context.plan}
-          onMerge={context.patchPlan}
+          onMerge={context.onMerge}
         />
       );
     }

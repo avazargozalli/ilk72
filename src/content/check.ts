@@ -10,8 +10,9 @@
  *  2. Kaynak anahtarları kayıtlı.
  *  3. Kaynak adresleri `https` ve izinli alan adlarında; adresi olmayan
  *     (doğrulanmamış) anahtarlar onaylanamaz.
- *  4. Metin ≤ 220 karakter.
- *  5. `onayli` maddelerde `reviewedBy` ve `reviewedAt` dolu.
+ *  4. Metin boş değil ve ≤ 220 karakter.
+ *  5. Kaynak erişim tarihi ve `onayli` maddelerin inceleme tarihi geçerli.
+ *     `onayli` maddelerde inceleyen kişi de kayıtlı.
  *  6. `onayli` hiçbir madde doğrulanmamış kaynak anahtarı taşımıyor.
  *  7. `id`'ler benzersiz.
  *  8. `reviewedAt` üzerinden 12 ay geçen maddeler uyarı, 18 ay geçenler hata.
@@ -51,6 +52,8 @@ export const ISSUE_CODES = {
   missingSources: 'kaynaksiz-madde',
   unknownSource: 'bilinmeyen-kaynak',
   invalidSourceUrl: 'gecersiz-kaynak-adresi',
+  invalidSourceDate: 'gecersiz-kaynak-tarihi',
+  missingText: 'bos-metin',
   textTooLong: 'metin-cok-uzun',
   missingReview: 'eksik-inceleme',
   invalidReviewDate: 'gecersiz-inceleme-tarihi',
@@ -70,6 +73,12 @@ export const REVIEW_WARNING_MONTHS = 12;
 export const REVIEW_ERROR_MONTHS = 18;
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+const REVIEW_DATE_FORMAT = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Istanbul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 
 /** `YYYY-AA-GG` biçimindeki geçerli bir takvim tarihini UTC gece yarısına çevirir. */
 function parseIsoDate(value: string): Date | undefined {
@@ -123,6 +132,7 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
   const errors: Issue[] = [];
   const warnings: Issue[] = [];
   const now = input.now ?? new Date();
+  const today = parseIsoDate(REVIEW_DATE_FORMAT.format(now))?.getTime() ?? now.getTime();
   const prod = input.prod ?? false;
   const sourceCounts = countBy(input.sources.map((source) => source.key));
   const itemIdCounts = countBy(input.items.map((item) => item.id));
@@ -136,6 +146,14 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
       errors.push({
         code: ISSUE_CODES.duplicateSourceKey,
         detail: `${source.key} kaynak anahtarı ${sourceCounts.get(source.key) ?? 0} kez tanımlanmış; anahtarlar benzersiz olmalı (§13.1).`,
+      });
+    }
+
+    const accessedDate = parseIsoDate(source.accessed);
+    if (accessedDate === undefined || accessedDate.getTime() > today) {
+      errors.push({
+        code: ISSUE_CODES.invalidSourceDate,
+        detail: `${source.key}: accessed "${source.accessed}" geçmişteki veya bugünkü geçerli bir YYYY-AA-GG tarihi olmalı (§13.1).`,
       });
     }
 
@@ -195,7 +213,7 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
           errors.push({
             code: ISSUE_CODES.notApprovableSource,
             itemId: item.id,
-            detail: `${item.id} "onayli" olamaz: ${key} doğrulanmamış bir kaynak (resmî adresi yok). Önce kaynağı doğrulayın ya da maddeyi silin (§13.3, §13.4-1).`,
+            detail: `${item.id} "onayli" olamaz: ${key} doğrulanmış bir resmî adrese sahip değil. Önce kaynağı doğrulayın ya da maddeyi silin (§13.3, §13.4-1).`,
           });
         } else {
           const ids = unverifiedUsage.get(key) ?? [];
@@ -214,7 +232,13 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
       }
     }
 
-    if (item.text.length > CONTENT_TEXT_MAX) {
+    if (item.text.trim() === '') {
+      errors.push({
+        code: ISSUE_CODES.missingText,
+        itemId: item.id,
+        detail: `${item.id} maddesinin metni boş (§13.2).`,
+      });
+    } else if (item.text.length > CONTENT_TEXT_MAX) {
       errors.push({
         code: ISSUE_CODES.textTooLong,
         itemId: item.id,
@@ -224,12 +248,12 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
 
     if (item.status === 'onayli') {
       const reviewedBy = item.reviewedBy?.trim() ?? '';
-      const reviewedAt = item.reviewedAt?.trim() ?? '';
+      const reviewedAt = item.reviewedAt ?? '';
       const missingFields: string[] = [];
       if (reviewedBy === '') {
         missingFields.push('reviewedBy');
       }
-      if (reviewedAt === '') {
+      if (reviewedAt.trim() === '') {
         missingFields.push('reviewedAt');
       }
 
@@ -241,19 +265,19 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
         });
       } else {
         const reviewedDate = parseIsoDate(reviewedAt);
-        if (reviewedDate === undefined) {
+        if (reviewedDate === undefined || reviewedDate.getTime() > today) {
           errors.push({
             code: ISSUE_CODES.invalidReviewDate,
             itemId: item.id,
-            detail: `${item.id}: reviewedAt "${reviewedAt}" geçerli bir YYYY-AA-GG tarihi değil (§13.2).`,
+            detail: `${item.id}: reviewedAt "${reviewedAt}" geçmişteki veya bugünkü geçerli bir YYYY-AA-GG tarihi olmalı (§13.2).`,
           });
-        } else if (now.getTime() >= addMonths(reviewedDate, REVIEW_ERROR_MONTHS).getTime()) {
+        } else if (today >= addMonths(reviewedDate, REVIEW_ERROR_MONTHS).getTime()) {
           errors.push({
             code: ISSUE_CODES.expiredReview,
             itemId: item.id,
             detail: `${item.id} inceleme tarihi ${reviewedAt}; ${REVIEW_ERROR_MONTHS} aydan eski. Üretim derlemesi bu maddeyle yayımlanamaz; kaynak yeniden doğrulanmalı (§13.4-4).`,
           });
-        } else if (now.getTime() >= addMonths(reviewedDate, REVIEW_WARNING_MONTHS).getTime()) {
+        } else if (today >= addMonths(reviewedDate, REVIEW_WARNING_MONTHS).getTime()) {
           warnings.push({
             code: ISSUE_CODES.staleReview,
             itemId: item.id,
@@ -276,7 +300,7 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
     const uniqueIds = [...new Set(ids)];
     warnings.push({
       code: ISSUE_CODES.unverifiedSource,
-      detail: `${key} doğrulanmamış bir kaynak (resmî adresi yok); bu anahtarı taşıyan maddeler "onayli" yapılamaz: ${uniqueIds.join(', ')}.`,
+      detail: `${key} doğrulanmış bir resmî adrese sahip değil. Bu anahtarı taşıyan maddeler "onayli" yapılamaz: ${uniqueIds.join(', ')}.`,
     });
   }
 

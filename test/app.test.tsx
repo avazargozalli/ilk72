@@ -6,8 +6,15 @@
  * çizimde yalnızca "Yükleniyor…" görünür ve sayfa başlığı **asenkron** gelir.
  * Yönlendirici ve model sözleşmesi testleri değişmedi.
  */
-import { act, render, screen } from '@testing-library/preact';
-import { describe, expect, it } from 'vitest';
+import 'fake-indexeddb/auto';
+import { act, fireEvent, render, screen } from '@testing-library/preact';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  applyServiceWorkerUpdate,
+  isUpdateReady,
+  onServiceWorkerControlling,
+  setUpdateApplier,
+} from '../src/app/pwa';
 import { ROUTES, WIZARD_STEP_COUNT } from '../src/config';
 import { tr } from '../src/i18n/tr';
 import { App } from '../src/main';
@@ -19,6 +26,9 @@ import {
   resolveRoute,
   updateDocumentTitle,
 } from '../src/router';
+import * as storage from '../src/storage/store';
+
+afterEach(() => vi.restoreAllMocks());
 
 /** Kabuk açılışını bekler ve sayfa başlığını döndürür. */
 const openApp = async () => {
@@ -64,6 +74,61 @@ describe('uygulama kabuğu', () => {
     expect(heading.textContent).toBe(tr.nav.emergency);
     expect(document.title).toBe(`${tr.nav.emergency} · ${tr.app.name}`);
     expect(document.activeElement).toBe(heading);
+  });
+
+  it('yazım sırasında boşluğu korur ve bir sonraki adıma adresiyle geçer', async () => {
+    window.location.hash = ROUTES.plan(1);
+    await openApp();
+    const input = screen.getByLabelText(tr.wizard.fields.householdLabel) as HTMLInputElement;
+
+    fireEvent.input(input, { target: { value: 'Örnek ' } });
+    expect(input.value).toBe('Örnek ');
+    fireEvent.input(input, { target: { value: 'Örnek aile' } });
+    expect(input.value).toBe('Örnek aile');
+
+    fireEvent.click(screen.getByRole('button', { name: tr.wizard.actions.next }));
+    await screen.findByRole('heading', { name: tr.wizard.steps.members.title, level: 1 });
+    expect(location.hash).toBe(ROUTES.plan(2));
+  });
+
+  it('depo yazma hatasında planı kaydedilmiş olarak göstermez', async () => {
+    vi.spyOn(storage, 'flushPending').mockRejectedValueOnce(new Error('depo-degisti'));
+    window.location.hash = ROUTES.plan(1);
+    await openApp();
+    const input = screen.getByLabelText(tr.wizard.fields.householdLabel);
+
+    fireEvent.input(input, { target: { value: 'Bu sekmedeki plan' } });
+
+    expect(screen.getByText(tr.components.saveStatus.saving)).toBeTruthy();
+    expect(await screen.findByText(tr.shell.concurrentEdit)).toBeTruthy();
+    expect(screen.queryByText(tr.components.saveStatus.saved)).toBeNull();
+  });
+
+  it('kilit ekranı parola kurtarma açıklaması ile bilgi ve acil sayfalarına erişim sunar', async () => {
+    vi.spyOn(storage, 'loadPlan').mockResolvedValue({ plan: null, encrypted: true });
+    const clear = vi.spyOn(storage, 'clearAllData');
+    expect((await openApp()).textContent).toBe(tr.shell.lock.title);
+
+    fireEvent.click(screen.getByRole('button', { name: tr.shell.lock.forgot }));
+    expect(await screen.findByRole('dialog', { name: tr.shell.lock.forgotTitle })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: tr.shell.lock.forgotCancel }));
+    expect(clear).not.toHaveBeenCalled();
+
+    window.location.hash = ROUTES.privacy;
+    expect(
+      await screen.findByRole('heading', { name: tr.legal.privacy.title, level: 1 }),
+    ).toBeTruthy();
+    window.location.hash = ROUTES.emergency;
+    expect(await screen.findByRole('heading', { name: tr.nav.emergency, level: 1 })).toBeTruthy();
+    expect(document.querySelector('main a[href="tel:112"]')).not.toBeNull();
+  });
+
+  it('okunamayan planı silmeden kurtarma ekranı gösterir', async () => {
+    vi.spyOn(storage, 'loadPlan').mockRejectedValue(new Error('bozuk-veri'));
+    const clear = vi.spyOn(storage, 'clearAllData');
+
+    expect((await openApp()).textContent).toBe(tr.shell.lock.storageErrorTitle);
+    expect(clear).not.toHaveBeenCalled();
   });
 });
 
@@ -145,5 +210,25 @@ describe('yönlendirici', () => {
 describe('veri modeli sözleşmesi', () => {
   it('şema sürümü 1 olarak sabitlenmiştir (§8.1)', () => {
     expect(SCHEMA_VERSION).toBe(1);
+  });
+});
+
+describe('hizmet çalışanı güncellemesi', () => {
+  it('başka sekmenin etkinleştirdiği sürümde yerel onay ve kayıt durumunu bekler', async () => {
+    const reload = vi.spyOn(window.location, 'reload').mockImplementation(() => undefined);
+    const apply = vi.fn(async () => undefined);
+    setUpdateApplier(apply);
+
+    await onServiceWorkerControlling();
+    expect(reload).not.toHaveBeenCalled();
+    expect(isUpdateReady()).toBe(true);
+
+    await applyServiceWorkerUpdate(() => false);
+    expect(reload).not.toHaveBeenCalled();
+    expect(isUpdateReady()).toBe(true);
+
+    await applyServiceWorkerUpdate(() => true);
+    expect(reload).toHaveBeenCalledOnce();
+    expect(apply).not.toHaveBeenCalled();
   });
 });

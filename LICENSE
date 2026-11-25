@@ -22,6 +22,7 @@ SOFTWARE.
 
 ---
 
-Bu lisans yalnızca kaynak kodu kapsar. Rehber metinleri, belgeler ve diğer
-içerik CC BY 4.0 lisansı altındadır; bkz. LICENSE-CONTENT ve
-THIRD_PARTY_LICENSES.md.
+Bu lisans, İlk 72'nin kendi kaynak kodu ve bu kodun derlenmiş hâli için
+geçerlidir. Projenin özgün metinlerine ve belgelerine uygulanan koşullar
+LICENSE-CONTENT dosyasındadır. Dağıtılan üçüncü taraf kodunun bildirimleri
+THIRD_PARTY_LICENSES.md dosyasındadır.

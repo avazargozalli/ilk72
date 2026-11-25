@@ -10,8 +10,7 @@
  */
 import { formatText, tr } from '../../../i18n/tr.ts';
 import type { Place, Plan } from '../../../model/types.ts';
-import { PLAN_LIMITS } from '../../../model/validate.ts';
-import { isIsoDateString } from './dates.ts';
+import { isIsoDate, PLAN_LIMITS } from '../../../model/validate.ts';
 import { FIELD_IDS } from './fieldIds.ts';
 import type { WizardStep } from './steps.ts';
 
@@ -53,7 +52,7 @@ const phoneError = (id: string, value: string): WizardFieldError | undefined => 
 
 const dateError = (id: string, value: string | null): WizardFieldError | undefined => {
   if (value === null || value === '') return undefined;
-  return isIsoDateString(value) ? undefined : { id, message: tr.wizard.errors.dateInvalid };
+  return isIsoDate(value) ? undefined : { id, message: tr.wizard.errors.dateInvalid };
 };
 
 function push(errors: WizardFieldError[], error: WizardFieldError | undefined): void {

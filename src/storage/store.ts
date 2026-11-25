@@ -35,10 +35,13 @@ import { createMemoryStore, type KeyValueStore, openStore } from './idb.ts';
 
 /** §9.1 — otomatik kayıt gecikmesi. */
 const SAVE_DELAY_MS = 500;
+export const PERSISTENCE_STATUS_EVENT = 'ilk72:persistence-status';
 
 /** §9.1 — nesne deposundaki anahtarlar. */
 const PLAN_KEY = 'plan';
 const SETTINGS_KEY = 'settings';
+// A new revision blocks writes from tabs holding an older plan or lock state.
+const REVISION_KEY = 'revision';
 
 /** §9.3 — kilit parolasının en kısa uzunluğu (güç ölçer yoktur). */
 const MIN_PASSPHRASE_LENGTH = 8;
@@ -80,6 +83,8 @@ let db: KeyValueStore = createMemoryStore();
 let ready: Promise<void> | null = null;
 let memoryMode = false;
 let settings: Settings = createDefaultSettings();
+let revision: unknown;
+let readError: unknown;
 
 /** Bellekteki çözülmüş plan; kilitliyken `null` olabilir. */
 let currentPlan: Plan | null = null;
@@ -91,9 +96,11 @@ let passphrase: string | null = null;
 let pendingPlan: Plan | null = null;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let writeChain: Promise<void> = Promise.resolve();
-let lastSaveError: unknown = null;
+let lastSave: Promise<void> = Promise.resolve();
+let clearing: Promise<void> | null = null;
 
 let persistenceRequested = false;
+let clearGeneration = 0;
 let visibilityListenerInstalled = false;
 
 /** Ayar kaydının varsayılanları; bozuk/eksik alanlar bunlara döner. */
@@ -187,15 +194,45 @@ async function initialize(): Promise<void> {
   installVisibilityListener();
 
   try {
-    settings = sanitizeSettings(await db.get(SETTINGS_KEY));
-  } catch {
-    settings = createDefaultSettings();
+    const [storedPlan, storedSettings, storedRevision] = await db.getMany([
+      PLAN_KEY,
+      SETTINGS_KEY,
+      REVISION_KEY,
+    ]);
+    settings = sanitizeSettings(storedSettings);
+    revision = storedRevision;
+    if (isEncryptedPlanRecord(storedPlan)) {
+      encryptedData = storedPlan.data;
+      settings.lockEnabled = true;
+    } else if (storedPlan !== undefined) {
+      const { plan } = sanitizePlan(storedPlan);
+      currentPlan ??= plan;
+      // The plan record takes precedence over settings written by older app versions.
+      settings.lockEnabled = false;
+    }
+    persistenceRequested = settings.storagePersisted !== null;
+  } catch (error) {
+    readError = error;
   }
 }
 
 function ensureReady(): Promise<void> {
   ready ??= initialize();
   return ready;
+}
+
+async function ensureReadable(): Promise<void> {
+  await ensureReady();
+  if (readError !== undefined) throw readError;
+}
+
+function queueWrite<T>(write: () => Promise<T>): Promise<T> {
+  const result = writeChain.then(write);
+  writeChain = result.then(
+    () => undefined,
+    () => undefined,
+  );
+  return result;
 }
 
 /**
@@ -238,14 +275,48 @@ export function getSettings(): Settings {
 
 /** §9.1 — ayar güncellemesi; kayıt hemen yazılır ve bir sonraki açılışta kalıcıdır. */
 export async function updateSettings(patch: Partial<Settings>): Promise<void> {
-  await ensureReady();
-  settings = sanitizeSettings({
-    ...settings,
-    ...patch,
-    // `printPrefs` alan alan birleştirilir: kısmi güncelleme diğer seçimleri silmez.
-    printPrefs: { ...settings.printPrefs, ...(patch.printPrefs ?? {}) },
+  return queueWrite(async () => {
+    await ensureReadable();
+    await commitSettings(patch);
   });
-  await db.set(SETTINGS_KEY, settings);
+}
+
+async function commitSettings(
+  patch: Partial<Settings>,
+  change?: { lockEnabled: boolean; record?: Plan | EncryptedPlanRecord },
+): Promise<void> {
+  const nextRevision = change === undefined ? revision : crypto.randomUUID();
+  const lockEnabled = change?.lockEnabled ?? settings.lockEnabled;
+  let nextSettings = settings;
+  await db.update([REVISION_KEY, SETTINGS_KEY], ([storedRevision, storedSettings]) => {
+    if (storedRevision !== revision) throw new Error('depo-degisti');
+    const current = sanitizeSettings(storedSettings);
+    nextSettings = sanitizeSettings({
+      ...current,
+      ...patch,
+      printPrefs: { ...current.printPrefs, ...patch.printPrefs },
+      lockEnabled,
+    });
+    const entries: [string, unknown][] = [[SETTINGS_KEY, nextSettings]];
+    if (change !== undefined) entries.push([REVISION_KEY, nextRevision]);
+    if (change?.record !== undefined) entries.push([PLAN_KEY, change.record]);
+    return { entries };
+  });
+  settings = nextSettings;
+  revision = nextRevision;
+}
+
+async function commitLock(nextPassphrase: string | null): Promise<void> {
+  const plan = currentPlan;
+  if (plan !== null) {
+    const previousSave = lastSave;
+    await persistPlan(plan, nextPassphrase);
+    if (pendingPlan === plan) pendingPlan = null;
+    if (lastSave === previousSave && currentPlan === plan) lastSave = Promise.resolve();
+  } else {
+    await commitSettings({}, { lockEnabled: nextPassphrase !== null });
+  }
+  passphrase = nextPassphrase;
 }
 
 /**
@@ -254,28 +325,10 @@ export async function updateSettings(patch: Partial<Settings>): Promise<void> {
  * Kilit bu oturumda zaten açıldıysa bellek içindeki plan döner.
  */
 export async function loadPlan(): Promise<LoadedPlan> {
-  await ensureReady();
-
-  if (passphrase !== null && currentPlan !== null) {
-    return { plan: currentPlan, encrypted: false };
-  }
-
-  const stored = await db.get(PLAN_KEY);
-  if (stored === undefined) {
-    currentPlan = null;
-    encryptedData = null;
-    return { plan: null, encrypted: false };
-  }
-
-  if (isEncryptedPlanRecord(stored)) {
-    encryptedData = stored.data;
-    currentPlan = null;
+  await ensureReadable();
+  if (encryptedData !== null && passphrase === null) {
     return { plan: null, encrypted: true };
   }
-
-  const sanitized = sanitizePlan(stored);
-  currentPlan = sanitized.plan;
-  encryptedData = null;
   return { plan: currentPlan, encrypted: false };
 }
 
@@ -285,38 +338,28 @@ export async function loadPlan(): Promise<LoadedPlan> {
  * gelir: `parola-yanlis-veya-bozuk`, `bozuk-veri`.
  */
 export async function unlockPlan(candidate: string): Promise<Plan> {
-  await ensureReady();
-
-  let data = encryptedData;
-  if (data === null) {
-    const stored = await db.get(PLAN_KEY);
-    if (stored === undefined) throw new Error('bozuk-veri');
-    if (isEncryptedPlanRecord(stored)) {
-      data = stored.data;
-    } else {
-      // Kayıt şifreli değilse parola sorulmasına gerek yok; temizleyip döndür.
-      const sanitized = sanitizePlan(stored);
-      currentPlan = sanitized.plan;
-      return sanitized.plan;
+  return queueWrite(async () => {
+    await ensureReadable();
+    if (encryptedData === null) {
+      if (currentPlan === null) throw new Error('bozuk-veri');
+      return currentPlan;
     }
-  }
 
-  const plain = await decryptBytes(data, candidate);
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(utf8Decode(plain));
-  } catch {
-    throw new Error('bozuk-veri');
-  }
-  const sanitized = sanitizePlan(parsed);
-
-  passphrase = candidate;
-  currentPlan = sanitized.plan;
-  if (!settings.lockEnabled) {
-    settings = { ...settings, lockEnabled: true };
-    await db.set(SETTINGS_KEY, settings).catch(() => undefined);
-  }
-  return sanitized.plan;
+    const plain = await decryptBytes(encryptedData, candidate);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(utf8Decode(plain));
+    } catch {
+      throw new Error('bozuk-veri');
+    }
+    const { plan } = sanitizePlan(parsed);
+    passphrase = candidate;
+    currentPlan = plan;
+    // A save queued before the lock was opened cannot replace the decrypted plan.
+    pendingPlan = null;
+    lastSave = Promise.resolve();
+    return plan;
+  });
 }
 
 /**
@@ -324,6 +367,7 @@ export async function unlockPlan(candidate: string): Promise<Plan> {
  * edilmiş** kopya yazılır; ham girdi hiçbir zaman saklanmaz (§8.3).
  */
 export function savePlan(plan: Plan): void {
+  if (clearing !== null) return;
   const sanitized = sanitizePlan(plan);
   currentPlan = sanitized.plan;
   pendingPlan = sanitized.plan;
@@ -331,7 +375,7 @@ export function savePlan(plan: Plan): void {
   if (saveTimer !== null) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveTimer = null;
-    void writePending();
+    void writePending().catch(() => undefined);
   }, SAVE_DELAY_MS);
 }
 
@@ -344,49 +388,71 @@ export const setPlan = savePlan;
  * gösterebilir.
  */
 export async function flushPending(): Promise<void> {
+  stopSaveTimer();
+  return writePending();
+}
+
+function stopSaveTimer(): void {
   if (saveTimer !== null) {
     clearTimeout(saveTimer);
     saveTimer = null;
-  }
-  await ensureReady();
-  await writePending();
-  if (lastSaveError !== null) {
-    const error = lastSaveError;
-    lastSaveError = null;
-    throw error;
   }
 }
 
 function writePending(): Promise<void> {
   const plan = pendingPlan;
+  if (plan === null) return lastSave;
   pendingPlan = null;
-  if (plan === null) return writeChain;
 
-  writeChain = writeChain.then(async () => {
+  lastSave = queueWrite(async () => {
     try {
-      // `savePlan` depo hazır olmadan çağrılabilir (ör. yeni plan); yazmadan
-      // önce açılışın tamamlanması beklenir.
-      await ensureReady();
-      await persistPlan(plan);
-      lastSaveError = null;
+      await ensureReadable();
+      if (currentPlan !== plan) return;
+      await saveInCurrentMode(plan);
     } catch (error) {
-      lastSaveError = error;
+      if (currentPlan === plan && clearing === null) pendingPlan ??= plan;
+      throw error;
     }
   });
-  return writeChain;
+  return lastSave;
 }
 
-async function persistPlan(plan: Plan): Promise<void> {
-  if (settings.lockEnabled) {
-    if (passphrase === null) throw new Error('parola-gerekli');
-    const data = await encryptBytes(utf8Encode(JSON.stringify(plan)), passphrase);
-    await db.set(PLAN_KEY, { enc: true, data });
-    encryptedData = data;
-  } else {
-    await db.set(PLAN_KEY, plan);
-    encryptedData = null;
-  }
-  await requestPersistence();
+/** Bir yedeği, yazma işlemi tamamlanınca bellekteki planın yerine koyar. */
+export async function replacePlan(plan: Plan): Promise<Plan> {
+  const replacement = sanitizePlan(plan).plan;
+  return queueWrite(async () => {
+    await ensureReadable();
+    const preferences = currentPlan?.id === replacement.id ? {} : { visitedSteps: [] };
+    await saveInCurrentMode(replacement, preferences);
+    stopSaveTimer();
+    pendingPlan = null;
+    lastSave = Promise.resolve();
+    currentPlan = replacement;
+    return replacement;
+  });
+}
+
+async function saveInCurrentMode(plan: Plan, patch?: Partial<Settings>): Promise<void> {
+  if (settings.lockEnabled && passphrase === null) throw new Error('parola-gerekli');
+  await persistPlan(plan, passphrase, patch);
+}
+
+async function persistPlan(
+  plan: Plan,
+  activePassphrase: string | null,
+  patch: Partial<Settings> = {},
+): Promise<void> {
+  const data =
+    activePassphrase === null
+      ? null
+      : await encryptBytes(utf8Encode(JSON.stringify(plan)), activePassphrase);
+  await commitSettings(patch, {
+    lockEnabled: data !== null,
+    record: data ? { enc: true, data } : plan,
+  });
+  encryptedData = data;
+  // Firefox may show a permission prompt. The plan is already committed.
+  void requestPersistence();
 }
 
 /**
@@ -396,47 +462,35 @@ async function persistPlan(plan: Plan): Promise<void> {
 async function requestPersistence(): Promise<void> {
   if (persistenceRequested || memoryMode) return;
   persistenceRequested = true;
+  const generation = clearGeneration;
 
-  let persisted: boolean | null = null;
-  const manager = globalThis.navigator?.storage;
-  if (manager && typeof manager.persist === 'function') {
-    try {
-      persisted = await manager.persist();
-    } catch {
-      persisted = false;
-    }
+  let persisted: boolean;
+  try {
+    const manager = globalThis.navigator?.storage;
+    if (!manager || typeof manager.persist !== 'function') return;
+    persisted = await manager.persist();
+  } catch {
+    persisted = false;
   }
 
-  settings = { ...settings, storagePersisted: persisted };
   // Plan yazıldı; ayar kaydının yazılamaması kaydetmeyi başarısız saymaz.
-  await db.set(SETTINGS_KEY, settings).catch(() => undefined);
+  await queueWrite(async () => {
+    if (generation !== clearGeneration) return;
+    await commitSettings({ storagePersisted: persisted });
+    globalThis.window?.dispatchEvent(new Event(PERSISTENCE_STATUS_EVENT));
+  }).catch(() => undefined);
 }
 
 /** §9.3 — kilidi açar: plan bundan sonra `{ enc: true, data }` olarak saklanır. */
 export async function enableLock(candidate: string): Promise<void> {
-  await ensureReady();
-  if (typeof candidate !== 'string' || candidate.length < MIN_PASSPHRASE_LENGTH) {
+  if (typeof candidate !== 'string' || [...candidate].length < MIN_PASSPHRASE_LENGTH) {
     throw new Error('parola-kisa');
   }
-  if (currentPlan === null && encryptedData !== null) {
-    // Kilitli plan önce açılmalı; yoksa parola değişmiş gibi görünürdü.
-    throw new Error('kilitli');
-  }
-
-  const previousLock = settings.lockEnabled;
-  passphrase = candidate;
-  settings = { ...settings, lockEnabled: true };
-  try {
-    if (currentPlan !== null) {
-      pendingPlan = currentPlan;
-      await flushPending();
-    }
-    await db.set(SETTINGS_KEY, settings);
-  } catch (error) {
-    settings = { ...settings, lockEnabled: previousLock };
-    passphrase = null;
-    throw error;
-  }
+  return queueWrite(async () => {
+    await ensureReadable();
+    if (encryptedData !== null && passphrase === null) throw new Error('kilitli');
+    await commitLock(candidate);
+  });
 }
 
 /**
@@ -444,17 +498,12 @@ export async function enableLock(candidate: string): Promise<void> {
  * açılmamışsa `parola-gerekli` verir (veri silinmez).
  */
 export async function disableLock(): Promise<void> {
-  await ensureReady();
-  if (!settings.lockEnabled) return;
-  if (passphrase === null && encryptedData !== null) throw new Error('parola-gerekli');
-
-  settings = { ...settings, lockEnabled: false };
-  if (currentPlan !== null) {
-    pendingPlan = currentPlan;
-    await flushPending();
-  }
-  passphrase = null;
-  await db.set(SETTINGS_KEY, settings);
+  return queueWrite(async () => {
+    await ensureReadable();
+    if (!settings.lockEnabled) return;
+    if (passphrase === null && encryptedData !== null) throw new Error('parola-gerekli');
+    await commitLock(null);
+  });
 }
 
 /** §9.3 — kayıt diskte şifreli mi (bu oturumda açılmış olsa bile)? */
@@ -468,57 +517,35 @@ export function isUnlocked(): boolean {
 }
 
 /**
- * §9.4, §18.4-7 — "Bütün verilerimi sil": veritabanı, `caches` ve
- * `localStorage` temizlenir; bellekteki plan, ayarlar ve parola sıfırlanır.
- * Sonraki çağrı depoyu yeniden açar.
+ * §9.4 — "Bütün verilerimi sil": depodaki ve bu sekmenin belleğindeki plan,
+ * ayarlar ve parola silinir. Çevrimdışı açılış için kullanılan uygulama
+ * dosyalarının önbelleği korunur.
  */
-export async function clearAllData(): Promise<void> {
-  await ensureReady();
+export function clearAllData(): Promise<void> {
+  if (clearing !== null) return clearing;
+  stopSaveTimer();
+  clearing = queueWrite(async () => {
+    await ensureReady();
+    // Eski sekmelerin silinen veriyi yeniden yazmasını engelleyen tek kayıt.
+    const nextRevision = crypto.randomUUID();
+    await db.update([], () => ({ clear: true, entries: [[REVISION_KEY, nextRevision]] }));
 
-  // Bekleyen debounce yazmasını iptal et; uçuştaki yazma bitmeden silme.
-  if (saveTimer !== null) {
-    clearTimeout(saveTimer);
-    saveTimer = null;
-  }
-  pendingPlan = null;
-  await writeChain;
-
-  let databaseError: unknown = null;
-  try {
-    await db.clear();
-  } catch (error) {
-    databaseError = error;
-  }
-
-  await clearCacheStorage();
-  try {
-    if (typeof localStorage !== 'undefined') localStorage.clear();
-  } catch {
-    // Gizli kipte localStorage erişilemez; veritabanı ve önbellek yine temizlendi.
-  }
-
-  resetRuntimeState();
-  db.close();
-  db = createMemoryStore();
-  ready = null;
-  memoryMode = false;
-  persistenceRequested = false;
-
-  if (databaseError !== null) throw databaseError;
+    resetRuntimeState(nextRevision);
+  }).finally(() => {
+    clearing = null;
+  });
+  return clearing;
 }
 
-async function clearCacheStorage(): Promise<void> {
-  if (typeof caches === 'undefined') return;
-  const keys = await caches.keys().catch(() => [] as string[]);
-  await Promise.all(keys.map((key) => caches.delete(key).catch(() => false)));
-}
-
-function resetRuntimeState(): void {
+function resetRuntimeState(nextRevision: string): void {
+  clearGeneration += 1;
+  revision = nextRevision;
+  readError = undefined;
   currentPlan = null;
   encryptedData = null;
   passphrase = null;
   pendingPlan = null;
-  lastSaveError = null;
-  writeChain = Promise.resolve();
+  lastSave = Promise.resolve();
+  persistenceRequested = false;
   settings = createDefaultSettings();
 }

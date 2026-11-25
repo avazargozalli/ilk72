@@ -20,7 +20,7 @@
  * 4. kullanıcıya gösterilecek özet (`members`, `contacts`, `updatedAt`) döner.
  *
  * **Bu dosya hiçbir zaman mevcut planın üzerine yazmaz.** Arayüz özeti
- * gösterip onay aldıktan sonra `store.savePlan` çağırmalıdır (§9.4).
+ * gösterip onay aldıktan sonra `store.replacePlan` çağırmalıdır (§9.4).
  *
  * Hata kodları: `cok-buyuk`, `bozuk-veri`, `gecersiz-format`,
  * `desteklenmeyen-surum`, `parola-gerekli`, `parola-yanlis-veya-bozuk`.
@@ -90,6 +90,8 @@ export function backupFilename(now: Date = new Date()): string {
  */
 export async function exportBackup(plan: Plan, passphrase?: string): Promise<BackupFile> {
   const sanitized = sanitizePlan(plan).plan;
+  const json = JSON.stringify(sanitized);
+  if (utf8Encode(json).length > BACKUP_MAX_BYTES) throw new Error('cok-buyuk');
   const envelope: BackupEnvelope = {
     format: BACKUP_FORMAT,
     schemaVersion: SCHEMA_VERSION,
@@ -99,13 +101,19 @@ export async function exportBackup(plan: Plan, passphrase?: string): Promise<Bac
 
   if (passphrase !== undefined && passphrase !== '') {
     envelope.encrypted = true;
-    const compressed = await deflate(utf8Encode(JSON.stringify(sanitized)));
+    const compressed = await deflate(utf8Encode(json));
     envelope.data = b64urlEncode(await encryptBytes(compressed, passphrase));
   } else {
     envelope.plan = sanitized;
   }
 
-  return { filename: backupFilename(), text: JSON.stringify(envelope, null, 2) };
+  const formatted = JSON.stringify(envelope, null, 2);
+  if (utf8Encode(formatted).length <= BACKUP_MAX_BYTES) {
+    return { filename: backupFilename(), text: formatted };
+  }
+  const compact = JSON.stringify(envelope);
+  if (utf8Encode(compact).length > BACKUP_MAX_BYTES) throw new Error('cok-buyuk');
+  return { filename: backupFilename(), text: compact };
 }
 
 /**

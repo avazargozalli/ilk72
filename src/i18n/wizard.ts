@@ -191,7 +191,7 @@ export const wizard = {
     dailyPlaces: 'Okul, iş yeri ya da düzenli gidilen bir yer.',
     needsNote: 'Örneğin: merdiven inerken destek gerekir.',
     healthIntro:
-      'Sağlık bilgileri isteğe bağlıdır, varsayılan olarak kapalıdır ve paylaşılan özet karta girmez.',
+      'Sağlık alanları isteğe bağlıdır ve başlangıçta kapalıdır. Serbest notlara sağlık ayrıntısı yazmayın.',
     contacts: 'En az bir şehir dışı kişi önerilir; zorunlu değildir.',
     contactCity: 'Şehir dışı irtibat kişisiyse şehri yazın.',
     placeDetail: 'Yeri kısa bir tarifle anlatın.',
@@ -212,13 +212,13 @@ export const wizard = {
     lastDrillAt: 'Tatbikat yaptıysanız tarihini seçin.',
     nextReviewAt: 'Altı ay sonrası önerilir; tarihi değiştirebilirsiniz.',
     notes: 'Planınızla ilgili eklemek istediğiniz notlar.',
-    reviewCalendar: 'Takvim dosyasında kişisel bilgi yer almaz.',
+    reviewCalendar: 'Takvim dosyasında ad, telefon, adres veya sağlık bilgisi yer almaz.',
   },
 
   notices: {
-    /** §11.5/3 — sağlık anahtarı açılırken gösterilen metin (birebir). */
+    /** Sağlık alanları açıldığında gösterilen bilgilendirme. */
     healthInfo:
-      'Kan grubu, hastalık, ilaç gibi bilgiler hassastır. Yalnızca bu cihazda saklanır. Eklemek zorunda değilsiniz; yalnızca acil durumda bir başkasının bilmesi gereken kadarını yazın.',
+      'Kan grubu, hastalık ve ilaç bilgileri özel nitelikli kişisel veridir. Başkasının sağlık bilgisini yalnızca gerekli olduğunda ve bunu yapmaya yetkiniz varsa yazın.',
     /** §11.5/6 — tesisat uyarısı (birebir). */
     utilitiesWarning:
       'Tesisat üzerinde kendiniz işlem yapmayın; gerekirse yetkili servisten destek alın.',

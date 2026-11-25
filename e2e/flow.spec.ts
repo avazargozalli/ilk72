@@ -17,8 +17,10 @@ test('ilk açılış → 9 adım → özet → yazdırma, yenilemeden sonra veri
   await expect(page.getByRole('heading', { level: 1, name: 'Haneniz' })).toBeVisible();
 
   // 1. Haneniz
-  await page.getByLabel('Hane etiketi').fill('Yılmaz ailesi');
+  const householdLabel = page.getByLabel('Hane etiketi');
+  await householdLabel.fill('Yılmaz ailesi');
   await page.getByLabel('Adres').fill('Cumhuriyet Mahallesi 12/4, İzmir');
+  await expect(householdLabel).toHaveValue('Yılmaz ailesi');
   await page.getByRole('button', { name: 'İleri' }).click();
 
   // 2. Kişiler (zorunlu alan: en az bir ad)
@@ -43,13 +45,12 @@ test('ilk açılış → 9 adım → özet → yazdırma, yenilemeden sonra veri
 
   // 9. adımdayız: bitir → özet.
   await expect(page.getByRole('heading', { level: 1, name: 'Gözden geçirme' })).toBeVisible();
+  await expect(page.getByText('Kaydedildi', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Planı bitir' }).click();
   await expect(page).toHaveURL(/#\/ozet$/);
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByText('Yılmaz ailesi', { exact: true })).toBeVisible();
 
-  // §18.4-2 — yenile, veri duruyor. Otomatik kayıt 500 ms gecikmelidir (§9.1);
-  // yenilemeden önce bekleyen yazmanın tamamlanmasını bekleriz.
-  await page.waitForTimeout(1_200);
+  // §18.4-2 — doğrulanmış kayıttan sonra yenile, veri duruyor.
   await page.reload();
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText('Yılmaz ailesi').first()).toHaveCount(1, { timeout: 15_000 });

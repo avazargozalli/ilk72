@@ -17,11 +17,14 @@ import { Sources } from '../../src/ui/pages/Sources';
 import { Terms } from '../../src/ui/pages/Terms';
 
 describe('yasal sayfalar (§14)', () => {
-  it('gizlilik bildirimi §14.1 başlıklarını taşır', () => {
+  it('plan verisini, barındırma kayıtlarını ve geri bildirim işlemesini açıklar', () => {
     render(<Privacy />);
     expect(screen.getByRole('heading', { level: 1, name: tr.legal.privacy.title })).toBeTruthy();
-    expect(screen.getByText(/Çerez ve izleme/)).toBeTruthy();
-    expect(screen.getByText(/Yazdıklarınız cihazınızdan çıkmaz/)).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Planınız bu tarayıcıda saklanır' })).toBeTruthy();
+    const hostingLink = screen.getByRole('link', { name: 'GitHub Pages ziyaretçi kayıtları' });
+    expect(hostingLink.getAttribute('href')).toContain('#data-collection');
+    expect(hostingLink.getAttribute('rel')).toContain('noreferrer');
+    expect(screen.getByRole('heading', { name: 'KVKK kapsamındaki haklarınız' })).toBeTruthy();
   });
 
   it('kullanım koşulları §14.2 "ne değildir" ve 112 yönlendirmesini taşır', () => {
@@ -32,13 +35,13 @@ describe('yasal sayfalar (§14)', () => {
 
   it('künye sürüm ve sorumlu bilgisini gösterir (§14.3)', () => {
     render(<Imprint />);
-    expect(screen.getByText(/Sorumlu:/)).toBeTruthy();
-    expect(screen.getByText(/Uygulama sürümü:/)).toBeTruthy();
+    expect(screen.getByText(/Sorumlu kişi/)).toBeTruthy();
+    expect(screen.getByText(/Uygulama sürümü/)).toBeTruthy();
   });
 
   it('erişilebilirlik beyanı gönüllü olduğunu söyler (§14.4)', () => {
     render(<Accessibility />);
-    expect(screen.getByText(/Bu beyan gönüllüdür/)).toBeTruthy();
+    expect(screen.getByText(/Bu beyan gönüllü olarak yayımlanır/)).toBeTruthy();
   });
 
   it('yasal sayfalar birbirine bağlantı verir (§14.5 listesi)', () => {

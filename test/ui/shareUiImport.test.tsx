@@ -206,6 +206,28 @@ describe('Import — seçenekler (§10.3/4)', () => {
 });
 
 describe('Import — birleştirme (§10.3/4)', () => {
+  it('aynı adlı mevcut kişileri belirsiz bir kayıtla birleştirmez', async () => {
+    const target = planOf({
+      members: [member('Ayşe Yılmaz', '0555 100 00 00'), member('Ayşe Yılmaz', '0555 200 00 00')],
+    });
+    const onMerge = vi.fn();
+    await renderPreview(planOf({ members: [member('Ayşe Yılmaz', '0555 300 00 00')] }), {
+      plan: target,
+      onMerge,
+    });
+
+    fireEvent.click(screen.getByRole('radio', { name: tr.share.receive.merge }));
+    expect(screen.queryByText(tr.share.receive.conflict.title)).toBeNull();
+    fireEvent.click(buttonByName(tr.share.receive.mergeApply));
+
+    const merged = onMerge.mock.calls[0]?.[0] as Plan;
+    expect(merged.members.map((entry) => entry.phone)).toEqual([
+      '0555 100 00 00',
+      '0555 200 00 00',
+      '0555 300 00 00',
+    ]);
+  });
+
   it('çakışan alanı sorar; varsayılan olarak mevcut bilgiyi korur', async () => {
     const target = planOf({ members: [member('Ayşe Yılmaz', '0555 999 99 99')] });
     const onMerge = vi.fn();

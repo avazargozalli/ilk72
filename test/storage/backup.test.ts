@@ -22,6 +22,22 @@ function envelopeOf(text: string): Record<string, unknown> {
 }
 
 describe('dosya adı ve düz biçim', () => {
+  it('girintisiz yedeği sınır içindeyse üretir ve açılamayacak büyüklükte dosya üretmez', async () => {
+    const plan = samplePlan();
+    plan.documents = Array.from({ length: 4_500 }, (_, index) => ({
+      id: `belge-${index}`,
+      done: false,
+      note: 'a'.repeat(200),
+    }));
+    await expect(exportBackup(plan)).rejects.toThrow('cok-buyuk');
+    await expect(exportBackup(plan, PASS)).rejects.toThrow('cok-buyuk');
+
+    plan.documents = plan.documents.slice(0, 4_200);
+    const { text } = await exportBackup(plan);
+    expect(text).not.toContain('\n');
+    await expect(importBackup(text)).resolves.toMatchObject({ plan });
+  });
+
   it('dosya adı ilk72-yedek-YYYY-AA-GG.json biçimindedir', async () => {
     expect(backupFilename(new Date(2026, 0, 5))).toBe('ilk72-yedek-2026-01-05.json');
     expect(backupFilename(new Date(2026, 10, 19))).toBe('ilk72-yedek-2026-11-19.json');

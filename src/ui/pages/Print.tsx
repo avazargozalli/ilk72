@@ -13,9 +13,16 @@
  * Kâğıt önceliği (İ3): bu sayfa her akışın son durağıdır; ölçek notu ("%100")
  * ve takvim niyeti burada gösterilir.
  */
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { tr } from '../../i18n/tr.ts';
 import type { Plan } from '../../model/types.ts';
+import {
+  buildShareCard,
+  buildShareQr,
+  buildShareUrl,
+  encodeShare,
+  type ShareQr,
+} from '../../share/index.ts';
 import { Checkbox, Notice } from '../components/index.ts';
 import {
   BagChecklist,
@@ -50,10 +57,12 @@ function PrintDocument({
   id,
   plan,
   options,
+  walletQr,
 }: {
   id: PrintDocumentId;
   plan: Plan;
   options: PrintOptions;
+  walletQr: ShareQr | null;
 }) {
   switch (id) {
     case 'fullPlan': {
@@ -68,6 +77,7 @@ function PrintDocument({
           plan={plan}
           includeBloodType={options.includeBloodType}
           includeWalletNote={options.includeWalletNote}
+          qr={walletQr}
         />
       );
     }
@@ -89,6 +99,37 @@ function PrintDocument({
 export function Print({ plan, visitedSteps, onPrint, onDownloadIcs }: PrintProps) {
   const [documents, setDocuments] = useState<readonly PrintDocumentId[]>(DEFAULT_PRINT_DOCUMENTS);
   const [options, setOptions] = useState<PrintOptions>(DEFAULT_PRINT_OPTIONS);
+  const [includeWalletQr, setIncludeWalletQr] = useState(false);
+  const [walletQr, setWalletQr] = useState<ShareQr | null>(null);
+  const [qrState, setQrState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const walletSelected = documents.includes('walletCards');
+
+  useEffect(() => {
+    if (!includeWalletQr || !walletSelected) {
+      setQrState('idle');
+      setWalletQr(null);
+      return;
+    }
+
+    let cancelled = false;
+    setQrState('loading');
+    setWalletQr(null);
+    const card = buildShareCard(plan, { includeNeedsNotes: false, includeHealth: false });
+    void encodeShare({ ...card, n: '' }).then(
+      (payload) => {
+        if (cancelled) return;
+        const qr = buildShareQr(buildShareUrl(payload));
+        setWalletQr(qr);
+        setQrState(qr === null ? 'error' : 'ready');
+      },
+      () => {
+        if (!cancelled) setQrState('error');
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [includeWalletQr, walletSelected, plan]);
 
   // §4.1 satır 3 / İ8: sağlık seçeneği yalnızca plan izinliyse sunulur. Ziyaret
   // izi verilmişse 3. adımın açılmış olması da aranır; iz hiç yoksa (ör. içe
@@ -179,10 +220,31 @@ export function Print({ plan, visitedSteps, onPrint, onDownloadIcs }: PrintProps
             checked={options.includeWalletNote}
             onChange={(checked) => setOption('includeWalletNote', checked)}
           />
+          <Checkbox
+            id="print-include-wallet-qr"
+            label={tr.print.page.includeWalletQr}
+            hint={tr.print.page.includeWalletQrHint}
+            checked={includeWalletQr}
+            disabled={!walletSelected || plan.members.length === 0}
+            onChange={setIncludeWalletQr}
+          />
+          {qrState === 'error' && includeWalletQr && walletSelected ? (
+            <Notice tone="warning" live="polite">
+              {tr.print.page.walletQrError}
+            </Notice>
+          ) : null}
         </fieldset>
 
         <div class="print__actions">
-          <button class="button button--primary" type="button" onClick={handlePrint}>
+          <button
+            class="button button--primary"
+            type="button"
+            disabled={
+              selected.length === 0 ||
+              (includeWalletQr && walletSelected && (qrState === 'idle' || qrState === 'loading'))
+            }
+            onClick={handlePrint}
+          >
             {tr.print.page.printButton}
           </button>
           {onDownloadIcs === undefined ? null : (
@@ -206,7 +268,15 @@ export function Print({ plan, visitedSteps, onPrint, onDownloadIcs }: PrintProps
         {selected.length === 0 ? (
           <p class="print__empty">{tr.print.page.previewEmpty}</p>
         ) : (
-          selected.map((id) => <PrintDocument key={id} id={id} plan={plan} options={options} />)
+          selected.map((id) => (
+            <PrintDocument
+              key={id}
+              id={id}
+              plan={plan}
+              options={options}
+              walletQr={includeWalletQr ? walletQr : null}
+            />
+          ))
         )}
       </section>
     </div>

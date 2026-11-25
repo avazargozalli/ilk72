@@ -33,7 +33,7 @@ export const print = {
     optionsLegend: 'Baskı seçenekleri',
     includeHealth: 'Sağlık bilgilerini de bas',
     includeHealthHint:
-      'Sağlık bilgileri yalnızca bu seçenek işaretliyse tam plana eklenir. Buzdolabı sayfasına ve cüzdan kartlarına hiçbir zaman basılmaz.',
+      'Sağlık bilgilerini tam plana ekler. Cüzdan kartı için kan grubunu ayrıca seçebilirsiniz.',
     includeHealthUnavailable:
       'Planda sağlık bilgisi yok. 3. adımdaki "Sağlık bilgisi eklemek istiyorum" anahtarını açarsanız bu seçenek kullanılabilir.',
     includeHealthNotVisited:
@@ -46,9 +46,13 @@ export const print = {
       'Kan grubu sağlık bilgisidir; yalnızca bu seçenek işaretliyse ve planda yazılıysa basılır.',
     includeWalletNote: 'Cüzdan kartına tek satır not bas',
     includeWalletNoteHint: 'Planınızdaki notların ilk satırı cüzdan kartının arkasına basılır.',
+    includeWalletQr: 'Cüzdan kartına plan özeti kare kodu bas',
+    includeWalletQrHint:
+      'Kodu okutan herkes parola girmeden hane etiketini, kişi bilgilerini, acil bağlantıları ve buluşma yerlerini görebilir. Kartı güvendiğiniz kişilerle paylaşın.',
+    walletQrError: 'Özet kare koda sığmadı. Cüzdan kartları kare kod olmadan yazdırılabilir.',
     printButton: 'Yazdır',
     calendarButton: 'Takvimime ekle',
-    calendarHint: 'Takvim dosyasında kişisel bilgi yer almaz.',
+    calendarHint: 'Takvim dosyasında ad, telefon, adres veya sağlık bilgisi yer almaz.',
     scaleNote: 'Yazdırırken ölçek %100 olsun.',
     previewTitle: 'Önizleme',
     previewEmpty: 'Yazdırmak için yukarıdan en az bir belge seçin.',
@@ -190,8 +194,7 @@ export const print = {
   fullPlan: {
     /** Ev adresinin yalnızca bu çıktıda yer aldığı notu (§11.5/1). */
     addressNote: 'Ev adresi yalnızca tam planda ve yalnızca bu çıktıda yer alır.',
-    healthNote:
-      'Sağlık bilgileri yalnızca bu çıktıda ve yalnızca siz işaretlediğiniz için basıldı; paylaşılan özette yer almaz.',
+    healthNote: 'Sağlık alanlarını bu çıktıya eklediniz. Belgeyi güvenli bir yerde saklayın.',
   },
 
   /** §12.2 — buzdolabı sayfası (sağlık bilgisi yok). */

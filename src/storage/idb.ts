@@ -2,8 +2,8 @@
  * Şartname §6, §9.1 — IndexedDB sarmalayıcısı (kütüphane yok, projede yazıldı).
  *
  * Veritabanı `ilk72`, sürüm 1, tek nesne deposu `kv` (anahtar: dize).
- * Bu dosya yalnızca "aç / oku / yaz / temizle / kapat" sözleşmesini sağlar;
- * bellek içi kip kararı ve saklama biçimi `store.ts` dosyasındadır (§9.2).
+ * Tekil ve işlem grubu olarak okuma/yazma işlemlerini sağlar. Bellek içi kip
+ * kararı ve saklama biçimi `store.ts` dosyasındadır (§9.2).
  *
  * Depo açılamazsa **açık hata** fırlatılır (`Error('depo-kullanilamaz')`);
  * çağıran taraf `createMemoryStore()` ile bellek içi kipe düşebilir.
@@ -25,10 +25,19 @@ export interface KeyValueStore {
   /** Kayıt yoksa `undefined` döner. */
   get(key: string): Promise<unknown>;
   set(key: string, value: unknown): Promise<void>;
+  /** Anahtarları tek bir işlemde, giriş sırasıyla okur. */
+  getMany(keys: readonly string[]): Promise<unknown[]>;
+  /** Okuma, doğrulama, silme ve yazmayı bir işlemde tamamlar. */
+  update(keys: readonly string[], change: StoreChange): Promise<void>;
   /** Depodaki bütün anahtarları siler. */
   clear(): Promise<void>;
   close(): void;
 }
+
+type StoreChange = (current: readonly unknown[]) => {
+  clear?: boolean;
+  entries: ReadonlyArray<readonly [string, unknown]>;
+};
 
 /** Tarayıcıda `indexedDB` yoksa `undefined`; erişim `typeof` ile güvenlidir. */
 function defaultIndexedDb(): IDBFactory | undefined {
@@ -47,6 +56,8 @@ export async function openStore(
   return {
     get: (key) => readValue(database, key),
     set: (key, value) => writeValue(database, key, value),
+    getMany: (keys) => readValues(database, keys),
+    update: (keys, change) => updateValues(database, keys, change),
     clear: () => clearValues(database),
     close: () => database.close(),
   };
@@ -64,6 +75,14 @@ export function createMemoryStore(): KeyValueStore {
     },
     async set(key, value) {
       values.set(key, value);
+    },
+    async getMany(keys) {
+      return keys.map((key) => values.get(key));
+    },
+    async update(keys, change) {
+      const { clear, entries } = change(keys.map((key) => values.get(key)));
+      if (clear) values.clear();
+      for (const [key, value] of entries) values.set(key, value);
     },
     async clear() {
       values.clear();
@@ -135,6 +154,53 @@ async function readValue(database: IDBDatabase, key: string): Promise<unknown> {
   const transaction = database.transaction(STORE_NAME, 'readonly');
   const request = transaction.objectStore(STORE_NAME).get(key);
   return requestResult(request);
+}
+
+async function readValues(database: IDBDatabase, keys: readonly string[]): Promise<unknown[]> {
+  const store = database.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME);
+  return Promise.all(keys.map((key) => requestResult(store.get(key))));
+}
+
+async function updateValues(
+  database: IDBDatabase,
+  keys: readonly string[],
+  change: StoreChange,
+): Promise<void> {
+  const transaction = database.transaction(STORE_NAME, 'readwrite');
+  const store = transaction.objectStore(STORE_NAME);
+  const done = transactionDone(transaction);
+  const current: unknown[] = [];
+  let remaining = keys.length;
+  let failure: { error: unknown } | undefined;
+
+  // IndexedDB allows writes only while the transaction is active, so queue
+  // them from the read request's callback rather than after an async step.
+  const apply = (): void => {
+    try {
+      const { clear, entries } = change(current);
+      if (clear) store.clear();
+      for (const [key, value] of entries) store.put(value, key);
+    } catch (error) {
+      failure = { error };
+      transaction.abort();
+    }
+  };
+
+  if (remaining === 0) apply();
+  keys.forEach((key, index) => {
+    const request = store.get(key);
+    request.onsuccess = () => {
+      current[index] = request.result;
+      remaining -= 1;
+      if (remaining === 0) apply();
+    };
+  });
+
+  try {
+    await done;
+  } catch (error) {
+    throw failure ? failure.error : error;
+  }
 }
 
 async function writeValue(database: IDBDatabase, key: string, value: unknown): Promise<void> {

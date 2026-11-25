@@ -15,9 +15,9 @@
  */
 import { useEffect, useState } from 'preact/hooks';
 import { ROUTES } from '../../config.ts';
-import { errorMessage, formatDate, tr } from '../../i18n/tr.ts';
+import { errorMessage, formatDate, formatText, tr } from '../../i18n/tr.ts';
 import { createEmptyContact, createEmptyMember } from '../../model/defaults.ts';
-import type { Contact, Member, Plan } from '../../model/types.ts';
+import type { Contact, Member, Place, Plan } from '../../model/types.ts';
 import { PLAN_LIMITS } from '../../model/validate.ts';
 import {
   decodeShare,
@@ -37,7 +37,7 @@ export interface ImportProps {
   /** "Yalnızca görüntüle ve yazdır" seçildiğinde çağrılır. */
   onViewOnly?: () => void;
   /** Birleştirme onaylandığında temizlenmiş yeni planla çağrılır. */
-  onMerge?: (merged: Plan) => void;
+  onMerge?: (merged: Plan) => void | Promise<void>;
 }
 
 type Phase = 'loading' | 'password' | 'preview' | 'error';
@@ -109,10 +109,28 @@ function contactLabels(contact: Contact): string[] {
   return labels;
 }
 
-function findContactIndex(plan: Plan, label: string): number | undefined {
-  const target = normalized(label);
-  const index = plan.contacts.findIndex((contact) => contactLabels(contact).includes(target));
-  return index < 0 ? undefined : index;
+/** Aynı adlı kişilerde yalnızca tekil telefon eşleşmesi mevcut kayda bağlanır. */
+function findMatchingPerson<T>(
+  records: readonly T[],
+  incoming: readonly SharePerson[],
+  person: SharePerson,
+  labels: (record: T) => readonly string[],
+  phones: (record: T) => readonly string[],
+): number | undefined {
+  const name = normalized(person.a);
+  if (name === '') return undefined;
+  const matches = records.flatMap((record, index) =>
+    labels(record).includes(name) ? [{ record, index }] : [],
+  );
+  const phone = importedTelHref(person.t);
+  if (phone !== null) {
+    const phoneMatches = matches.filter(({ record }) =>
+      phones(record).some((value) => importedTelHref(value) === phone),
+    );
+    if (phoneMatches.length === 1) return phoneMatches[0]?.index;
+  }
+  const duplicateName = incoming.some((other) => other !== person && normalized(other.a) === name);
+  return !duplicateName && matches.length === 1 ? matches[0]?.index : undefined;
 }
 
 /** Birleştirmede kullanıcıya sorulacak çakışma. */
@@ -131,6 +149,7 @@ interface MergeConflict {
 /** Birleştirme önizlemesi: eklemeler ve çakışmalar. */
 interface MergePreview {
   conflicts: readonly MergeConflict[];
+  skipped: number;
   build: (choices: Readonly<Record<string, boolean>>) => Plan;
 }
 
@@ -166,6 +185,19 @@ function placeLine(label: string, detail: string): string {
   return detail;
 }
 
+function placeFromShare(line: string): Place {
+  const separator = line.indexOf(', ');
+  if (separator > 0) {
+    const label = line.slice(0, separator);
+    if ([...label].length <= PLAN_LIMITS.nameLength) {
+      return { label, detail: line.slice(separator + 2) };
+    }
+  }
+  return [...line].length <= PLAN_LIMITS.nameLength
+    ? { label: line, detail: '' }
+    : { label: '', detail: line };
+}
+
 /**
  * §10.3/4 — kartı mevcut planla birleştirmeyi hazırlar.
  *
@@ -176,21 +208,29 @@ function placeLine(label: string, detail: string): string {
 function buildMerge(plan: Plan, card: ShareCard): MergePreview {
   const additions: Array<(draft: Plan) => void> = [];
   const conflicts: MergeConflict[] = [];
-
-  const memberIndex = new Map<string, number>();
-  plan.members.forEach((member, index) => {
-    if (isFilled(member.name)) memberIndex.set(normalized(member.name), index);
-  });
+  const assignedMembers = new Set<number>();
+  const assignedContacts = new Set<number>();
+  let membersRemaining = PLAN_LIMITS.members - plan.members.length;
+  let contactsRemaining = PLAN_LIMITS.contacts - plan.contacts.length;
+  let skipped = 0;
 
   for (const person of card.k) {
     if (!isFilled(person.a) && !isFilled(person.t)) continue;
-    const index = memberIndex.get(normalized(person.a));
-    if (index === undefined) {
-      additions.push((draft) => {
-        if (draft.members.length < PLAN_LIMITS.members) draft.members.push(memberFrom(person));
-      });
+    const index = findMatchingPerson(
+      plan.members,
+      card.k,
+      person,
+      (member) => [normalized(member.name)],
+      (member) => [member.phone],
+    );
+    if (index === undefined || assignedMembers.has(index)) {
+      if (membersRemaining > 0) {
+        membersRemaining -= 1;
+        additions.push((draft) => draft.members.push(memberFrom(person)));
+      } else skipped += 1;
       continue;
     }
+    assignedMembers.add(index);
 
     const current = plan.members[index];
     if (current === undefined) continue;
@@ -242,15 +282,18 @@ function buildMerge(plan: Plan, card: ShareCard): MergePreview {
 
   for (const person of card.i) {
     if (!isFilled(person.a) && !isFilled(person.t)) continue;
-    const index = findContactIndex(plan, person.a);
-    if (index === undefined) {
-      additions.push((draft) => {
-        if (draft.contacts.length < PLAN_LIMITS.contacts) {
-          draft.contacts.push(contactFrom(person));
-        }
-      });
+    const index = findMatchingPerson(plan.contacts, card.i, person, contactLabels, (contact) => [
+      contact.phone,
+      contact.phoneAlt,
+    ]);
+    if (index === undefined || assignedContacts.has(index)) {
+      if (contactsRemaining > 0) {
+        contactsRemaining -= 1;
+        additions.push((draft) => draft.contacts.push(contactFrom(person)));
+      } else skipped += 1;
       continue;
     }
+    assignedContacts.add(index);
 
     const current = plan.contacts[index];
     if (current === undefined) continue;
@@ -299,18 +342,16 @@ function buildMerge(plan: Plan, card: ShareCard): MergePreview {
       }
     }
 
-    // Şehir dışı işareti yalnızca gönderen "evet" dediyse ve mevcut kayıt
-    // "hayır" ise sorulur; mevcut bilgiyi kendiliğinden kapatmayız.
-    if (person.d && !current.outOfArea) {
+    if (person.d !== current.outOfArea) {
       conflicts.push({
         id: `contact-out-of-area-${index}`,
         subject: name,
         label: tr.share.receive.fields.outOfAreaFlag,
-        current: tr.share.receive.conflict.no,
-        incoming: tr.share.receive.conflict.yes,
+        current: current.outOfArea ? tr.share.receive.conflict.yes : tr.share.receive.conflict.no,
+        incoming: person.d ? tr.share.receive.conflict.yes : tr.share.receive.conflict.no,
         take: (draft) => {
           const contact = draft.contacts[index];
-          if (contact !== undefined) contact.outOfArea = true;
+          if (contact !== undefined) contact.outOfArea = person.d;
         },
       });
     }
@@ -321,11 +362,13 @@ function buildMerge(plan: Plan, card: ShareCard): MergePreview {
     if (incoming === '') continue;
     const current = plan.meeting[meeting.key];
     const currentLine = placeLine(current.label, current.detail).trim();
+    const take = (draft: Plan): void => {
+      draft.meeting[meeting.key] = placeFromShare(incoming);
+      if (meeting.key === 'assemblyArea') draft.meeting.assemblyCheckedAt = null;
+    };
 
     if (currentLine === '') {
-      additions.push((draft) => {
-        draft.meeting[meeting.key] = { label: incoming, detail: '' };
-      });
+      additions.push(take);
     } else if (currentLine !== incoming) {
       conflicts.push({
         id: `meeting-${meeting.key}`,
@@ -333,9 +376,7 @@ function buildMerge(plan: Plan, card: ShareCard): MergePreview {
         label: meeting.label,
         current: currentLine,
         incoming,
-        take: (draft) => {
-          draft.meeting[meeting.key] = { label: incoming, detail: '' };
-        },
+        take,
       });
     }
   }
@@ -350,7 +391,7 @@ function buildMerge(plan: Plan, card: ShareCard): MergePreview {
     return draft;
   };
 
-  return { conflicts, build };
+  return { conflicts, skipped, build };
 }
 
 function ImportedPhone({ phone }: { phone: string }) {
@@ -454,6 +495,7 @@ export function Import({ payload, plan = null, onViewOnly, onMerge }: ImportProp
   const [mode, setMode] = useState<MergeMode>('view');
   const [choices, setChoices] = useState<Readonly<Record<string, boolean>>>({});
   const [finished, setFinished] = useState<string | null>(null);
+  const [mergeFailed, setMergeFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -467,6 +509,7 @@ export function Import({ payload, plan = null, onViewOnly, onMerge }: ImportProp
     setMode('view');
     setChoices({});
     setFinished(null);
+    setMergeFailed(false);
 
     const run = async (): Promise<void> => {
       if (payload === '') {
@@ -522,15 +565,15 @@ export function Import({ payload, plan = null, onViewOnly, onMerge }: ImportProp
   /** §10.3/6 — yükü adres çubuğundan siler; sayfa görünümü değişmez. */
   const finish = (message: string): void => {
     if (typeof history !== 'undefined' && typeof history.replaceState === 'function') {
-      history.replaceState(null, '', ROUTES.home);
+      history.replaceState(null, '', `${location.pathname}${location.search}`);
     }
     setFinished(message);
   };
 
   const handleView = (): void => {
     onViewOnly?.();
-    if (typeof window !== 'undefined' && typeof window.print === 'function') window.print();
     finish(tr.share.receive.done);
+    if (typeof window !== 'undefined' && typeof window.print === 'function') window.print();
   };
 
   const handleFinish = (): void => {
@@ -539,10 +582,18 @@ export function Import({ payload, plan = null, onViewOnly, onMerge }: ImportProp
 
   const preview = card !== null && plan !== null ? buildMerge(plan, card) : null;
 
-  const handleMerge = (): void => {
-    if (preview === null) return;
-    onMerge?.(preview.build(choices));
-    finish(tr.share.receive.mergeDone);
+  const handleMerge = async (): Promise<void> => {
+    if (preview === null || busy || finished !== null) return;
+    setBusy(true);
+    setMergeFailed(false);
+    try {
+      await onMerge?.(preview.build(choices));
+      finish(tr.share.receive.mergeDone);
+    } catch {
+      setMergeFailed(true);
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (phase === 'error') {
@@ -612,81 +663,102 @@ export function Import({ payload, plan = null, onViewOnly, onMerge }: ImportProp
 
       <CardText card={card} />
 
-      {plan === null ? <Notice tone="info">{tr.share.receive.noPlanNote}</Notice> : null}
+      <div class="import__controls">
+        {plan === null ? <Notice tone="info">{tr.share.receive.noPlanNote}</Notice> : null}
 
-      <RadioGroup
-        legend={tr.share.receive.modeLegend}
-        name="import-mode"
-        value={mode}
-        onChange={(value) => setMode(value === 'merge' ? 'merge' : 'view')}
-        options={[
-          { value: 'view', label: tr.share.receive.viewOnly },
-          {
-            value: 'merge',
-            label: tr.share.receive.merge,
-            hint: tr.share.receive.mergeHint,
-            disabled: plan === null,
-          },
-        ]}
-      />
+        <RadioGroup
+          legend={tr.share.receive.modeLegend}
+          name="import-mode"
+          value={mode}
+          onChange={(value) => setMode(value === 'merge' ? 'merge' : 'view')}
+          options={[
+            { value: 'view', label: tr.share.receive.viewOnly },
+            {
+              value: 'merge',
+              label: tr.share.receive.merge,
+              hint: tr.share.receive.mergeHint,
+              disabled: plan === null,
+            },
+          ]}
+        />
 
-      {mode === 'merge' && preview !== null && preview.conflicts.length > 0 ? (
-        <section class="import__conflicts" aria-labelledby="import-conflicts-heading">
-          <h2 id="import-conflicts-heading">{tr.share.receive.conflict.title}</h2>
-          <p>{tr.share.receive.conflict.hint}</p>
-          {preview.conflicts.map((conflict) => (
-            <div class="import__conflict" key={conflict.id}>
-              <p class="import__conflict-subject">{conflict.subject}</p>
-              <p class="import__conflict-field">{conflict.label}</p>
-              <dl class="import__fields">
-                <dt>{tr.share.receive.conflict.currentLabel}</dt>
-                <dd>{conflict.current}</dd>
-                <dt>{tr.share.receive.conflict.incomingLabel}</dt>
-                <dd>{conflict.incoming}</dd>
-              </dl>
-              <RadioGroup
-                legend={conflict.label}
-                name={`merge-conflict-${conflict.id}`}
-                value={choices[conflict.id] === true ? 'take' : 'keep'}
-                onChange={(value) =>
-                  setChoices((current) => ({ ...current, [conflict.id]: value === 'take' }))
-                }
-                direction="horizontal"
-                options={[
-                  { value: 'keep', label: tr.share.receive.conflict.keep },
-                  { value: 'take', label: tr.share.receive.conflict.take },
-                ]}
-              />
-            </div>
-          ))}
-        </section>
-      ) : null}
+        {mode === 'merge' && finished === null && preview !== null && preview.skipped > 0 ? (
+          <Notice tone="warning">
+            {formatText(tr.share.receive.mergeLimit, { count: preview.skipped })}
+          </Notice>
+        ) : null}
 
-      <div class="button-row import__actions">
-        {mode === 'merge' ? (
+        {mode === 'merge' &&
+        finished === null &&
+        preview !== null &&
+        preview.conflicts.length > 0 ? (
+          <section class="import__conflicts" aria-labelledby="import-conflicts-heading">
+            <h2 id="import-conflicts-heading">{tr.share.receive.conflict.title}</h2>
+            <p>{tr.share.receive.conflict.hint}</p>
+            {preview.conflicts.map((conflict) => (
+              <div class="import__conflict" key={conflict.id}>
+                <p class="import__conflict-subject">{conflict.subject}</p>
+                <p class="import__conflict-field">{conflict.label}</p>
+                <dl class="import__fields">
+                  <dt>{tr.share.receive.conflict.currentLabel}</dt>
+                  <dd>{conflict.current}</dd>
+                  <dt>{tr.share.receive.conflict.incomingLabel}</dt>
+                  <dd>{conflict.incoming}</dd>
+                </dl>
+                <RadioGroup
+                  legend={conflict.label}
+                  name={`merge-conflict-${conflict.id}`}
+                  value={choices[conflict.id] === true ? 'take' : 'keep'}
+                  onChange={(value) =>
+                    setChoices((current) => ({ ...current, [conflict.id]: value === 'take' }))
+                  }
+                  direction="horizontal"
+                  options={[
+                    { value: 'keep', label: tr.share.receive.conflict.keep },
+                    { value: 'take', label: tr.share.receive.conflict.take },
+                  ]}
+                />
+              </div>
+            ))}
+          </section>
+        ) : null}
+
+        <div class="button-row import__actions">
+          {mode === 'merge' ? (
+            <button
+              class="button button--primary"
+              type="button"
+              disabled={busy || preview === null || finished !== null}
+              onClick={() => void handleMerge()}
+            >
+              {tr.share.receive.mergeApply}
+            </button>
+          ) : (
+            <button class="button button--primary" type="button" onClick={handleView}>
+              {tr.share.receive.print}
+            </button>
+          )}
           <button
-            class="button button--primary"
+            class="button button--secondary"
             type="button"
-            disabled={busy || preview === null}
-            onClick={handleMerge}
+            disabled={busy}
+            onClick={handleFinish}
           >
-            {tr.share.receive.mergeApply}
+            {tr.share.receive.finish}
           </button>
-        ) : (
-          <button class="button button--primary" type="button" onClick={handleView}>
-            {tr.share.receive.print}
-          </button>
-        )}
-        <button class="button button--secondary" type="button" onClick={handleFinish}>
-          {tr.share.receive.finish}
-        </button>
-      </div>
+        </div>
 
-      {finished === null ? null : (
-        <Notice tone="success" live="polite">
-          {finished}
-        </Notice>
-      )}
+        {finished === null ? null : (
+          <Notice tone="success" live="polite">
+            {finished}
+          </Notice>
+        )}
+        {mergeFailed ? (
+          <Notice tone="error" live="assertive">
+            {tr.share.receive.mergeFailed}
+          </Notice>
+        ) : null}
+      </div>
     </div>
   );
 }

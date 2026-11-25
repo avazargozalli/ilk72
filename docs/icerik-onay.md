@@ -41,8 +41,9 @@ Onaylayan kişi, metni yazan kişiyle aynı olabilir; ancak metnin kaynağıyla 
 1. Her maddenin **en az bir kaynağı** vardır.
 2. Kaynak anahtarları `sources.ts` içinde **kayıtlıdır**.
 3. Kaynak adresleri **`https`** ile başlar ve **izinli alan adlarındadır** (aşağıdaki liste).
-4. Metin en fazla **220 karakterdir**.
-5. `onayli` maddelerde **`reviewedBy` ve `reviewedAt` doludur**.
+4. Metin boş olamaz ve en fazla **220 karakterdir**.
+5. `onayli` maddelerde **`reviewedBy` ve `reviewedAt` doludur**. Kaynak erişim ve inceleme
+   tarihleri Türkiye takvimine göre geçerli bir gün olmalıdır. Gelecek tarihler reddedilir.
 6. `onayli` hiçbir madde **doğrulanmamış** kaynak anahtarı taşımaz (`verified: false` ya da
    `url: null` olan kaynak).
 7. Madde ve kaynak **kimlikleri benzersizdir**.
@@ -55,16 +56,20 @@ Ek kapılar:
   onaylanmamıştır" şeridi gösterilir.
 - **12 / 18 ay kuralı**: `reviewedAt` üzerinden 12 ay geçen maddeler için `content:check` **uyarı**
   verir; 18 ay geçen maddeler `build:prod`'u **başarısız** kılar.
-- **İzinli alan adları:** `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`,
+- **İzinli alan adları:** `afad.gov.tr`, `hazirim.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`,
   `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`,
   `resmigazete.gov.tr`, `kvkk.gov.tr`, `mebakub.meb.gov.tr` (ve alt alan adları).
 
 ## Uzman incelemesine hazırlanan kaynaklar
 
-İçerik sürümü 2’de önceki kayıtta adresi eksik olan 20 maddeye kaynak eklendi.
-Aile planı, yardımcı cihazlar ve hane çantası için [Güvenli Yaşam 1 Eğitimi](https://cankiri.afad.gov.tr/kurumlar/cankiri.afad/dOKUMANLAR/Guvenli_Yasam_Klavuzu/gy_1_egitim_kitapcigi.pdf) içindeki aile planı ve çanta bölümlerine bakın.
-Bebek ihtiyaçları, son kullanma tarihleri ve tesisatın yerini bilme maddeleri için [Okul Tabanlı Afet Eğitimi, Kitap 1](https://mebakub.meb.gov.tr/eskisite/wp-content/uploads/2024/03/okul-tabanli-afet-egitimi_kitap_1.pdf) içinde 65–67. sayfaları kullanın.
-Altı aylık süre planın gözden geçirilmesi için geçerlidir. Kaynak eşleştirmeleri aşağıdaki uzman onayına hazırlıktır.
+İçerik sürümü 3’te 83 maddenin kimlikleri korunarak plan, çanta ve deprem rehberi kaynakları güncellendi.
+Madde metinlerinin uzman incelemesi ve onay kayıtları aşağıdaki süreçte tamamlanır.
+
+- `P-01`–`P-02` ve Bursa İl AFAD’a dayanan `H` maddeleri için aile planı ve yapısal olmayan riskler bölümlerini karşılaştırın. [Bursa İl AFAD — Afete Hazır Aile](https://bursa.afad.gov.tr/afete-hazir-aile)
+- `P-03`–`P-05`, `P-08`–`P-11`, hane çantası ve yardımcı cihaz maddeleri için plan, çanta ve özel ihtiyaç bölümlerine bakın. Kitapta geçen tarihsel acil numaralar yerine uygulamada güncel tek acil çağrı numarası olan 112 kullanılır. [Güvenli Yaşam 1 Eğitimi](https://cankiri.afad.gov.tr/kurumlar/cankiri.afad/dOKUMANLAR/Guvenli_Yasam_Klavuzu/gy_1_egitim_kitapcigi.pdf), [112 Acil Çağrı Merkezi](https://www.112.gov.tr/112-acm-projesi)
+- Bebek ihtiyaçları, son kullanma tarihleri, araç ve iş yeri çantası ile tesisatın yerini bilme maddeleri için 65–67. sayfalara bakın. Evcil hayvan maddelerinde AFAD’ın ayrı rehberini açın. [MEB — Okul Tabanlı Afet Eğitimi, Kitap 1](https://mebakub.meb.gov.tr/eskisite/wp-content/uploads/2024/03/okul-tabanli-afet-egitimi_kitap_1.pdf), [AFAD Hazırım — Evcil Hayvanlarınızı Afete Hazırlayın](https://hazirim.gov.tr/tr/ozel-icerikler/evcil-hayvanlar-icin)
+- Deprem anı ve sonrası kartları için Hazırım rehberini, `A-02` tekerlekli sandalye uyarlaması için AFAD’ın ilgili metnini ve `S-03` vana ve şalter koşulu için il müdürlüğünün duyurusunu karşılaştırın. [AFAD Hazırım — Deprem](https://hazirim.gov.tr/tr/afetler/deprem), [AFAD — Deprem önlemleri](https://afad.gov.tr/deprem-oncesi-ani-ve-sonrasi-alabileceginiz-onlemleri-biliyor-musunuz), [Bartın İl AFAD — Elazığ depremi](https://bartin.afad.gov.tr/elazigdaki-deprem-sonrasi-mudahale-ve-iyilestirme-calismalari)
+- `P-12` konuma ilişkin deprem tehlikesi ile yapının dayanıklılık değerlendirmesini ayrı ele alır. `O-07` için sigortanın kapsam içi ve kapsam dışı bina türlerini kontrol edin. [AFAD — Türkiye Deprem Tehlike Haritası](https://afad.gov.tr/turkiye-deprem-tehlike-haritasi), [DASK — Teminat ve Kapsamı](https://www.dask.gov.tr/tr/teminat-ve-kapsami)
 
 ## 3. Adım adım onay
 
@@ -106,7 +111,7 @@ onaylamayın**; onaylar izlenebilir olmalıdır.
    - `status: 'onayli'`
    - `reviewedBy`: onaylayan kişinin adı ve niteliği — ör.
      `"Ad Soyad (AFAD afet eğitmeni)"`
-   - `reviewedAt`: karşılaştırmanın yapıldığı tarih — **`YYYY-AA-GG`** (ör. `2026-12-03`).
+   - `reviewedAt`: karşılaştırmanın yapıldığı tarih — **`YYYY-AA-GG`** (ör. `2026-11-25`).
      Geçersiz tarih `content:check` hatası verir.
 10. İlgili kaynağın `accessed` alanını, sayfayı gerçekten kontrol ettiğiniz tarihle güncelleyin
     (aynı kaynağı kullanan başka maddeler de bu tarihten yararlanır).
@@ -170,7 +175,7 @@ kanıtıdır.
 
 | Tarih | Madde | Onaylayan (nitelik) | Kaynak | Commit / not |
 |---|---|---|---|---|
-| _(YYYY-AA-GG)_ | _(ör. P-01)_ | _(Ad Soyad — nitelik)_ | _(K-PLAN72)_ | _(commit özeti)_ |
+| _(YYYY-AA-GG)_ | _(ör. P-01)_ | _(Ad Soyad — nitelik)_ | _(K-AILE)_ | _(commit özeti)_ |
 
 ## 8. Sık yapılan hatalar
 

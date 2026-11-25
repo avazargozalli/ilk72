@@ -50,7 +50,7 @@ Döngüsel import yasak.
    - Kayıt düz `Plan` ise doğrudan.
    - `{ enc: true, data }` ise parola sorulur, `decryptBytes` → `JSON.parse` → `sanitizePlan`.
    - Depo açılamazsa bellek içi kip + kalıcı uyarı (§9.2).
-2. **Düzenleme:** sayfa `plan` üzerinde değişiklik üretir → `store.setPlan(next)` → 500 ms debounce
+2. **Düzenleme:** sayfa `plan` üzerinde değişiklik üretir → `store.savePlan(next)` → 500 ms debounce
    ile yazma; `visibilitychange → hidden` anında bekleyen yazma hemen.
 3. **Doğrulama:** depodan, dosyadan ve bağlantıdan gelen **her** veri `sanitizePlan`'dan geçer.
    Doğrulanmamış veri duruma ya da DOM'a ulaşmaz (§8.3).
@@ -68,6 +68,12 @@ Veritabanı `ilk72`, sürüm 1, tek nesne deposu `kv` (anahtar: dize).
 | `plan` | `Plan` **veya** `{ enc: true, data: Uint8Array }` |
 | `settings` | `{ largeText, lockEnabled, printPrefs, firstRunAccepted, visitedSteps? }` |
 | `meta` | `{ contentSeenVersion }` |
+| `revision` | Son plan/kilit yazımının rastgele depo sürümü |
+
+Plan, kilit ayarı ve sürüm tek IndexedDB işleminde yazılır. Ayrı sekmeler, açtıkları
+sürüm artık geçerli değilse planı güncelleyemez. Silme işlemi planı ve ayarları temizler,
+eski sekmelerin planı yeniden yazmasını önlemek için yeni bir rastgele sürüm bırakır.
+Uygulama dosyaları çevrimdışı erişim için önbellekte kalır.
 
 ## 5. Paylaşım biçimi
 
@@ -101,11 +107,10 @@ Otomatik karşılığı olanlar `e2e/a11y.spec.ts` (axe, WCAG 2.2 AA, 11 sayfa +
 `e2e/*.spec.ts` içindedir. Aşağıdaki **elle** kalemler sahibinde açıktır
 (`docs/son-kontrol.md` §3).
 
-Otomatik doğrulanmış (2026-11-19):
+Otomatik kontroller:
 
-- [x] Klavye ile tam akış: e2e akış testi (ilk açılış → 9 adım → özet → yazdırma) klavye/pointer karışık yürür; görünür odak CSS'te (`:focus-visible`) ve axe denetiminde.
-- [x] %200 yakınlaştırmada yatay kaydırma yok: `pages.css` küçük ekran kuralları; axe/mobil profil.
-- [x] 320 px genişlikte yatay kaydırma yok: mobil profil 360 × 640 ile koşuldu; 320 px için `pages.css` kırılımı var.
+- [x] Sihirbaz → özet → yazdırma akışı ve yanıt veren kontroller tarayıcı testinde. Görünür odak stili CSS ve bileşen testleriyle denetlenir.
+- [x] 320 px genişlikte büyük yazı açıkken gizlilik bildirimi yatay taşmıyor. Varsayılan mobil test profili 360 × 640.
 - [x] Koyu temada kontrast ≥ 4,5:1 (büyük metin ≥ 3:1): `tokens.css` `prefers-color-scheme` bloğu; axe `color-contrast` sıfır ihlal (acil düğmesi 1.14:1 hatası düzeltildi).
 - [x] Bilgi yalnız renkle verilmiyor: doluluk/durum metinle de yazılır; taslak etiketi metin.
 - [x] Odak görünür; odak tuzağı yalnız iletişim kutularında; `Esc` kapatır: `Dialog` bileşeni + `test/ui/dialog.test.tsx`.
@@ -113,6 +118,7 @@ Otomatik doğrulanmış (2026-11-19):
 
 Sahibinde kalan elle doğrulamalar:
 
+- [ ] %200 tarayıcı yakınlaştırması ve 320 px genişlikte tam akışın elle kontrolü.
 - [ ] Ekran okuyucuyla tam akış (NVDA veya VoiceOver): her adımda başlık, etiket, hata duyurusu.
 - [ ] Gerçek telefonla (Android Chrome / iOS Safari) tam akış ve ana ekrana ekleme.
 - [ ] Baskı çıktılarının okunurluğu: A4'te taşma yok, kart ölçüleri cetvelle doğru (85,6 × 54 mm), her belge yeni sayfada.

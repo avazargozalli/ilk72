@@ -14,7 +14,7 @@ Ailelerin afet ve acil durum planını on dakikada hazırlayıp yazdırabildiği
 2. **Önce testler.** Her aşamada önce testleri yaz (Ek B'deki vektörler dahil), sonra kodu.
 3. **Öncelik sırası.** Çelişki olursa: Bölüm 2 (ilkeler) > Bölüm 4 (hukuki tasarım kararları) > Ek B (vektörler) > Ek A (referans kod) > diğer bölümler.
 4. **İlkeleri esnetme.** Bölüm 2'deki kurallar "daha iyi kullanıcı deneyimi" gerekçesiyle bile delinmez. Bir kuralı delmeden çözemediğin bir şey olursa o özelliği yapma, `docs/kararlar.md` dosyasına not düş.
-5. **Güvenlik ve hukuk metni uydurma.** Kullanıcıya görünen her afet tavsiyesi Bölüm 13'teki kayıt sisteminden gelir ve kaynağı gösterilir. Bölüm 13.3'te olmayan bir tavsiye cümlesi yazma. Hukuki metinler için Bölüm 14'teki taslakları kullan; anlamını değiştirme.
+5. **Güvenlik ve hukuk metni uydurma.** Kullanıcıya görünen her afet tavsiyesi Bölüm 13'teki kayıt sisteminden gelir ve kaynağı gösterilir. Bölüm 13.3'te olmayan bir tavsiye cümlesi yazma. Hukuki metinlerde Bölüm 14 ve kaynaklı hukuki inceleme kaydı esas alınır.
 6. **Bağımlılık ekleme.** Çalışma zamanı bağımlılıkları yalnızca `preact` ve `qrcode-generator`. Geliştirme bağımlılıkları Bölüm 6'dakilerle sınırlı. Kurarken o günkü güncel kararlı sürümleri kullan, lisanslarını denetle (yalnızca MIT, ISC, BSD, Apache-2.0), kilit dosyasını depoya ekle.
 7. **Dil.** Kod içi adlar İngilizce; kullanıcıya görünen her metin Türkçe ve `src/i18n/tr.ts` içinde. Bileşenlerin içine sabit Türkçe metin gömme.
 8. **Dış kaynak yok.** Uygulama çalışırken kendi kökeni dışına hiçbir istek yapmaz (yazı tipi, harita, analitik, CDN, API dahil). Bunu Bölüm 18.5'teki test kanıtlar.
@@ -45,7 +45,7 @@ Kullanıcı kısa bir soru dizisini yanıtlar; uygulama şunları üretir:
 - **Rehber kartları:** deprem öncesi, anı ve sonrası için resmî kaynaklara dayalı kısa tavsiyeler; her kartta kaynak bağlantısı.
 - **Paylaşım:** özet kartı bağlantı ya da kare kodla aile üyelerine aktarma; tam plan için yedek dosyası.
 
-Dayanak: AFAD, ailelerin afet sonrası ilk 72 saat için bir afet ve acil durum planı yapmasını önerir (kaynak anahtarları: K-PLAN72, K-KIRSEHIR; Bölüm 13.3). Uygulama resmî bir uygulama değildir; resmî tavsiyeyi uygulanabilir bir forma dönüştüren bağımsız bir araçtır.
+Dayanak: AFAD, ailelerin afet sonrası ilk 72 saat için bir afet ve acil durum planı yapmasını önerir (kaynak anahtarları: K-AILE, K-GUVENLI-YASAM; Bölüm 13.3). Uygulama resmî bir uygulama değildir; resmî tavsiyeyi uygulanabilir bir forma dönüştüren bağımsız bir araçtır.
 
 ## 2. İlkeler (değiştirilemez)
 
@@ -87,12 +87,15 @@ Dayanak: AFAD, ailelerin afet sonrası ilk 72 saat için bir afet ve acil durum 
 
 ### 4.1 Mevzuat ve tasarım kararları
 
+25.11.2026 güncellemesinin madde bazında sonuçları, veri akışları ve birincil kaynakları
+[hukuki inceleme kaydındadır](hukuki-inceleme.md).
+
 | # | Mevzuat ve hüküm | Projeye etkisi | Tasarım kararı | Durum |
 |---|---|---|---|---|
-| 1 | **6698 sayılı KVKK m.28/1-a.** Gerçek kişilerin tamamen kendisiyle veya aynı konutta yaşayan aile fertleriyle ilgili faaliyetler kapsamındaki işlemesi Kanun dışındadır. Kurumun rehberine göre veriler üçüncü kişilerle paylaşılır ya da alenileştirilirse istisna tartışmalı hale gelir. | Planı dolduran kullanıcı, ailesinin verisini kendi cihazında işler. | Veri yalnızca cihazda tutulur (İ1). Paylaşım her zaman kullanıcının açık eylemidir; paylaşım ekranında "Bu bilgileri yalnızca ailenizle ve güvendiğiniz kişilerle paylaşın; adı geçen kişilere haber verin." uyarısı gösterilir. Herkese açık yayın özelliği yoktur. | D (madde ve rehber alıntısı) |
-| 2 | **KVKK m.3** (veri sorumlusu: işleme amaç ve vasıtalarını belirleyen), **m.10** (aydınlatma), **m.12** (veri güvenliği), **m.16** (sicil). | Proje sahibi plan verisine erişmediği ve onu işlemediği için bu veriler bakımından veri sorumlusu sayılmaması **beklenir**. | Mimari bunu teknik olarak imkânsız kılar: sunucu yok, günlük yok, telemetri yok. Yine de bir "Gizlilik Bildirimi" yayımlanır (Bölüm 14.1) ve bu değerlendirme hukukçuya sorulur (4.4-S1). | H |
+| 1 | **6698 sayılı KVKK m.28/1-a.** Gerçek kişilerin tamamen kendisiyle veya aynı konutta yaşayan aile fertleriyle ilgili faaliyetler kapsamındaki işlemesi Kanun dışındadır. İstisna için veri güvenliği sağlanmalı ve kişisel veriler üçüncü kişilere verilmemelidir. | Planı dolduran kullanıcı, ailesinin verisini kendi cihazında işler. | Veri yalnızca cihazda tutulur (İ1). Paylaşım her zaman kullanıcının açık eylemidir; paylaşım ekranında "Bu bilgileri yalnızca ailenizle ve güvendiğiniz kişilerle paylaşın; adı geçen kişilere haber verin." uyarısı gösterilir. Herkese açık yayın özelliği yoktur. | D (madde ve rehber alıntısı) |
+| 2 | **KVKK m.3** (veri sorumlusu: işleme amaç ve vasıtalarını belirleyen), **m.10** (aydınlatma), **m.12** (veri güvenliği), **m.16** (sicil). | Kullanıcı yerel planın amaç ve kapsamını belirler. Proje sahibi bu verilere erişmez. | Uygulama plan verisini sunucuya göndermez. Barındırma ve yazışma akışlarında amaç ve vasıtaları belirleyen taraflar ayrı değerlendirilir. Yine de bir "Gizlilik Bildirimi" yayımlanır (Bölüm 14.1) ve bu değerlendirme hukukçuya sorulur (4.4-S1). | H |
 | 3 | **KVKK m.6** (2/3/2024 tarihli 7499 sayılı Kanunla değişik). Sağlık verisi özel niteliklidir; işlenmesi kural olarak yasaktır, istisnalar sayılıdır (açık rıza vb.). | Kan grubu, hastalık, ilaç, alerji, engellilik bilgisi özel niteliklidir. | Sağlık alanları isteğe bağlıdır; ayrı bir açma-kapama ile, bilgilendirme metni gösterilerek açılır (11.5, 3. adım). Varsayılan paylaşımlara girmez; cüzdan kartına basılması ayrıca sorulur. İsteğe bağlı parola ile cihazda şifrelenebilir (9.3). | D (madde metni alıntısı) |
-| 4 | **KVKK m.9** (yurt dışına aktarım) ve barındırma. | Statik dosyalar yurt dışındaki bir sağlayıcıdan sunulursa, sağlayıcı ziyaretçinin IP adresini ve tarayıcı bilgisini kendi günlüklerine yazabilir. Plan verisi **aktarılmaz**. | Gizlilik bildiriminde barındırma sağlayıcısı ve bu günlükler açıkça yazılır. Paylaşım yükü URL'nin `#` sonrasındaki parçasında taşınır; bu parça sunucuya gönderilmez (10.2). Barındırma seçenekleri 4.3'te. Proje sahibinin bu günlükler bakımından konumu hukukçuya sorulur (4.4-S2). | H |
+| 4 | **KVKK m.9** (yurt dışına aktarım) ve barındırma. | GitHub Pages ziyaretçinin IP adresini güvenlik amacıyla kaydettiğini bildirir. Plan içeriği normal sayfa isteğinde aktarılmaz. GitHub ve Gmail yazışmaları ayrı veri akışlarıdır. | Gizlilik bildiriminde barındırma sağlayıcısı ve bu günlükler açıkça yazılır. Paylaşım yükü URL'nin `#` sonrasındaki parçasında taşınır; bu parça sunucuya gönderilmez (10.2). Barındırma seçenekleri 4.3'te. Proje sahibinin bu günlükler bakımından konumu hukukçuya sorulur (4.4-S2). | H |
 | 5 | **Kişisel Verileri Koruma Kurumu, Çerez Uygulamaları Hakkında Rehber.** | Analitik ve reklam çerezleri rıza gerektirir. | Çerez kullanılmaz. Tarayıcı deposu yalnızca kullanıcının kendi planını ve ayarlarını saklamak için, hizmetin çalışması için zorunlu ölçüde kullanılır. Rıza penceresi yoktur; gizlilik bildiriminde açıklanır. | H |
 | 6 | **5651 sayılı Kanun m.2, m.4.** İçerik sağlayıcı, internette sunduğu her içerikten sorumludur. | Proje sahibi içerik sağlayıcıdır; rehber metinlerinin doğruluğundan sorumludur. | İçerik kayıt sistemi ve onay kapısı (Bölüm 13). Dış bağlantılar yalnızca izinli resmî alan adlarına verilir (13.2). | D |
 | 7 | **5651 m.3** ve **İnternet Ortamında Yapılan Yayınların Düzenlenmesine Dair Usul ve Esaslar Hakkında Yönetmelik m.5.** Tanıtıcı bilgi bulundurma yükümlülüğü; Yönetmelik bunu "ticari veya ekonomik amaçlı" sağlayıcılar için düzenler. | Proje ticari değildir. | Yine de gönüllü bir "Künye ve İletişim" sayfası bulunur: sorumlu kişi, e-posta, depo adresi, barındırma sağlayıcısı (14.3). Projenin ticari sayılıp sayılmayacağı hukukçuya sorulur (4.4-S3). | D |
@@ -100,14 +103,14 @@ Dayanak: AFAD, ailelerin afet sonrası ilk 72 saat için bir afet ve acil durum 
 | 9 | **6098 sayılı TBK m.115.** Ağır kusurdan sorumlu olunmayacağına dair önceden yapılan anlaşma kesin hükümsüzdür. Ayrıca m.49 vd. (haksız fiil). | Sorumluluk reddi metni tek başına koruma sağlamaz. | Asıl koruma içerik sürecidir: kaynak zorunluluğu, insan onayı, tarihli kayıt, hata bildirim yolu, hızlı düzeltme (Bölüm 13). Sorumluluk reddi yine de açık ve görünür biçimde yer alır (14.2). | D (m.115) / H (m.49) |
 | 10 | **5237 sayılı TCK m.217/A** (13/10/2022 tarihli 7418 sayılı Kanunla eklendi): halkı yanıltıcı bilgiyi alenen yayma. | Afet dönemlerinde doğrulanmamış bilgi yaymak hukuki risk taşır. | İ6 ve İ12: haber, anlık bilgi, söylenti, kullanıcı içeriği yok. Yalnızca resmî kaynağa dayalı, tarihli, değişmeyen rehber metni. | D (maddenin varlığı ve adı) |
 | 11 | **e-Devlet "Afet ve Acil Durum Toplanma Alanı Sorgulama"** hizmeti ve kullanım koşulları; **TCK m.243–244** (bilişim sistemine girme, sistemi engelleme). | Toplanma alanı verisi resmî hizmettedir; otomatik çekmek koşullara ve hukuka aykırı olabilir. | Veri çekilmez, kopyalanmaz, çerçeve içinde gösterilmez. Kullanıcıya bağlantı verilir; sonucu kendisi yazar (11.5, 5. adım). | D (hizmetin varlığı) / H (koşullar) |
-| 12 | **Afet ve Acil Durum Müdahale Hizmetleri Yönetmeliği** (RG 31760): "afet ve acil durum toplanma alanı" tanımı. **5902 sayılı Kanun** ve **7269 sayılı Kanun**: afet yönetiminde yetkili kurumlar. | Terimler ve yetki. | Arayüzde resmî terim kullanılır: "afet ve acil durum toplanma alanı". Uygulama kurum yetkisindeki hiçbir işi üstlenmez (İ6). | D (tanım) / H (kanunlar) |
+| 12 | **Afet ve Acil Durum Müdahale Hizmetleri Yönetmeliği** (Karar 10809, RG 33124, 5. Mükerrer, 31.12.2025): "afet ve acil durum toplanma alanı" tanımı. **5902 sayılı Kanun** ve **7269 sayılı Kanun**: afet yönetiminde yetkili kurumlar. | Terimler ve yetki. | Arayüzde resmî terim kullanılır: "afet ve acil durum toplanma alanı". Uygulama kurum yetkisindeki hiçbir işi üstlenmez (İ6). | D (tanım) / H (kanunlar) |
 | 13 | **112 Acil Çağrı Merkezi.** İçişleri Bakanlığı açıklamasına göre 110, 112, 155, 156, 122, 177 ve 158 numaraları 112'de birleştirilmiştir. | Eski numaraları göstermek yanıltır. | Uygulamada tek acil numara: **112** (`tel:112` bağlantısı). Başka kısa numara gösterilmez. | D |
-| 14 | **5846 sayılı FSEK.** Kurum yayınları, afişleri, görselleri eserdir. m.31: resmen yayımlanan mevzuat metinlerinin çoğaltılması serbesttir. | Kurum metinlerini ve görsellerini kopyalamak ihlal olabilir. | İ4: bütün rehber metni kendi cümlelerimizle yazılır, kaynak gösterilir. Kurum görseli, afişi, simgesi kullanılmaz. Çizimler özgün ve sade olur. | H |
+| 14 | **5846 sayılı FSEK.** Kurum yayını veya görseli eser niteliği taşıyabilir. m.31 resmen yayımlanan mevzuat ve yargı kararları için, m.35 ise sınırlı iktibas için uygulanır. | Kurum metinlerini ve görsellerini kopyalamak ihlal olabilir. | İ4: bütün rehber metni kendi cümlelerimizle yazılır, kaynak gösterilir. Kurum görseli, afişi, simgesi kullanılmaz. Çizimler özgün ve sade olur. | H |
 | 15 | **6769 sayılı Sınai Mülkiyet Kanunu** ve kurum ad/amblemlerinin korunmasına dair özel düzenlemeler (Kızılay amblemi dahil). | Kurum adı ya da amblemi kullanmak, resmî izlenimi vermek. | İ5. Kurum adları yalnızca kaynak gösterirken düz metin olarak geçer. İlk yardım çantası simgesi için kırmızı hilal ya da haç **kullanılmaz**; nötr bir çanta simgesi kullanılır. | H |
-| 16 | **2025/10 sayılı Cumhurbaşkanlığı Genelgesi** (RG 21.06.2025, 32933) ve **5378 sayılı Kanun m.7**. Genelge kamu kurumları, bankalar, özel hastaneler, e-ticaret hizmet sağlayıcıları gibi sayılı kuruluşlara WCAG 2.2 temelli erişilebilirlik yükümlülüğü getirir. | Bireyler ve açık kaynak projeleri Genelge'de sayılmaz. | Yükümlülük olmasa da hedef WCAG 2.2 AA'dır (İ10); erişilebilirlik beyanı yayımlanır (14.4). Erişilebilirlik Logosu **kullanılmaz** (resmî değerlendirme gerektirir). | D |
+| 16 | **2025/10 sayılı Cumhurbaşkanlığı Genelgesi** (RG 21.06.2025, 32933) ve **5378 sayılı Kanun m.7**. Genelge kamu kurumları, bankalar, özel hastaneler, e-ticaret hizmet sağlayıcıları gibi sayılı kuruluşlara WCAG 2.2 temelli erişilebilirlik yükümlülüğü getirir. | Bağımsız ücretsiz proje mevcut Genelge listesinde görünmüyor. 5378 m.7 ve 6701 m.3–5 ayrıca değerlendirilir. | Hedef WCAG 2.2 AA’dır (İ10); erişilebilirlik beyanı yayımlanır (14.4). Erişilebilirlik Logosu **kullanılmaz** (resmî değerlendirme gerektirir). | D |
 | 17 | **6305 sayılı Afet Sigortaları Kanunu** (zorunlu deprem sigortası). | Sigorta bilgisi plana girer. | Yalnızca "Zorunlu deprem sigortanız var mı?" denetim maddesi ve DASK resmî sitesine bağlantı. Şirket, ürün, fiyat, tavsiye yok. Poliçe numarası alanı yok. | H |
 | 18 | **İlkyardım Yönetmeliği** ve sağlık mevzuatı. | İlk yardım anlatmak yetki ve doğruluk riski taşır. | İ7. Çanta listesinde "ilk yardım çantası" maddesi bulunur; uygulama yöntemi anlatılmaz, "Yetkili merkezlerden ilk yardım eğitimi alın." denir. | H |
-| 19 | **6502 sayılı Tüketicinin Korunması Hakkında Kanun**, **6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun**. | Satış ve ticari ileti yoksa uygulanmaz. | İ11 ile kapsam dışında kalınır: satış, üyelik, e-posta toplama, bildirim gönderimi yok. | H |
+| 19 | **6502 sayılı Tüketicinin Korunması Hakkında Kanun**, **6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun**. | Uygulanabilirlik faaliyetin ekonomik, ticari veya mesleki niteliğine ve olası karşı edime bağlıdır. | Mevcut dağıtım ücretsiz, reklamsız ve bağışsızdır. Uygulama kullanıcı hesabı veya toplu ticari ileti içermez. | H |
 | 20 | **Çocuklara ilişkin veriler** (velayet, TMK) ve çocuk güvenliği. | Çocuğun adı, okulu, adresi plana girer. | Bilgiyi veli girer. Çocuk kartında varsayılan olarak ev adresi **basılmaz**; yalnızca ad, veli telefonları, buluşma yeri (12.4). Okul adı karta isteğe bağlı eklenir. | H |
 | 21 | **Açık kaynak lisansları.** | Kod ve içerik yeniden kullanımı. | Kod: MIT. Rehber metinleri ve belgeler: CC BY 4.0. Üçüncü taraf lisansları `THIRD_PARTY_LICENSES.md` içinde. | H |
 
@@ -115,7 +118,7 @@ Dayanak: AFAD, ailelerin afet sonrası ilk 72 saat için bir afet ve acil durum 
 
 | Karar | Teknik karşılık | Kanıtlayan test |
 |---|---|---|
-| Veri cihazdan çıkmaz | Ağ isteği yapan kod yok; CSP `connect-src 'none'` | 18.5 dış istek testi |
+| Uygulama planı kendiliğinden göndermez | Plan için ağ isteği yapan kod yok; CSP `connect-src 'none'` | 18.5 dış istek testi |
 | Paylaşım kullanıcı eylemidir | Paylaşım yalnızca düğmeyle, uyarı onayından sonra üretilir | 18.4 uçtan uca |
 | Sağlık verisi isteğe bağlı | `health` alanı yalnızca `healthOptIn === true` iken saklanır; kapatılınca silinir | 18.2 model testleri |
 | Sağlık verisi varsayılan paylaşılmaz | Özet kart şemasında sağlık alanı yok; ek not ayrı onay ister | 18.3 kodlama testleri |
@@ -217,7 +220,7 @@ ilk72/
 ├─ public/                     # manifest simgeleri (özgün), robots.txt
 ├─ test/                       # birim ve bileşen testleri, vectors/
 ├─ e2e/                        # Playwright senaryoları
-├─ docs/                       # kararlar.md, hukuki-inceleme.md (şablon), icerik-onay.md, mimari.md
+├─ docs/                       # kararlar.md, hukuki-inceleme.md (inceleme ve onay kaydı), icerik-onay.md, mimari.md
 ├─ .github/                    # workflows (ci, pages), issue ve PR şablonları
 ├─ README.md  CONTRIBUTING.md  CODE_OF_CONDUCT.md  SECURITY.md  CHANGELOG.md
 ├─ LICENSE  LICENSE-CONTENT  THIRD_PARTY_LICENSES.md
@@ -367,8 +370,9 @@ Bütün metinlerde baştaki ve sondaki boşluk kırpılır, denetim karakterleri
 ### 9.1 IndexedDB
 
 - Veritabanı `ilk72`, sürüm 1, tek nesne deposu `kv` (anahtar: dize).
-- Anahtarlar: `plan` (düz `Plan` ya da `{ enc: true, data: Uint8Array }`), `settings` (`{ largeText, lockEnabled, printPrefs, firstRunAccepted }`), `meta` (`{ contentSeenVersion }`).
+- Anahtarlar: `plan` (düz `Plan` ya da `{ enc: true, data: Uint8Array }`), `settings` (`{ largeText, lockEnabled, printPrefs, firstRunAccepted }`), `meta` (`{ contentSeenVersion }`) ve sekmeler arası yazma denetimi için rastgele veri sürümü olan `revision`.
 - Değişiklikler 500 ms gecikmeyle otomatik kaydedilir; sayfa kapanırken (`visibilitychange` → `hidden`) bekleyen kayıt hemen yazılır.
+- Plan ve kilit ayarı tek işlemde yazılır. Sürümü eski olan açık sekme yeni planı veya kilit durumunu ezemez.
 - İlk kayıtta `navigator.storage.persist()` çağrılır (varsa); sonuç ayarlar sayfasında gösterilir.
 
 ### 9.2 Depo kullanılamıyorsa
@@ -389,7 +393,7 @@ Gizli sekme ya da kısıtlı ortamda IndexedDB açılamazsa uygulama bellek içi
   - Düz: `{ "format": "ilk72-yedek", "schemaVersion": 1, "exportedAt": "...", "encrypted": false, "plan": { ... } }`
   - Parolalı: `{ ..., "encrypted": true, "data": "<base64url(encryptBytes(deflate(utf8(JSON(plan)))))>" }`
 - İçe aktarma: dosya en çok 1 MB; `format` denetlenir; parolalıysa parola sorulur; sonuç `sanitizePlan`'dan geçer; kullanıcıya özet gösterilir ("4 kişi, 3 acil kişi, son güncelleme …") ve mevcut planın **üzerine yazılacağı** açıkça onaylatılır.
-- Ayarlar sayfasında "Bütün verilerimi sil" düğmesi: onaydan sonra veritabanını, önbelleği (`caches`) ve `localStorage`'ı temizler.
+- Ayarlar sayfasında "Bütün verilerimi sil" düğmesi: onaydan sonra yerel plan ve ayarları siler. Çevrimdışı uygulama dosyaları önbellekte kalır. Diğer açık İlk 72 sekmelerinde eski oturumun yeniden kayıt yapması engellenir.
 
 ## 10. Paylaşım
 
@@ -457,7 +461,7 @@ Tam ekran olmayan bir bilgilendirme kutusu (yalnızca ilk kez):
 > **Başlamadan önce**
 > - Bu, bağımsız bir açık kaynak projesidir; resmî bir kurum uygulaması değildir.
 > - Acil durumda **112**'yi arayın. Bu uygulama yardım çağırmaz.
-> - Yazdıklarınız yalnızca bu cihazda saklanır; bize ya da başkasına gönderilmez.
+> - Planınız bu tarayıcıda saklanır. Uygulama planınızı kendiliğinden göndermez.
 > - Tavsiyeler resmî kaynaklara dayanır ama onların yerini tutmaz.
 >
 > [Kullanım koşulları] · [Gizlilik bildirimi] — **[Anladım, başla]**
@@ -482,7 +486,7 @@ Onay `settings.firstRunAccepted` olarak saklanır.
 |---|---|---|---|
 | 1 | **Haneniz** | Hane etiketi; adres; bina notu (kat, asansör, merdiven) | Adresin yalnızca tam plan çıktısında yer aldığı belirtilir |
 | 2 | **Kişiler** | Tekrarlı: ad*, grup (yetişkin/çocuk/bebek/yaşlı), telefon; gün içinde bulunduğu yerler (tür, ad, telefon, not) | En az 1 kişi. Çocuk için "Okuldan kim teslim alabilir?" ipucu 4. adıma yönlendirir |
-| 3 | **Özel ihtiyaçlar** | Kişi başına: hareket, işitme, görme, iletişim desteği kutuları + not. **Ayrı bölüm:** "Sağlık bilgisi eklemek istiyorum" anahtarı | Anahtar açılırken metin: "Kan grubu, hastalık, ilaç gibi bilgiler hassastır. Yalnızca bu cihazda saklanır. Eklemek zorunda değilsiniz; yalnızca acil durumda bir başkasının bilmesi gereken kadarını yazın." Açılınca kişi başına sağlık alanları görünür. Kapatılırken: "Girdiğiniz sağlık bilgileri silinecek." onayı |
+| 3 | **Özel ihtiyaçlar** | Kişi başına: hareket, işitme, görme, iletişim desteği kutuları + not. **Ayrı bölüm:** "Sağlık bilgisi eklemek istiyorum" anahtarı | Anahtar açılırken sağlık verisinin özel nitelikli olduğu ve başkasının verisinin yalnızca gerekliyse ve yetkili olunması halinde eklenebileceği açıklanır. Açılınca kişi başına sağlık alanları görünür. Kapatılırken: "Girdiğiniz sağlık bilgileri silinecek." onayı |
 | 4 | **Acil kişiler** | Tekrarlı: ad, ilişki, telefon, ikinci telefon, şehir dışı irtibat mı (+şehir), çocukları teslim alabilir mi | Açıklama olarak P-04 maddesi gösterilir. En az bir şehir dışı kişi önerilir, zorunlu değil |
 | 5 | **Buluşma yerleri** | Ev yakını; mahallede; şehir dışı; resmî toplanma alanı + "Resmî sorgudan baktım" tarihi | Toplanma alanı için: "Size en yakın afet ve acil durum toplanma alanını e-Devlet'teki resmî sorgudan öğrenin ve buraya yazın." + dış bağlantı (K-EDEVLET). Uygulama alan önermez |
 | 6 | **Eviniz** | Odalardaki güvenli yerler; çıkış yolları; elektrik şalteri, gaz vanası, su vanası yer tarifleri; tehlike avı listesi (H-*) | Vana ve şalterin nasıl kapatılacağı anlatılmaz; yalnızca yeri yazılır. Uyarı: "Tesisat üzerinde kendiniz işlem yapmayın; gerekirse yetkili servisten destek alın." |
@@ -576,7 +580,7 @@ interface Source {
 }
 ```
 
-İzinli alan adları (ve alt alan adları): `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`, `kvkk.gov.tr`, `mebakub.meb.gov.tr`. Uygulamadaki **bütün** dış bağlantılar bu listeden olmak zorundadır (depo ve lisans bağlantıları hariç: `github.com`, `creativecommons.org`, `opensource.org`).
+İzinli alan adları (ve alt alan adları): `afad.gov.tr`, `turkiye.gov.tr`, `112.gov.tr`, `icisleri.gov.tr`, `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`, `resmigazete.gov.tr`, `kvkk.gov.tr`, `mebakub.meb.gov.tr`, `hazirim.gov.tr`. Bu liste içerik kaydındaki resmî kaynak bağlantıları için geçerlidir. Hukuki ve proje sayfalarında sağlayıcı gizlilik politikası, standart, depo, iletişim ve lisans bağlantıları da yer alabilir.
 
 ### 13.2 İçerik kaydı (`registry.ts`)
 
@@ -597,14 +601,17 @@ Yazım kuralları: emir kipi yerine yalın, sakin anlatım ("… yapın"); korku
 
 ### 13.3 Başlangıç içeriği
 
+Bu bölümdeki tablolar ilk taslak kaydını gösterir. Güncel metinler ve kaynaklar
+[içerik kaydında](../src/content/registry.ts) ve [kaynak kaydında](../src/content/sources.ts) tutulur.
+
 Aşağıdaki metinler resmî sayfaların **arama alıntılarına** dayanılarak yazılmış taslaklardır (siteler otomatik erişime kapalıdır). Hepsi `status: 'taslak'` olarak girilir. Onay sırasında kaynak sayfada karşılığı bulunamayan madde **silinir**, düzeltilmez.
 
 **Plan (`plan`)**
 
 | id | Metin | Kaynak |
 |---|---|---|
-| P-01 | Aile afet ve acil durum planı, afetten sonraki ilk 72 saat için hazırlanır. | K-PLAN72, K-KIRSEHIR |
-| P-02 | Planda evin güvenli yerleri, afet ve acil durum çantası ve evi tahliye planı yer alır. | K-PLAN72, K-KIRSEHIR |
+| P-01 | Aile afet ve acil durum planı, afetten sonraki ilk 72 saat için hazırlanır. | K-AILE, K-GUVENLI-YASAM |
+| P-02 | Planda evin güvenli yerleri, afet ve acil durum çantası ve evi tahliye planı yer alır. | K-AILE, K-GUVENLI-YASAM |
 | P-03 | Afet anında aile bireyleri arasındaki görev dağılımını önceden belirleyin. | K-KARAR |
 | P-04 | Şehir içinde ve şehir dışında birer destek noktası ve irtibat kişisi belirleyin. | K-KARAR |
 | P-05 | Evden çıkış için birden fazla yol düşünün. | K-KARAR |
@@ -765,57 +772,17 @@ Adresi "bulunacak" olan anahtarlar `K-ONERI-DOGRULA` gibi davranır: bağlı mad
 4. Her yıl ve büyük bir afetten sonra resmî tavsiyeler değişmiş olabilir: `reviewedAt` üzerinden 12 ay geçen maddeler için `content:check` uyarı verir; 18 ay geçince `build:prod` başarısız olur.
 5. Kullanıcıların yanlış ya da eskimiş içeriği bildirmesi için her rehber kartında "Hata bildir" bağlantısı (depo sorun şablonuna gider) ve Künye sayfasında e-posta bulunur.
 
-## 14. Hukuki metin taslakları
+## 14. Hukuki metinler
 
-Bu metinler `src/i18n/tr.ts` içinde durur ve ilgili sayfalarda gösterilir. Avukat onayına kadar taslaktır; ajan anlamlarını değiştirmez, yalnızca yer tutucuları doldurur.
+Güncel kullanıcı metinleri [`src/i18n/legal.ts`](../src/i18n/legal.ts) içinde düzenlenir.
+Yayın sürümünün değerlendirmesi ve onay kaydı [hukuki inceleme belgesindedir](hukuki-inceleme.md).
 
-### 14.1 Gizlilik Bildirimi (`#/gizlilik`)
-
-> **Kısaca:** Yazdıklarınız cihazınızdan çıkmaz. Sizi izlemiyoruz.
->
-> **Hangi bilgiler nerede durur?** Planınıza yazdığınız her şey (adlar, telefonlar, adres, isterseniz sağlık bilgileri) yalnızca bu cihazdaki tarayıcının deposunda saklanır. Bize ya da başka birine gönderilmez. Sunucumuz, üyelik sistemimiz ya da veritabanımız yoktur; bu bilgilere erişemeyiz.
->
-> **Çerez ve izleme.** Çerez, analitik, reklam ya da izleme aracı kullanmıyoruz. Tarayıcı deposunu yalnızca planınızı ve ayarlarınızı saklamak için kullanıyoruz.
->
-> **Barındırma.** Uygulamanın dosyaları GitHub Pages üzerinden sunulur. Her internet sitesinde olduğu gibi, barındırma sağlayıcısı sayfayı açtığınızda IP adresinizi ve tarayıcı bilginizi kendi kayıtlarına yazabilir. Bu kayıtlara biz erişemeyiz; ayrıntı için sağlayıcının gizlilik politikasına bakabilirsiniz. Uygulamayı bir kez açtıktan sonra internet olmadan da kullanabilirsiniz.
->
-> **Paylaşım.** Bir özeti bağlantı ya da kare kodla paylaşırsanız bilgiler o bağlantının içinde taşınır; sunucuya gönderilmez. Bağlantıyı gören herkes içeriğini okuyabilir. Parola koyarsanız yalnızca parolayı bilenler okuyabilir. Bağlantıyı kimle paylaştığınız sizin sorumluluğunuzdadır.
->
-> **Başkalarının bilgileri.** Planınıza aile üyelerinizin ve yakınlarınızın bilgilerini yazıyorsunuz. Bu bilgileri yalnızca aileniz ve güvendiğiniz kişilerle paylaşın; adı geçenlere haber verin.
->
-> **Takvim hatırlatması.** İndirdiğiniz takvim dosyasında kişisel bilginiz yer almaz.
->
-> **Silme.** Ayarlar sayfasındaki "Bütün verilerimi sil" düğmesi bu cihazdaki her şeyi kalıcı olarak siler. Yazdırdığınız kâğıtlar ve paylaştığınız bağlantılar sizdedir.
->
-> **İletişim.** Azar Gozalli — gozelliazer@gmail.com
->
-> Son güncelleme: {TARIH}
-
-### 14.2 Kullanım Koşulları ve Sorumluluk Reddi (`#/kosullar`)
-
-> **Bu uygulama nedir?** İlk 72, ailenizin afet ve acil durum planını hazırlamanıza yardımcı olan ücretsiz ve açık kaynak bir araçtır. Gönüllü olarak geliştirilir.
->
-> **Ne değildir?** Resmî bir kurum uygulaması değildir; herhangi bir kurumla bağlantısı yoktur. Acil yardım hizmeti değildir; yardım çağırmaz, uyarı göndermez. Acil durumda 112'yi arayın. Tıbbi, hukuki, mühendislik ya da sigorta danışmanlığı vermez.
->
-> **İçerik.** Rehber metinleri resmî kurumların kamuya açık tavsiyelerinden özetlenmiştir ve her birinin kaynağı gösterilir. Özen göstermemize rağmen içerik eksik, eskimiş ya da durumunuza uygun olmayabilir. Güncel ve bağlayıcı bilgi için resmî kaynaklara ve yetkililerin yönlendirmelerine uyun. Afet anında yetkililerin talimatları her zaman bu uygulamadaki bilgilerden önce gelir.
->
-> **Sizin sorumluluğunuz.** Plana yazdığınız bilgilerin doğruluğu, güncelliği ve kimlerle paylaşıldığı sizin sorumluluğunuzdadır. Planın basılı bir kopyasını bulundurun; cihazınız afet anında çalışmayabilir.
->
-> **Garanti.** Uygulama "olduğu gibi" sunulur; kesintisiz ya da hatasız çalışacağı garanti edilmez. Yürürlükteki hukukun izin verdiği ölçüde, uygulamanın kullanımından doğabilecek zararlardan sorumluluk kabul edilmez. Bu madde, hukuken sınırlandırılamayan sorumlulukları kaldırmaz.
->
-> **Lisans.** Kaynak kodu MIT lisansı, rehber metinleri CC BY 4.0 lisansı altındadır.
->
-> **Hata bildirimi.** Yanlış ya da eskimiş bir bilgi görürseniz lütfen bildirin: https://github.com/avazargozalli/ilk72/issues ya da gozelliazer@gmail.com
->
-> Son güncelleme: {TARIH}
-
-### 14.3 Künye ve İletişim (`#/kunye`)
-
-> Sorumlu: Azar Gozalli · E-posta: gozelliazer@gmail.com · Kaynak kodu: https://github.com/avazargozalli/ilk72 · Barındırma: GitHub Pages · Uygulama sürümü: {SURUM} · İçerik sürümü: {ICERIK_SURUMU} · Ticari amaç taşımaz; bağış ya da ödeme kabul etmez.
-
-### 14.4 Erişilebilirlik Beyanı (`#/erisilebilirlik`)
-
-> Bu uygulamayı herkesin kullanabilmesini istiyoruz. Hedefimiz WCAG 2.2 AA düzeyidir. Uygulama klavyeyle kullanılabilir, ekran okuyucularla denenmiştir, metin boyutu büyütülebilir. Bilinen eksikler: {BILINEN_EKSIKLER}. Bir engelle karşılaşırsanız gozelliazer@gmail.com adresine yazın; en geç 14 gün içinde yanıt vermeye çalışırız. Bu beyan gönüllüdür; resmî bir erişilebilirlik belgesi ya da logosu anlamına gelmez. Son değerlendirme: {TARIH}
+| Bölüm | Sayfa | Kapsam |
+|---|---|---|
+| 14.1 | Gizlilik Bildirimi (`#/gizlilik`) | Yerel saklama, barındırma, dışa aktarma, üçüncü kişi ve sağlık bilgileri, silme, geri bildirim, KVKK hakları. |
+| 14.2 | Kullanım Koşulları ve Sorumluluk Reddi (`#/kosullar`) | Uygulama kapsamı, 112 ve yetkili kaynaklar, kanuni haklar, lisans ve bildirim. |
+| 14.3 | Künye ve İletişim (`#/kunye`) | Sorumlu, sürüm, sağlayıcı, depo ve iletişim. |
+| 14.4 | Erişilebilirlik Beyanı (`#/erisilebilirlik`) | WCAG hedefi, inceleme durumu, bilinen eksikler ve bildirim yolları. |
 
 ### 14.5 Her sayfanın alt bilgisi
 
@@ -849,9 +816,9 @@ Bu metinler `src/i18n/tr.ts` içinde durur ve ilgili sayfalarda gösterilir. Avu
 - `tel:` ve dış bağlantılar yalnızca doğrulanmış değerlerle üretilir; dış bağlantılarda `rel="noopener noreferrer"` ve `target="_blank"`; `<meta name="referrer" content="no-referrer">`.
 - İçe aktarma ve paylaşım girdileri güvenilmezdir: boyut sınırları, sıkıştırma bombası sınırı (`SHARE_MAX_JSON`), şema temizliği (8.3, 10.1).
 - Şifreleme: PBKDF2-HMAC-SHA256, 600.000 tur, 16 baytlık rastgele tuz; AES-256-GCM, 12 baytlık rastgele başlangıç vektörü; her şifrelemede yeni tuz ve vektör (Ek A). Parola hiçbir yere yazılmaz.
-- Bağımlılıklar: CI'da `npm audit --omit=dev` (yüksek ve kritik açıkta başarısız); Dependabot açık; kilit dosyası zorunlu.
+- Bağımlılıklar: CI'da `pnpm audit --prod --audit-level=high` (yüksek ve kritik açıkta başarısız); Dependabot açık; kilit dosyası zorunlu.
 - `SECURITY.md`: açıkların özelden bildirilmesi.
-- `robots.txt`: dizine eklenmeye izin verir (uygulamada kişisel veri sunulmaz); `#/al/...` yolları zaten sunucuya gitmez.
+- `robots.txt`: dizine eklenmeye izin verir (uygulama sunucusunda plan verisi sunulmaz). Alan adı köküne yapılan kurulumlarda uygulanır; `#/al/...` yolları zaten sunucuya gitmez.
 
 ## 18. Testler
 
@@ -897,8 +864,8 @@ Toplam JavaScript (gzip) ≤ 150 kB; ilk yükleme düşük donanımlı telefonda
 
 ## 19. CI/CD
 
-- **`ci.yml`** (push, pull request): `npm ci` → `lint` → `typecheck` → `coverage` → `content:check` → `build` → Playwright tarayıcı kurulumu → `e2e` → `npm audit --omit=dev`. Ek adım: depoda `FUNDING.yml` bulunmadığını denetle.
-- **`pages.yml`** (yalnızca `v*` etiketi ve elle tetikleme): `npm ci` → `build:prod` (onaysız içerik varsa burada durur) → `docs/hukuki-inceleme.md` dosyasının "Onay tarihi" satırının dolu olduğunu denetle → Pages'e yayımla. `main` dalına her itişte **yayımlanmaz**; böylece onaysız içerik ve incelenmemiş sürüm canlıya çıkamaz.
+- **`ci.yml`** (push, pull request): `pnpm install --frozen-lockfile` → `lint` → `typecheck` → `coverage` → `content:check` → `build` → Playwright tarayıcı kurulumu → `e2e` → `pnpm audit --prod --audit-level=high`. Ek adım: depoda `FUNDING.yml` bulunmadığını denetle.
+- **`pages.yml`** (yalnızca `v*` etiketi ve elle tetikleme): `pnpm install --frozen-lockfile` → `build:prod` (onaysız içerik varsa burada durur) → `docs/hukuki-inceleme.md` dosyasının "Onay tarihi" satırının dolu olduğunu denetle → Pages'e yayımla. `main` dalına her itişte **yayımlanmaz**; böylece onaysız içerik ve incelenmemiş sürüm canlıya çıkamaz.
 - Geliştirme önizlemesi isteyenler `npm run build && npm run preview` kullanır.
 - Action'ların güncel ana sürümleri; en dar `permissions`.
 
@@ -973,7 +940,7 @@ Sahibinin tamamlayacakları (bunlar bitmeden yayın yapılmaz):
 
 ## 24. Mevzuat ve kaynak listesi
 
-Erişim tarihi: 2026-11-19. Güncel metin için Mevzuat Bilgi Sistemi (`mevzuat.gov.tr`) ve Resmî Gazete esas alınır.
+İlk kaynak taraması 19.11.2026. [25.11.2026 ek incelemesi](hukuki-inceleme.md) madde ve bağlantıları içerir. Güncel metin için Mevzuat Bilgi Sistemi (`mevzuat.gov.tr`) ve Resmî Gazete esas alınır.
 
 - 6698 sayılı Kişisel Verilerin Korunması Kanunu (m.3, 6, 9, 10, 12, 16, 28); 7499 sayılı Kanunla yapılan değişiklikler. Kişisel Verileri Koruma Kurumu, "Kişisel Verilerin Korunması Kanunu ve Uygulaması" rehberi; "Çerez Uygulamaları Hakkında Rehber".
 - 5651 sayılı İnternet Ortamında Yapılan Yayınların Düzenlenmesi ve Bu Yayınlar Yoluyla İşlenen Suçlarla Mücadele Edilmesi Hakkında Kanun (m.2, 3, 4); İnternet Ortamında Yapılan Yayınların Düzenlenmesine Dair Usul ve Esaslar Hakkında Yönetmelik (m.5, 6).
@@ -982,9 +949,9 @@ Erişim tarihi: 2026-11-19. Güncel metin için Mevzuat Bilgi Sistemi (`mevzuat.
 - 5237 sayılı Türk Ceza Kanunu (m.217/A, m.243, m.244).
 - 5846 sayılı Fikir ve Sanat Eserleri Kanunu (m.31); 6769 sayılı Sınai Mülkiyet Kanunu.
 - 5378 sayılı Engelliler Hakkında Kanun (m.7); 2025/10 sayılı Cumhurbaşkanlığı Genelgesi (RG 21.06.2025, 32933).
-- 5902 sayılı Afet ve Acil Durum Yönetimi Başkanlığı ile İlgili Bazı Düzenlemeler Hakkında Kanun; 7269 sayılı Umumi Hayata Müessir Afetler Dolayısiyle Alınacak Tedbirlerle Yapılacak Yardımlara Dair Kanun; Afet ve Acil Durum Müdahale Hizmetleri Yönetmeliği (RG 31760).
+- 5902 sayılı Afet ve Acil Durum Yönetimi Başkanlığı ile İlgili Bazı Düzenlemeler Hakkında Kanun; 7269 sayılı Umumi Hayata Müessir Afetler Dolayısiyle Alınacak Tedbirlerle Yapılacak Yardımlara Dair Kanun; [Afet ve Acil Durum Müdahale Hizmetleri Yönetmeliği (Karar 10809, RG 33124, 5. Mükerrer)](https://www.resmigazete.gov.tr/eskiler/2025/12/20251231M5-15.pdf).
 - 6305 sayılı Afet Sigortaları Kanunu. İlkyardım Yönetmeliği. 6502 ve 6563 sayılı Kanunlar.
-- Rehber içeriğinin kaynakları: Bölüm 13.3'teki kaynak anahtarları tablosu.
+- Rehber içeriğinin güncel kaynakları [kaynak kaydında](../src/content/sources.ts) yer alır.
 
 ---
 

@@ -5,7 +5,11 @@
  * modül içi durum (açık bağlantı, parola, bekleyen yazma) testler arasında
  * taşınmaz. Depo olarak `fake-indexeddb` kullanılır; gerçek IndexedDB yoktur.
  */
-import { IDBKeyRange as FakeIDBKeyRange, indexedDB as fakeIndexedDB } from 'fake-indexeddb';
+import {
+  IDBKeyRange as FakeIDBKeyRange,
+  IDBObjectStore as FakeObjectStore,
+  indexedDB as fakeIndexedDB,
+} from 'fake-indexeddb';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Plan } from '../../src/model/types.ts';
 import { sanitizePlan } from '../../src/model/validate.ts';
@@ -57,7 +61,59 @@ async function writeRecord(key: string, value: unknown): Promise<void> {
   }
 }
 
+function rejectPlanWrites() {
+  const put = FakeObjectStore.prototype.put;
+  return vi.spyOn(FakeObjectStore.prototype, 'put').mockImplementation(function (
+    this: InstanceType<typeof FakeObjectStore>,
+    value,
+    key,
+  ) {
+    if (key === 'plan') throw new Error('yazma-basarisiz');
+    return put.call(this, value, key);
+  });
+}
+
 describe('açılış ve kayıt', () => {
+  it('geçici yazma hatasından sonra aynı planı yeniden kaydeder', async () => {
+    const plan = samplePlan();
+    const blocked = rejectPlanWrites();
+    try {
+      store.savePlan(plan);
+      await expect(store.flushPending()).rejects.toThrow('yazma-basarisiz');
+      expect(await readRecord('plan')).toBeUndefined();
+    } finally {
+      blocked.mockRestore();
+    }
+    await store.flushPending();
+    expect(await readRecord('plan')).toEqual(plan);
+  });
+
+  it('başarısız içe aktarma mevcut planı korur ve yeniden yazma kuyruğuna girmez', async () => {
+    const original = samplePlan();
+    await expect(store.replacePlan(original)).resolves.toEqual(original);
+
+    const blocked = rejectPlanWrites();
+    try {
+      await expect(store.replacePlan(samplePlan())).rejects.toThrow('yazma-basarisiz');
+      await expect(store.loadPlan()).resolves.toEqual({ plan: original, encrypted: false });
+    } finally {
+      blocked.mockRestore();
+    }
+    await store.flushPending();
+    expect(await readRecord('plan')).toEqual(original);
+  });
+
+  it('başka bir plan yüklenince önceki planın adım ilerlemesi temizlenir', async () => {
+    const original = samplePlan();
+    await store.replacePlan(original);
+    await store.updateSettings({ visitedSteps: [1, 3], largeText: true });
+    await store.replacePlan({ ...original, notes: 'Güncellenmiş plan' });
+    expect(store.getSettings().visitedSteps).toEqual([1, 3]);
+
+    await store.replacePlan(samplePlan());
+    expect(await readRecord('settings')).toMatchObject({ visitedSteps: [], largeText: true });
+  });
+
   it('boş depoda plan yoktur, ayarlar varsayılandır', async () => {
     await expect(store.loadPlan()).resolves.toEqual({ plan: null, encrypted: false });
     expect(store.isMemoryMode()).toBe(false);
@@ -230,7 +286,7 @@ describe('kalıcı depolama isteği (§9.1)', () => {
     store.savePlan(samplePlan());
     await store.flushPending();
     expect(persist).toHaveBeenCalledTimes(1);
-    expect(store.getSettings().storagePersisted).toBe(true);
+    await vi.waitFor(() => expect(store.getSettings().storagePersisted).toBe(true));
 
     store.savePlan(samplePlan());
     await store.flushPending();
@@ -249,7 +305,47 @@ describe('kalıcı depolama isteği (§9.1)', () => {
 
     store.savePlan(samplePlan());
     await store.flushPending();
-    expect(store.getSettings().storagePersisted).toBe(false);
+    await vi.waitFor(() => expect(store.getSettings().storagePersisted).toBe(false));
+  });
+
+  it('izin yanıtı beklenirken hem ilk planı hem sonraki düzenlemeyi kaydeder', async () => {
+    const reply = Promise.withResolvers<boolean>();
+    const persist = vi.fn(() => reply.promise);
+    Object.defineProperty(navigator, 'storage', { configurable: true, value: { persist } });
+    const first = samplePlan();
+    const second = { ...first, notes: 'İzin beklerken düzenlendi.' };
+
+    store.savePlan(first);
+    await store.flushPending();
+    expect(await readRecord('plan')).toEqual(first);
+    expect(store.getSettings().storagePersisted).toBeNull();
+
+    store.savePlan(second);
+    await store.flushPending();
+    expect(await readRecord('plan')).toEqual(second);
+    expect(persist).toHaveBeenCalledOnce();
+
+    reply.resolve(true);
+    await vi.waitFor(() => expect(store.getSettings().storagePersisted).toBe(true));
+    expect(await readRecord('settings')).toMatchObject({ storagePersisted: true });
+  });
+
+  it('silme işleminden sonra gelen izin yanıtı silinen ayarları geri yazmaz', async () => {
+    const reply = Promise.withResolvers<boolean>();
+    Object.defineProperty(navigator, 'storage', {
+      configurable: true,
+      value: { persist: () => reply.promise },
+    });
+    store.savePlan(samplePlan());
+    await store.flushPending();
+    await store.clearAllData();
+
+    reply.resolve(true);
+    await reply.promise;
+    await store.updateSettings({ largeText: true });
+
+    expect(await readRecord('plan')).toBeUndefined();
+    expect(await readRecord('settings')).toMatchObject({ largeText: true, storagePersisted: null });
   });
 
   it('persist yoksa sonuç null kalır', async () => {
@@ -287,6 +383,45 @@ describe('bellek içi kip (§9.2)', () => {
 });
 
 describe('uygulama kilidi (§9.3)', () => {
+  it('plan yazılamazsa kilit değişikliği hem diskte hem bellekte geri alınır', async () => {
+    const plan = samplePlan();
+    await store.replacePlan(plan);
+    const blocked = rejectPlanWrites();
+    try {
+      await expect(store.enableLock(PASS)).rejects.toThrow('yazma-basarisiz');
+      expect(await readRecord('plan')).toEqual(plan);
+      expect(await readRecord('settings')).toMatchObject({ lockEnabled: false });
+      expect(store.isUnlocked()).toBe(false);
+    } finally {
+      blocked.mockRestore();
+    }
+    await store.enableLock(PASS);
+    const encrypted = await readRecord('plan');
+    const blockedAgain = rejectPlanWrites();
+    try {
+      await expect(store.disableLock()).rejects.toThrow('yazma-basarisiz');
+      expect(await readRecord('plan')).toEqual(encrypted);
+      expect(await readRecord('settings')).toMatchObject({ lockEnabled: true });
+      expect(store.isUnlocked()).toBe(true);
+    } finally {
+      blockedAgain.mockRestore();
+    }
+  });
+
+  it('eski sekme yeni şifrelenmiş planı düz metin olarak geri yazamaz', async () => {
+    const plan = samplePlan();
+    await store.replacePlan(plan);
+    const staleTab = await freshStore();
+    await staleTab.loadPlan();
+
+    await store.enableLock(PASS);
+    staleTab.savePlan({ ...plan, notes: 'Eski sekme' });
+
+    await expect(staleTab.flushPending()).rejects.toThrow('depo-degisti');
+    expect(await readRecord('plan')).toMatchObject({ enc: true });
+    expect(await readRecord('settings')).toMatchObject({ lockEnabled: true });
+  });
+
   it('kilit açıkken plan şifreli saklanır, yanlış parola veriyi silmez', async () => {
     await store.enableLock(PASS);
     expect(store.isLocked()).toBe(true);
@@ -369,6 +504,7 @@ describe('uygulama kilidi (§9.3)', () => {
 
   it('kilit parolası en az 8 karakterdir (§9.3)', async () => {
     await expect(store.enableLock('kisa')).rejects.toThrow('parola-kisa');
+    await expect(store.enableLock('😀'.repeat(4))).rejects.toThrow('parola-kisa');
     expect(store.isLocked()).toBe(false);
   });
 
@@ -418,50 +554,55 @@ describe('uygulama kilidi (§9.3)', () => {
 });
 
 describe('bütün verileri silme (§9.4)', () => {
-  it('veritabanını, caches ve localStorage temizler', async () => {
+  it('eski sekme silinen planı ve ayarları geri yazamaz', async () => {
+    const plan = samplePlan();
+    await store.replacePlan(plan);
+    const staleTab = await freshStore();
+    await staleTab.loadPlan();
+
+    await store.clearAllData();
+    staleTab.savePlan({ ...plan, notes: 'Eski sekme' });
+
+    await expect(staleTab.flushPending()).rejects.toThrow('depo-degisti');
+    await expect(staleTab.updateSettings({ largeText: true })).rejects.toThrow('depo-degisti');
+    expect(await readRecord('plan')).toBeUndefined();
+    expect(await readRecord('settings')).toBeUndefined();
+  });
+
+  it('okunamayan sürüme yazmaz ve açık silme işlemiyle yeniden kullanılabilir', async () => {
+    const unsupported = { schemaVersion: 2 };
+    await writeRecord('plan', unsupported);
+    const fresh = await freshStore();
+
+    await expect(fresh.loadPlan()).rejects.toThrow('desteklenmeyen-surum');
+    await expect(fresh.replacePlan(samplePlan())).rejects.toThrow('desteklenmeyen-surum');
+    expect(await readRecord('plan')).toEqual(unsupported);
+
+    await fresh.clearAllData();
+    await expect(fresh.loadPlan()).resolves.toEqual({ plan: null, encrypted: false });
+  });
+
+  it('planı ve tercihleri siler, çevrimdışı dosyaları ve diğer sitelerin verisini korur', async () => {
     store.savePlan(samplePlan());
     await store.flushPending();
     await store.updateSettings({ largeText: true });
     window.localStorage.setItem('deneme', '1');
 
     const deleteCache = vi.fn(async () => true);
-    const keys = vi.fn(async () => ['a', 'b']);
+    const keys = vi.fn(async () => ['workbox-precache-v2-https://ornek.test/ilk72/']);
     vi.stubGlobal('caches', { keys, delete: deleteCache });
 
     await store.clearAllData();
 
-    expect(deleteCache).toHaveBeenCalledTimes(2);
-    expect(window.localStorage.length).toBe(0);
+    expect(deleteCache).not.toHaveBeenCalled();
+    expect(keys).not.toHaveBeenCalled();
+    expect(window.localStorage.getItem('deneme')).toBe('1');
     expect(store.getSettings().largeText).toBe(false);
     expect(await readRecord('plan')).toBeUndefined();
     expect(await readRecord('settings')).toBeUndefined();
-    // Silme sonrası depo yeniden açılır ve boştur.
+    // Silme sonrası yeni bir plan oluşturulabilir.
     await expect(store.loadPlan()).resolves.toEqual({ plan: null, encrypted: false });
     expect(store.isMemoryMode()).toBe(false);
-  });
-
-  it('cache hataları veri silmeyi engellemez', async () => {
-    store.savePlan(samplePlan());
-    await store.flushPending();
-
-    vi.stubGlobal('caches', {
-      keys: async () => {
-        throw new Error('cache yok');
-      },
-      delete: async () => false,
-    });
-    await expect(store.clearAllData()).resolves.toBeUndefined();
-
-    store.savePlan(samplePlan());
-    await store.flushPending();
-    vi.stubGlobal('caches', {
-      keys: async () => ['a'],
-      delete: async () => {
-        throw new Error('silinemedi');
-      },
-    });
-    await expect(store.clearAllData()).resolves.toBeUndefined();
-    expect(await readRecord('plan')).toBeUndefined();
   });
 
   it('bekleyen debounce yazmasını iptal eder, sonradan veri geri yazılmaz', async () => {

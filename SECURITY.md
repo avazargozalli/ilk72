@@ -66,6 +66,8 @@ Kapsam dışı:
   açıklama).
 - Açık, kullanıcı verisini ya da üçüncü kişileri riske atıyorsa önce geçici önlem (özelliği
   kapatma) uygulanabilir.
+- Kişisel veri ihlali ve siber olaylar için uygulanabilir kanuni bildirim süreleri olayın
+  niteliğine ve veri akışına göre değerlendirilir. [Hukuki inceleme kaydı](docs/hukuki-inceleme.md)
 
 ## Güvenlik ilkeleri
 

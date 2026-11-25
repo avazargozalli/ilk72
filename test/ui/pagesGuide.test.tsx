@@ -13,7 +13,8 @@ import { render, screen } from '@testing-library/preact';
 import { describe, expect, it } from 'vitest';
 import { CONTENT_ISSUE_URL, ROUTES } from '../../src/config.ts';
 import { contentByCategory } from '../../src/content/registry.ts';
-import { tr } from '../../src/i18n/tr.ts';
+import { getSource } from '../../src/content/sources.ts';
+import { formatDate, formatText, tr } from '../../src/i18n/tr.ts';
 import { Guide, type GuidePart } from '../../src/ui/pages/Guide.tsx';
 import { normalizeText } from './helpers.tsx';
 
@@ -120,7 +121,13 @@ describe('Guide — kaynak ve hata bildirimi', () => {
       const text = normalizeText(card.textContent);
 
       expect(text).toContain(tr.pages.common.sourcePrefix);
-      expect(text).toContain('erişim: 19.11.2026');
+      for (const key of item.sources) {
+        const source = getSource(key);
+        if (source === undefined || source.url === null) continue;
+        expect(text).toContain(
+          formatText(tr.pages.common.sourceAccessed, { date: formatDate(source.accessed) }),
+        );
+      }
       const anchors = Array.from(card.querySelectorAll('a[href]'));
       expect(anchors.length).toBeGreaterThan(0);
       const sourceAnchors = anchors.filter((anchor) =>

@@ -141,6 +141,19 @@ describe('§13.4-1 — kaynak adresi https ve izinli alan adında', () => {
     expect(issues).toHaveLength(1);
     expect(issues[0]?.detail).toContain('K-DENEME');
   });
+
+  it.each(['', '2026-02-30', '2026-11-20'])(
+    'geçersiz erişim tarihini reddeder (%s)',
+    (accessed) => {
+      const result = checkContent({
+        items: [makeItem()],
+        sources: [makeSource({ accessed })],
+        now: FIXED_NOW,
+      });
+
+      expect(errorsWithCode(result, ISSUE_CODES.invalidSourceDate)).toHaveLength(1);
+    },
+  );
 });
 
 describe('§13.4-1 — metin en fazla 220 karakter', () => {
@@ -165,6 +178,16 @@ describe('§13.4-1 — metin en fazla 220 karakter', () => {
     expect(issues).toHaveLength(1);
     expect(issues[0]?.itemId).toBe('T-01');
     expect(issues[0]?.detail).toContain(String(CONTENT_TEXT_MAX + 1));
+  });
+
+  it('boş metni reddeder', () => {
+    const result = checkContent({
+      items: [makeItem({ text: '   ' })],
+      sources: [makeSource()],
+      now: FIXED_NOW,
+    });
+
+    expect(errorsWithCode(result, ISSUE_CODES.missingText)).toHaveLength(1);
   });
 });
 
@@ -238,6 +261,28 @@ describe('§13.4-1 — onayli maddede reviewedBy ve reviewedAt dolu', () => {
     });
 
     expect(errorsWithCode(result, ISSUE_CODES.invalidReviewDate)).toHaveLength(1);
+  });
+
+  it('üretimde gelecekteki incelemeyi reddeder', () => {
+    const result = checkContent({
+      items: [makeItem({ ...reviewed, reviewedAt: '2026-11-20' })],
+      sources: [makeSource()],
+      prod: true,
+      now: FIXED_NOW,
+    });
+
+    expect(errorsWithCode(result, ISSUE_CODES.invalidReviewDate)).toHaveLength(1);
+  });
+
+  it('erişim ve inceleme tarihlerini Türkiye takvim gününe göre kabul eder', () => {
+    const nextDay = '2026-11-20';
+    const result = checkContent({
+      items: [makeItem({ ...reviewed, reviewedAt: nextDay })],
+      sources: [makeSource({ accessed: nextDay })],
+      now: new Date('2026-11-19T21:00:00Z'),
+    });
+
+    expect(result.errors).toEqual([]);
   });
 });
 
@@ -340,11 +385,11 @@ describe('§13.4-4 — 12 ay uyarı, 18 ay hata', () => {
   it('olumsuz: 29 Şubat incelemesi ay sonuna kısaltılarak hesaplanır', () => {
     const result = checkContent({
       items: [itemReviewedAt('2024-02-29')],
-      sources: [makeSource()],
+      sources: [makeSource({ accessed: '2024-02-29' })],
       now: new Date('2025-02-28T00:00:00.000Z'),
     });
 
-    expect(errorsWithCode(result, ISSUE_CODES.expiredReview)).toEqual([]);
+    expect(result.errors).toEqual([]);
     expect(warningsWithCode(result, ISSUE_CODES.staleReview)).toHaveLength(1);
   });
 });

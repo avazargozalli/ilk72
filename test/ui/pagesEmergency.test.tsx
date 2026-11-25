@@ -13,7 +13,8 @@ import { render, screen } from '@testing-library/preact';
 import { describe, expect, it } from 'vitest';
 import { EMERGENCY_TEL } from '../../src/config.ts';
 import { contentByCategory } from '../../src/content/registry.ts';
-import { tr } from '../../src/i18n/tr.ts';
+import { getSource } from '../../src/content/sources.ts';
+import { formatDate, tr } from '../../src/i18n/tr.ts';
 import { createEmptyPlan } from '../../src/model/defaults.ts';
 import { Emergency } from '../../src/ui/pages/Emergency.tsx';
 import { normalizeText } from './helpers.tsx';
@@ -138,8 +139,11 @@ describe('Emergency — deprem sonrası kartları', () => {
     const text = normalizeText(section.textContent);
 
     expect(text).toContain(tr.pages.common.sourcePrefix);
-    expect(text).toContain('erişim: 19.11.2026');
-    expect(text).toContain('AFAD');
+    const source = getSource('K-HAZIRIM-DEPREM');
+    if (source === undefined) throw new Error('Deprem rehberi kaynağı bulunamadı.');
+    expect(text).toContain(`erişim: ${formatDate(source.accessed)}`);
+    expect(text).toContain(source.org);
+    expect(text).toContain(source.title);
     expect(section.querySelector('a[href^="https://"]')).not.toBeNull();
   });
 });

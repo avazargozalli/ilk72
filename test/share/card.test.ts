@@ -116,6 +116,14 @@ describe('buildShareCard — Ek B.3 vektörü', () => {
     expect(JSON.parse(JSON.stringify(card))).toEqual(vector);
   });
 
+  it('birleşik buluşma tarifi kesildikten sonra doğrulama kartı değiştirmez', () => {
+    const plan = vectorPlan();
+    plan.meeting.nearHome = { label: 'Park', detail: `${'a'.repeat(193)} son` };
+    const card = buildShareCard(plan, plainOptions);
+    expect(card.b.e).toHaveLength(199);
+    expect(validateCard(card)).toEqual(card);
+  });
+
   it('şema sürümü 1 ve alanlar tam olarak v, h, u, k, i, b, n', () => {
     const card = buildShareCard(vectorPlan(), plainOptions);
     expect(card.v).toBe(CARD_VERSION);

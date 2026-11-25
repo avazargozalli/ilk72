@@ -8,6 +8,9 @@
 
 ## Kontrol listesi
 
+Bu öneri ve ekleri herkese açık olur. Ekran görüntüsü, bağlantı ve örneklerde uydurma veriler
+kullanın. [Geri bildirim gizliliği](https://github.com/avazargozalli/ilk72#gizlilik-%C3%B6zeti)
+
 - [ ] `pnpm run check` yerelde temiz (lint + typecheck + coverage + content:check + build).
 - [ ] Değişiklik 12 ilkeyi delmiyor; yeni dış istek, çerez, analitik, bağış ya da kurum amblemi eklenmedi.
 - [ ] Kullanıcıya görünen bütün metinler Türkçe ve `src/i18n/` içinde; bileşenlerde sabit metin yok.

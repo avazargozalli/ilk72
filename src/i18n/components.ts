@@ -83,7 +83,7 @@ const componentsText = {
     items: [
       'Bu, bağımsız bir açık kaynak projesidir; resmî bir kurum uygulaması değildir.',
       "Acil durumda 112'yi arayın. Bu uygulama yardım çağırmaz.",
-      'Yazdıklarınız yalnızca bu cihazda saklanır; bize ya da başkasına gönderilmez.',
+      'Planınız bu tarayıcıda saklanır. Uygulama planınızı kendiliğinden göndermez.',
       'Tavsiyeler resmî kaynaklara dayanır ama onların yerini tutmaz.',
     ],
     termsLink: 'Kullanım koşulları',

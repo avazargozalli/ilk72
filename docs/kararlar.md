@@ -22,9 +22,9 @@ Biçim: kimlik, tarih, karar, gerekçe, şartname referansı, geri alma yolu.
 | K-13 | Özel çanta maddesinin metni `note` alanında | §8.1'de ad alanı yok |
 | K-14 | `frame-ancestors` yayın öncesi sahip görevi | barındırma başlığı |
 | K-15 | `src/lib/**` kapsama eklendi | paylaşılan bayt katmanı |
-| K-16 | E2E sistem tarayıcısı + genişletilmiş izin | indirme ve alt süreç engeli |
-| K-17 | `.ics`/QR bağlaması kabukta | paralel ajan çakışmasını önler |
-| K-18 | Cüzdan kartında kare kod yok | katman bağımlılığı |
+| K-16 | Chromium, Firefox, WebKit ve mobil tarayıcı testleri | şartname §18.1 |
+| K-17 | Takvim ve kare kod bağlantıları | ortak çıktı bileşenleri |
+| K-18 | Cüzdan kartında isteğe bağlı kare kod | şartname §12.3 |
 | K-19 | Plansız "Boş form" ayrı ekran | §12.6 plan gerektirmiyor |
 | K-20 | Barrel dosyaları kapsam dışı | %0 sayılıp eşiği düşürüyordu |
 | K-21 | Güncelleme + çevrimdışı notu kabukta | §16 |
@@ -124,36 +124,23 @@ olduğu için `src/lib` eşiğin dışında kalıyordu ve ölçülmüyordu. `vit
 eklendi; eşik değişmedi (satır/dal %90). Arayüz katmanı §18.1'de sayılmadığı için kapsam dışıdır;
 erişilebilirliği e2e/axe denetler.
 
-### K-16 · Uçtan uca testler sistem tarayıcısıyla ve genişletilmiş izinle koşar
-**Tarih:** 2026-11-19 · **Referans:** §18.1, §18.5, §21.13
+### K-16 · Chromium, Firefox, WebKit ve mobil tarayıcı testleri
+**Tarih:** 2026-11-25 · **Referans:** §18.1, §18.5, §21.13
 
-İki ortam kısıtı var:
+İlk çalışma ortamında tarayıcı indirme ve yerel önizleme sunucusu kısıtlıydı. O tarihte
+sistem tarayıcılarıyla test edildi. Güncel yapılandırma Playwright’ın Chromium, Firefox
+ve WebKit sürümlerini, ayrıca 360 × 640 mobil profili çalıştırır. GitHub Actions aynı
+tarayıcıları kurar. Bazı macOS 27 test ortamlarında Firefox için ayrı, geçici bir
+Core Foundation kullanıcı profili gerekebilir. [Playwright hata kaydı](https://github.com/microsoft/playwright/issues/42768)
 
-1. **Tarayıcı indirme engelli.** `playwright install` indirme alt süreci (piped stdio) dosya
-   sandbox'ında `EPERM` alıyor. Bu yüzden `playwright.config.ts` varsayılan olarak **sistemde kurulu**
-   Chrome ve Edge'i `channel` ile kullanır; indirme gerekmez. Firefox/WebKit projeleri yalnızca
-   `ILK72_E2E_ALL_BROWSERS=1` iken eklenir ve o ortamda ikililer önceden kurulmuş olmalıdır.
-   §18.1'in "Chromium, Firefox, WebKit" hedefi CI'da (Linux, indirme serbest) karşılanır; bu makinede
-   Chromium/Edge + mobil profil koşar.
-2. **Playwright alt süreç açar.** Test çalıştırıcısı her test için `child_process.fork` kullanır ve
-   sandbox bunu `EPERM` ile engeller. E2E bu nedenle **yalnızca genişletilmiş izinle** (Full access)
-   koşulabilir: `pnpm exec playwright test`. Dar sandbox'ta tüm birim/bileşen testleri ve derleme
-   çalışır; yalnızca e2e etkilenir.
+### K-18 · Cüzdan kartında isteğe bağlı kare kod
+**Tarih:** 2026-11-25 · **Referans:** §12.3, §10.2
 
-**Doğrulama (2026-11-19):** `--project=chromium` ile 2 test geçti; dış istek muhafızı (§18.5) ihlal
-bulmadı. Önizleme sunucusu `webServer` tarafından doğrudan Vite ile başlatılır (`pnpm`/`npm`
-gerektirmez, K-1).
-
-### K-18 · Cüzdan kartında kare kod basılmıyor
-**Tarih:** 2026-11-19 · **Referans:** §12.3, §10.2
-
-§12.3 cüzdan kartının arkasında "isteğe bağlı özet kart kare kodu" öngörür. Kare kod üretimi
-paylaşım katmanındadır (`buildShareQr`) ve özet kart içeriğine bağlıdır; yazdırma katmanı bu
-katmanı import etmez (K-17). Bu yüzden karta **boş yer tutucu** konmadı ve kare kod basılmıyor.
-Paylaşım ekranı kare kodu eksiksiz sunar (§10.2). Kartta da istenirse: `WalletCards`'a
-`qr?: (plan: Plan) => ShareQr | null` prop'u eklenip `AppShell`'de `buildShareCard` +
-`buildShareQr` ile beslenmelidir; bu, yazdırma sayfasının paylaşım katmanına bağımlı olması
-anlamına gelir ve bilinçli olarak yapılmadı.
+Yazdırma sayfası, kullanıcı ayrı bir kutuyu işaretlediğinde cüzdan kartının arkasına plan
+özetinin kare kodunu ekler. Paylaşım katmanının ürettiği bağlantı parola gerektirmediği için
+seçeneğin yanında kopyayı elinde bulunduranların görebileceği bilgiler açıkça yazılır.
+Genel plan notu, özel ihtiyaç notları ve sağlık alanları kodun dışında tutulur. Bağlantı
+boyut sınırını aşarsa uygulama önizlemede uyarı gösterir ve kare kod olmadan baskı sunar.
 
 ### K-19 · Plansız "Boş form" basımı ayrı ekranda
 **Tarih:** 2026-11-19 · **Referans:** §11.3, §12.6
@@ -180,13 +167,11 @@ gösterilir. **Sayfa kullanıcı onayı olmadan yenilenmez** (§16). Çevrimdı�
 "Çevrimdışı — planınız kullanılabilir" notu görünür. Birim testlerinde `virtual:pwa-register`
 sanal modülü `test/mocks/pwa-register.ts` ile takma adlandırılır.
 
-### K-17 · `.ics` ve QR entegrasyonu arayüz katmanında sonradan bağlanır
-**Tarih:** 2026-11-19 · **Referans:** §10.2, §12, §11.5/9
+### K-17 · Takvim ve kare kod bağlantıları
+**Tarih:** 2026-11-25 · **Referans:** §10.2, §12, §11.5/9
 
-Paylaşım/çıktı katmanı (`src/share/qr.ts`, `src/output/ics.ts`) ile yazdırma/paylaşım arayüzleri
-paralel yürüdüğü için arayüzler bu iki modülü **import etmez**; niyeti `onDownloadIcs?: () => void`
-gibi geri çağrılarla iletir. Bağlama uygulama kabuğunda (A13) yapılır. Böylece iki ajan aynı dosyaya
-yazmadı ve derleme hiçbir ara adımda kırılmadı.
+Takvim düğmesi `onDownloadIcs` üzerinden uygulama kabuğundaki dosya üretimini çağırır.
+Paylaşma ve yazdırma sayfaları aynı özet kart kodlayıcısını ve kare kod bileşenini kullanır.
 
 ### K-9 · Playwright tarayıcıları ertelendi
 **Tarih:** 2026-11-19 · **Referans:** §18.4
