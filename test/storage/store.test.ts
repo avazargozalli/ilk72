@@ -544,12 +544,26 @@ describe('uygulama kilidi (§9.3)', () => {
   }, 30000);
 
   it('kilit ayarı açıkken parola yoksa kaydetme parola-gerekli verir', async () => {
-    await writeRecord('settings', { lockEnabled: true });
+    await store.replacePlan(samplePlan());
+    await store.enableLock(PASS);
 
     const fresh = await freshStore();
     await fresh.loadPlan();
     fresh.savePlan(samplePlan());
     await expect(fresh.flushPending()).rejects.toThrow('parola-gerekli');
+  });
+
+  it('plan kaydı yoksa eski kilit ayarı yeni plan kaydını engellemez', async () => {
+    await writeRecord('settings', { lockEnabled: true, largeText: true });
+
+    const fresh = await freshStore();
+    await expect(fresh.loadPlan()).resolves.toEqual({ plan: null, encrypted: false });
+    expect(fresh.getSettings()).toMatchObject({ lockEnabled: false, largeText: true });
+
+    const plan = samplePlan();
+    fresh.savePlan(plan);
+    await expect(fresh.flushPending()).resolves.toBeUndefined();
+    expect(await readRecord('plan')).toEqual(sanitizePlan(plan).plan);
   });
 });
 

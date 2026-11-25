@@ -15,7 +15,7 @@ import { tr } from '../../i18n/tr.ts';
 import type { Contact, Member, Plan } from '../../model/types.ts';
 import type { ShareQr } from '../../share/index.ts';
 import { ShareQrImage } from '../components/ShareQrImage.tsx';
-import { DocHeading, filled, PrintFoot, planDate, printValue } from './parts.tsx';
+import { CardPhoneLine, DocHeading, filled, PrintFoot, planDate, printValue } from './parts.tsx';
 
 export interface WalletCardsProps {
   /** Yazdırılacak plan. */
@@ -36,21 +36,13 @@ function outOfAreaContact(plan: Plan): Contact | undefined {
   return plan.contacts.find((contact) => contact.outOfArea);
 }
 
-/** En çok üç acil telefon; şehir dışı kişi en üstte (§11.9 önceliği). */
-function emergencyPhones(plan: Plan): string[] {
-  const sorted = [...plan.contacts].sort(
-    (first, second) => Number(second.outOfArea) - Number(first.outOfArea),
-  );
-  const lines: string[] = [];
-  for (const contact of sorted) {
-    const phones = [contact.phone.trim(), contact.phoneAlt.trim()].filter((value) => value !== '');
-    if (phones.length === 0) continue;
-    lines.push(
-      filled(contact.name) ? `${contact.name.trim()} — ${phones.join(' / ')}` : phones.join(' / '),
-    );
-    if (lines.length >= 3) break;
-  }
-  return lines;
+/** En çok üç acil kişi; şehir dışı kişi ayrı satırda zaten gösterilir. */
+function emergencyContacts(plan: Plan, outOfArea: Contact | undefined): Contact[] {
+  return [...plan.contacts]
+    .sort((first, second) => Number(second.outOfArea) - Number(first.outOfArea))
+    .filter((contact) => filled(contact.phone) || filled(contact.phoneAlt))
+    .slice(0, 3)
+    .filter((contact) => contact.id !== outOfArea?.id);
 }
 
 /** Plan notlarının ilk dolu satırı (§12.3 tek satır not). */
@@ -90,7 +82,7 @@ function MemberCard({
   qr: ShareQr | null;
 }) {
   const outOfArea = outOfAreaContact(plan);
-  const phones = emergencyPhones(plan);
+  const contacts = emergencyContacts(plan, outOfArea);
   const bloodType = includeBloodType && plan.healthOptIn ? bloodTypeText(member) : null;
   const note = includeWalletNote ? noteLine(plan) : null;
 
@@ -98,22 +90,23 @@ function MemberCard({
     <div class="wallet-row">
       <div class="wallet-card wallet-card--front">
         <p class="wallet-card__eyebrow">{tr.print.wallet.frontTitle}</p>
-        <p class="wallet-card__name">{printValue(member.name)}</p>
-        <p class="wallet-card__household">{printValue(plan.household.label)}</p>
+        <p class="wallet-card__name print-card__short">{printValue(member.name)}</p>
+        <p class="wallet-card__household print-card__short">{printValue(plan.household.label)}</p>
         <p class="wallet-card__emergency">
           <a class="wallet-card__call" href={EMERGENCY_TEL}>
             {EMERGENCY_NUMBER}
           </a>
         </p>
-        <p class="wallet-card__line">
+        <p class="wallet-card__line print-card__short">
           {tr.print.wallet.meetingNear}: {placeOf(plan.meeting.nearHome)}
         </p>
-        <p class="wallet-card__line">
+        <p class="wallet-card__line print-card__short">
           {tr.print.wallet.meetingNeighborhood}: {placeOf(plan.meeting.neighborhood)}
         </p>
-        <p class="wallet-card__line">
+        <p class="wallet-card__line print-card__short">
           {tr.print.wallet.meetingOutOfArea}: {placeOf(plan.meeting.outOfArea)}
         </p>
+        <p class="print-card__more">{tr.print.labels.cardShortened}</p>
       </div>
 
       <div class="wallet-card__fold" aria-hidden="true">
@@ -122,33 +115,49 @@ function MemberCard({
 
       <div class="wallet-card wallet-card--back">
         <p class="wallet-card__eyebrow">{tr.print.wallet.backTitle}</p>
-        {qr === null ? null : <ShareQrImage qr={qr} class="wallet-card__qr" />}
-        <p class="wallet-card__line">
-          {tr.print.wallet.outOfAreaContact}:{' '}
-          {outOfArea === undefined
-            ? tr.print.values.empty
-            : `${printValue(outOfArea.name)} — ${printValue(outOfArea.phone)}`}
-        </p>
-        <p class="wallet-card__line">{tr.print.wallet.emergencyContacts}:</p>
-        {phones.length === 0 ? (
-          <p class="wallet-card__line">{tr.print.values.none}</p>
-        ) : (
-          <ul class="wallet-card__list">
-            {phones.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        )}
-        {bloodType === null ? null : (
-          <p class="wallet-card__line">
-            {tr.print.wallet.bloodType}: {bloodType}
-          </p>
-        )}
-        {note === null ? null : (
-          <p class="wallet-card__line">
-            {tr.print.wallet.note}: {note}
-          </p>
-        )}
+        <div class="wallet-card__back-layout">
+          <div class="wallet-card__contact-list">
+            <p>{tr.print.wallet.outOfAreaContact}:</p>
+            {outOfArea === undefined ? (
+              <p>{tr.print.values.empty}</p>
+            ) : (
+              <p>
+                <CardPhoneLine
+                  name={outOfArea.name}
+                  phone={outOfArea.phone}
+                  phoneAlt={outOfArea.phoneAlt}
+                />
+              </p>
+            )}
+            <p>{tr.print.wallet.emergencyContacts}:</p>
+            {contacts.length === 0 ? (
+              <p>{tr.print.values.none}</p>
+            ) : (
+              <ul class="wallet-card__list">
+                {contacts.map((contact) => (
+                  <li key={contact.id}>
+                    <CardPhoneLine
+                      name={contact.name}
+                      phone={contact.phone}
+                      phoneAlt={contact.phoneAlt}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+            {bloodType === null ? null : (
+              <p>
+                {tr.print.wallet.bloodType}: {bloodType}
+              </p>
+            )}
+            {note === null ? null : (
+              <p class="print-card__short">
+                {tr.print.wallet.note}: {note}
+              </p>
+            )}
+          </div>
+          {qr === null ? null : <ShareQrImage qr={qr} class="wallet-card__qr" />}
+        </div>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@
  *     `onayli` maddelerde inceleyen kişi de kayıtlı.
  *  6. `onayli` hiçbir madde doğrulanmamış kaynak anahtarı taşımıyor.
  *  7. `id`'ler benzersiz.
- *  8. `reviewedAt` üzerinden 12 ay geçen maddeler uyarı, 18 ay geçenler hata.
+ *  8. `reviewedAt` üzerinden 12 ay geçen maddeler uyarı, 18 ay geçenler üretimde hata.
  *  9. `prod: true` iken `taslak` madde kalması hatadır; her taslak madde
  *     ayrı ayrı listelenir (§21.13).
  */
@@ -69,7 +69,7 @@ export const ISSUE_CODES = {
 /** `reviewedAt` üzerinden bu kadar ay geçince uyarı (§13.4-4). */
 export const REVIEW_WARNING_MONTHS = 12;
 
-/** `reviewedAt` üzerinden bu kadar ay geçince hata (§13.4-4). */
+/** `reviewedAt` üzerinden bu kadar ay geçince üretimde hata (§13.4-4). */
 export const REVIEW_ERROR_MONTHS = 18;
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -272,7 +272,7 @@ export function checkContent(input: ContentCheckInput): ContentCheckResult {
             detail: `${item.id}: reviewedAt "${reviewedAt}" geçmişteki veya bugünkü geçerli bir YYYY-AA-GG tarihi olmalı (§13.2).`,
           });
         } else if (today >= addMonths(reviewedDate, REVIEW_ERROR_MONTHS).getTime()) {
-          errors.push({
+          (prod ? errors : warnings).push({
             code: ISSUE_CODES.expiredReview,
             itemId: item.id,
             detail: `${item.id} inceleme tarihi ${reviewedAt}; ${REVIEW_ERROR_MONTHS} aydan eski. Üretim derlemesi bu maddeyle yayımlanamaz; kaynak yeniden doğrulanmalı (§13.4-4).`,

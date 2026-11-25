@@ -186,6 +186,15 @@ describe('Acil kişiler', () => {
     expect(sectionStatus(plan, 'contacts')).toBe('kismen');
   });
 
+  it('şehir dışı irtibat kişisinin ikinci telefonu tek başına yeterlidir', () => {
+    const plan = createEmptyPlan();
+    const contact = addContact(plan, true);
+    contact.phone = '';
+    contact.phoneAlt = '0532 111 22 33';
+
+    expect(sectionStatus(plan, 'contacts')).toBe('dolu');
+  });
+
   it('kişi yoksa boş', () => {
     expect(sectionStatus(createEmptyPlan(), 'contacts')).toBe('bos');
   });

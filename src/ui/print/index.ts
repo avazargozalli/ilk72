@@ -1,8 +1,5 @@
 /**
  * Şartname §12 — baskı belgelerinin tek giriş noktası.
- *
- * `#/yazdir` sayfası belgeleri bu modülden içe aktarır; böylece `print.css` de
- * bir kez (belge parçaları üzerinden) yüklenir.
  */
 export { BagChecklist, type BagChecklistProps } from './BagChecklist.tsx';
 export { BlankForm, type BlankFormProps } from './BlankForm.tsx';

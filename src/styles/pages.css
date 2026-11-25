@@ -304,6 +304,7 @@
   /* Çok büyük punto: gövde metni 1.25em, başlıklar 1.6em. */
   font-size: 1.25em;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .page--emergency h1 {
@@ -334,7 +335,7 @@
   text-align: center;
 }
 
-.emergency__places {
+.page--emergency :is(.emergency__places, .emergency__contacts, .emergency__cards) {
   list-style: none;
   padding-inline-start: 0;
 }
@@ -344,9 +345,8 @@
 }
 
 .emergency__contacts {
-  list-style: none;
-  padding-inline-start: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
 }
 
@@ -356,17 +356,19 @@
 }
 
 .emergency__phone {
-  display: inline-flex;
-  align-items: center;
   min-height: var(--touch-target);
   font-size: 1.15em;
   font-weight: 700;
 }
 
+.emergency__phone .phone-link {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+
 .emergency__cards {
-  list-style: none;
-  padding-inline-start: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 

@@ -1,5 +1,6 @@
 /**
- * Şartname §12.2 — **Buzdolabı sayfası** (A4, tek sayfa, en az 16 pt).
+ * Şartname §12.2 — **Buzdolabı sayfası** (A4, en az 16 pt).
+ * Uzun kayıtlar, okunabilirliği korumak için ek sayfaya taşabilir.
  *
  * İçerik: 112; üç buluşma yeri ve resmî toplanma alanı; acil kişiler; vana ve
  * şalter yerleri; çantanın yeri; görevler. **Sağlık bilgisi yoktur** (İ8) — bu

@@ -69,7 +69,7 @@ export const print = {
     fridgeSheet: {
       title: 'Buzdolabı sayfası',
       description:
-        'Tek sayfa, büyük punto: 112, buluşma yerleri, acil kişiler, vana ve şalter yerleri, çantanın yeri, görevler. Sağlık bilgisi yok.',
+        'Büyük punto: 112, buluşma yerleri, acil kişiler, vana ve şalter yerleri, çantanın yeri ve görevler. Uzun kayıtlar ek sayfaya geçebilir. Sağlık bilgisi yok.',
     },
     walletCards: {
       title: 'Cüzdan kartları',
@@ -125,6 +125,7 @@ export const print = {
 
   /** Satır ve sütun etiketleri (sütun başlıkları dâhil). */
   labels: {
+    cardShortened: '… ile biten metinler tam plandadır.',
     // Hane
     householdLabel: 'Hane etiketi',
     address: 'Adres',
@@ -199,7 +200,8 @@ export const print = {
 
   /** §12.2 — buzdolabı sayfası (sağlık bilgisi yok). */
   fridge: {
-    usage: 'Bu sayfayı evde görünür bir yere asın.',
+    usage:
+      'Buzdolabı çıktısını evde görünür bir yere asın. Birden çok sayfa varsa birlikte saklayın.',
   },
 
   /** §12.3 — cüzdan kartları. */
@@ -219,7 +221,8 @@ export const print = {
 
   /** §12.4 — çocuk kartları (ev adresi yok, okul adı isteğe bağlı). */
   childCards: {
-    usage: 'Kartı çocuğun çantasına koyun. Ev adresi bu karta basılmaz.',
+    usage: 'Numaralı kartları birlikte saklayın. Ev adresi bu kartlara basılmaz.',
+    cardNumber: 'Çocuk kartı · {index}/{total}',
     family: 'Ailem:',
     pickUp: 'Beni teslim alabilecekler:',
     school: 'Okul:',

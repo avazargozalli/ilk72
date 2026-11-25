@@ -124,6 +124,13 @@ describe('buildIcs — alanlar ve kaçışlar', () => {
     expect(buildIcs({ ...B2_EVENT, date: '0099-12-31' })).toContain('DTEND;VALUE=DATE:01000101');
   });
 
+  it.each(['29', '30', '31'])('ayın %s. günü kısa aylarda son güne taşınır', (day) => {
+    const content = buildIcs({ ...B2_EVENT, date: `2027-08-${day}` });
+    expect(unfold(content)).toContain(
+      `RRULE:FREQ=MONTHLY;INTERVAL=6;BYMONTHDAY=${day},-1;BYSETPOS=1\r\n`,
+    );
+  });
+
   it('olay gövdesi sabittir: UID, DTSTAMP, altı aylık yineleme, anımsatıcı', () => {
     const content = buildIcs(B2_EVENT);
     expect(content).toContain('UID:3f0c2d5e-0000-4000-8000-000000000001@ilk72\r\n');

@@ -227,7 +227,7 @@ ilk72/
 └─ index.html  package.json  tsconfig.json  vite.config.ts  vitest.config.ts  playwright.config.ts  biome.json
 ```
 
-`package.json` betikleri: `dev`, `build` (taslak içeriğe izin verir, "TASLAK" şeridi gösterir), `build:prod` (taslak içerik varsa başarısız), `preview`, `test`, `coverage`, `e2e`, `lint`, `format`, `typecheck`, `content:check`, `check` (lint + typecheck + coverage + content:check + build + e2e).
+`package.json` betikleri: `dev`, `build` (taslak içeriğe izin verir, "TASLAK" şeridi gösterir), `build:prod` (onaylı içerik ve sürüme bağlı hukuki inceleme kaydı gerekir), `preview`, `test`, `coverage`, `e2e`, `lint`, `format`, `typecheck`, `content:check`, `check` (lint + typecheck + coverage + content:check + build + e2e).
 
 ## 8. Veri modeli
 
@@ -556,7 +556,7 @@ Genel baskı kuralları (`print.css`): yalnızca seçilen belgeler görünür; g
 | # | Belge | İçerik ve düzen |
 |---|---|---|
 | 12.1 | **Tam plan** (A4, 2–4 sayfa) | Planın tamamı, bölüm başlıklarıyla. Sağlık bilgileri yalnızca "Sağlık bilgilerini de bas" işaretliyse. En üstte "Acil durumda 112" ve buluşma yerleri |
-| 12.2 | **Buzdolabı sayfası** (A4, tek sayfa, en az 16 pt) | 112; üç buluşma yeri ve toplanma alanı; acil kişiler; vana ve şalter yerleri; çantanın yeri; görevler. Sağlık bilgisi **yok** |
+| 12.2 | **Buzdolabı sayfası** (A4, en az 16 pt) | 112; üç buluşma yeri ve toplanma alanı; acil kişiler; vana ve şalter yerleri; çantanın yeri; görevler. Uzun kayıtlar aynı puntoyla sonraki sayfaya geçebilir. Sağlık bilgisi **yok** |
 | 12.3 | **Cüzdan kartı** (kişi başına; 85,6 × 54 mm iki yüz yan yana, ortada katlama çizgisi, kesme işaretleri; A4'e 4 kart) | Ön: ad, hane etiketi, 112, buluşma yerleri. Arka: şehir dışı kişi ve en çok 3 acil kişi telefonu; isteğe bağlı kan grubu ve tek satır özel not (ayrı onayla); isteğe bağlı özet kart kare kodu |
 | 12.4 | **Çocuk kartı** (çocuk başına; cüzdan kartı ölçüsü) | Ad; "Ailem:" iki veli telefonu; şehir dışı kişi; buluşma yeri; "Beni teslim alabilecekler:" işaretli acil kişiler. Ev adresi **yok**; okul adı yalnızca ayrı onayla |
 | 12.5 | **Çanta kontrol listesi** (A4) | Üretilmiş liste, kutularla; çantanın yeri; son kontrol tarihi için boş satır; altında kaynak notu |
@@ -564,7 +564,9 @@ Genel baskı kuralları (`print.css`): yalnızca seçilen belgeler görünür; g
 
 Kâğıt boyutu `@page { size: A4; margin: 12mm }`. Kartların ölçüleri mm ile verilir; tarayıcı ölçeklemesi için önizlemede "Yazdırırken ölçek %100 olsun." notu.
 
-**Takvim dosyası:** `buildIcs` (Ek A). Dosya adı `ilk72-hatirlatma.ics`. Olay tüm gün, `nextReviewAt` tarihinde, altı ayda bir yinelenir. Açıklamada **kişisel veri bulunmaz** (takvim sağlayıcısına gidebileceği için); yalnızca Ek B.2'deki genel metin.
+Kartlarda alana sığmayan serbest metin üç noktayla kısalır. Telefon numaraları tam basılır. Tam plan alanları eksiksiz tutar. Çocuk kartındaki uzun teslim alma listesi numaralı devam kartlarına bölünür.
+
+**Takvim dosyası:** `buildIcs` (Ek A). Dosya adı `ilk72-hatirlatma.ics`. Olay tüm gün, `nextReviewAt` tarihinde, altı ayda bir yinelenir. Ayın 29–31’i için daha kısa ayların son günü kullanılır. Açıklama Ek B.2’deki genel metindir. Takvim dosyası tarih ve etkinlik kimliği taşır.
 
 ## 13. İçerik kayıt sistemi
 
@@ -865,7 +867,7 @@ Toplam JavaScript (gzip) ≤ 150 kB; ilk yükleme düşük donanımlı telefonda
 ## 19. CI/CD
 
 - **`ci.yml`** (push, pull request): `pnpm install --frozen-lockfile` → `lint` → `typecheck` → `coverage` → `content:check` → `build` → Playwright tarayıcı kurulumu → `e2e` → `pnpm audit --prod --audit-level=high`. Ek adım: depoda `FUNDING.yml` bulunmadığını denetle.
-- **`pages.yml`** (yalnızca `v*` etiketi ve elle tetikleme): `pnpm install --frozen-lockfile` → `build:prod` (onaysız içerik varsa burada durur) → `docs/hukuki-inceleme.md` dosyasının "Onay tarihi" satırının dolu olduğunu denetle → Pages'e yayımla. `main` dalına her itişte **yayımlanmaz**; böylece onaysız içerik ve incelenmemiş sürüm canlıya çıkamaz.
+- **`pages.yml`** (yalnızca `v*` etiketi ve elle tetikleme): `pnpm install --frozen-lockfile` → `build:prod` (içerik onayı ve incelenen commit ile eşleşen hukuki onay kaydı) → Pages’e yayımla. `main` dalına her itişte **yayımlanmaz**; böylece onaysız içerik ve incelenmemiş sürüm canlıya çıkamaz.
 - Geliştirme önizlemesi isteyenler `npm run build && npm run preview` kullanır.
 - Action'ların güncel ana sürümleri; en dar `permissions`.
 
@@ -874,7 +876,7 @@ Toplam JavaScript (gzip) ≤ 150 kB; ilk yükleme düşük donanımlı telefonda
 - **`README.md`:** ne olduğu; ekran görüntüsü yer tutucusu; canlı adres; ilkeler (Bölüm 2'nin kısa hali); "ne değildir"; nasıl kullanılır; gizlilik özeti; nasıl katkı verilir; içerik ve kaynak politikası; lisanslar; sınırlar (Bölüm 22).
 - **`CONTRIBUTING.md`:** kurulum; `npm run check`; içerik önerme kuralları (resmî kaynak zorunlu, izinli alan adları, kendi cümleleriyle); çeviri katkısı; ilkeleri delen önerilerin kabul edilmeyeceği.
 - **`docs/kararlar.md`:** tasarım kararları, tarihleriyle.
-- **`docs/hukuki-inceleme.md`:** şablon: inceleyen, tarih, kapsam, Bölüm 4.4 sorularına yanıtlar, istenen değişiklikler, "Onay tarihi:" satırı.
+- **`docs/hukuki-inceleme.md`:** kaynaklı ön inceleme, Bölüm 4.4 sorularının değerlendirmesi ve sürüm, onaylayan, tarih içeren onay kaydı.
 - **`docs/icerik-onay.md`:** 13.4'teki süreç, adım adım; onaylayan kişinin nitelikleri; yıllık gözden geçirme takvimi.
 - **`docs/mimari.md`:** modüller, veri akışı, saklama, paylaşım biçimi, elle test listeleri.
 - **`SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `LICENSE` (MIT, "Azar Gozalli ve ilk72 katkıcıları"), `LICENSE-CONTENT` (CC BY 4.0), `THIRD_PARTY_LICENSES.md`.**
@@ -1032,8 +1034,12 @@ function fold(line) { // 75 oktet sınırı, UTF-8 karakterleri bölmeden
 export function buildIcs({ uid, date, stamp, summary, description, url }) {
   const d = date.replace(/-/g, ''); const next = new Date(Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10) + 1));
   const dEnd = next.toISOString().slice(0, 10).replace(/-/g, '');
+  const day = +date.slice(-2);
+  const recurrence = day > 28
+    ? `FREQ=MONTHLY;INTERVAL=6;BYMONTHDAY=${day},-1;BYSETPOS=1`
+    : 'FREQ=MONTHLY;INTERVAL=6';
   return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ilk72//TR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
-    `UID:${uid}`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${dEnd}`, 'RRULE:FREQ=MONTHLY;INTERVAL=6',
+    `UID:${uid}`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${dEnd}`, `RRULE:${recurrence}`,
     `SUMMARY:${icsEsc(summary)}`, `DESCRIPTION:${icsEsc(description)}`, ...(url ? [`URL:${url}`] : []), 'TRANSP:TRANSPARENT',
     'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(summary)}`, 'TRIGGER:PT9H', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR']
     .map(fold).join('\r\n') + '\r\n';

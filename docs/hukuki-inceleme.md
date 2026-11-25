@@ -11,6 +11,10 @@ kullanıcı metinleri bu incelemeye göre güncellendi. Bölüm 5, yayınlanacak
 avukatın görüşünü kaydetmek içindir. Proje şartnamesi ayrıca afet rehberindeki her madde için
 [ayrı içerik incelemesi](icerik-onay.md) öngörür.
 
+Bu dosyadaki kaynak ve uygulama incelemesi mesleki görüşe hazırlık kaydıdır. Avukat görüşü
+ve afet uzmanı onayı bu projenin yayın koşullarıdır. Resmî kaynaklarla madde düzeyindeki
+karşılaştırmalar içerik inceleme kayıtlarında izlenir.
+
 ## 1. Veri akışları
 
 | Akış | Bugünkü tasarım | Yayın öncesi doğrulama |
@@ -24,6 +28,11 @@ GitHub’un [Pages ziyaretçi kaydı açıklaması](https://docs.github.com/en/p
 [depo görünürlüğü](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories#about-repository-visibility)
 ve [gizlilik bildirimi](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 Gmail için [Google veri aktarımı açıklaması](https://policies.google.com/privacy/frameworks?hl=tr).
+
+25.11.2026 tarihinde depo ayarları, Pages'in GitHub Actions üzerinden ve zorunlu HTTPS ile
+yapılandırıldığını gösterdi. `github-pages` ortamında dağıtım kaydı bulunmadı ve proje adresi
+HTTP 404 döndürdü. Sağlayıcı sözleşmesi, erişim günlükleri ve fiilî saklama koşulları bu ayarlardan
+doğrulanamaz. [GitHub Pages ayarları API’si](https://docs.github.com/en/rest/pages/pages)
 
 ## 2. Şartname §4.4 soruları
 
@@ -274,5 +283,8 @@ değerlendirmesine bağlıdır. [5378 sayılı Kanun](https://www.aile.gov.tr/ey
 - **Onay tarihi:**
 
 Onay tarihi, avukat görüşü alındıktan ve koşullar yerine getirildikten sonra `YYYY-AA-GG`
-biçiminde kaydedilir. [Pages iş akışı](../.github/workflows/pages.yml) geçerli tarih ve içerik
-onayı olmadan yayını durdurur.
+biçiminde kaydedilir. İncelenen sürüm alanına avukatın incelediği tam Git commit kimliği yazılır.
+Onay kaydı sonraki bir commit’te eklenebilir. Üretim derlemesi, incelenen commit’in yayın geçmişinde
+olduğunu ve yayın kapsamındaki kod, lisanslar, paketler, kamuya açık proje metinleri ile Pages
+yapılandırmasının aynı kaldığını doğrular. Yeni yayın içeriği yeniden incelemeye girer.
+[Yayın denetimi](../scripts/legal-gate.ts) · [Pages iş akışı](../.github/workflows/pages.yml)

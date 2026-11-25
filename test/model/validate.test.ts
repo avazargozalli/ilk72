@@ -428,7 +428,7 @@ describe('kimlik üretimi', () => {
   });
 
   it('geçersiz plan kimliği yeni UUID ile değiştirilir', () => {
-    for (const value of [42, '   ', null]) {
+    for (const value of [42, '   ', null, 'ornek@adres.test']) {
       const { plan, warnings } = sanitizePlan(mutatedPlan('id', value));
 
       expect(plan.id).toMatch(UUID_PATTERN);
@@ -455,6 +455,20 @@ describe('kimlik üretimi', () => {
     expect(plan.members.map((member) => member.id)).toEqual(['m1', 'm2']);
     expect(plan.bag.items.map((item) => item.id)).toEqual(['C-01', 'C-02']);
     expect(warnings).toEqual([]);
+  });
+
+  it('yinelenen kontrol listesi kimlikleri için ilk durumu ve notu korur', () => {
+    const raw = mutatedPlan('bag.items', [
+      { id: 'C-01', done: true, note: 'İlk kayıt' },
+      { id: ' C-01 ', done: false, note: 'Tekrar' },
+      { id: 'C-02', done: false, note: '' },
+    ]);
+    const { plan, warnings } = sanitizePlan(raw);
+    expect(plan.bag.items).toEqual([
+      { id: 'C-01', done: true, note: 'İlk kayıt' },
+      { id: 'C-02', done: false, note: '' },
+    ]);
+    expect(warnings).toEqual(['gecersiz-deger:bag.items[1].id']);
   });
 });
 

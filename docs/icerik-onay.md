@@ -60,15 +60,19 @@ Ek kapılar:
   `saglik.gov.tr`, `aile.gov.tr`, `dask.gov.tr`, `kizilay.org.tr`, `mevzuat.gov.tr`,
   `resmigazete.gov.tr`, `kvkk.gov.tr`, `mebakub.meb.gov.tr` (ve alt alan adları).
 
-## Uzman incelemesine hazırlanan kaynaklar
+## Kaynak karşılaştırması
 
-İçerik sürümü 3’te 83 maddenin kimlikleri korunarak plan, çanta ve deprem rehberi kaynakları güncellendi.
-Madde metinlerinin uzman incelemesi ve onay kayıtları aşağıdaki süreçte tamamlanır.
+İçerik sürümü 4 için 83 madde tek tek resmî dayanaklara bağlandı. 15 maddenin ifadesi veya
+kaynak eşleştirmesi güncellendi. Karşılaştırmalar, erişim sınırları ve değişiklik gerekçeleri iki
+kayıtta yer alır. [Plan ve deprem rehberi](icerik-kaynak-incelemesi-rehber.md) ·
+[Çanta, belge ve ev içi tehlike listeleri](icerik-kaynak-incelemesi-listeler.md)
+
+Uzman incelemesi ve onay kaydı aşağıdaki süreçte tamamlanır.
 
 - `P-01`–`P-02` ve Bursa İl AFAD’a dayanan `H` maddeleri için aile planı ve yapısal olmayan riskler bölümlerini karşılaştırın. [Bursa İl AFAD — Afete Hazır Aile](https://bursa.afad.gov.tr/afete-hazir-aile)
 - `P-03`–`P-05`, `P-08`–`P-11`, hane çantası ve yardımcı cihaz maddeleri için plan, çanta ve özel ihtiyaç bölümlerine bakın. Kitapta geçen tarihsel acil numaralar yerine uygulamada güncel tek acil çağrı numarası olan 112 kullanılır. [Güvenli Yaşam 1 Eğitimi](https://cankiri.afad.gov.tr/kurumlar/cankiri.afad/dOKUMANLAR/Guvenli_Yasam_Klavuzu/gy_1_egitim_kitapcigi.pdf), [112 Acil Çağrı Merkezi](https://www.112.gov.tr/112-acm-projesi)
-- Bebek ihtiyaçları, son kullanma tarihleri, araç ve iş yeri çantası ile tesisatın yerini bilme maddeleri için 65–67. sayfalara bakın. Evcil hayvan maddelerinde AFAD’ın ayrı rehberini açın. [MEB — Okul Tabanlı Afet Eğitimi, Kitap 1](https://mebakub.meb.gov.tr/eskisite/wp-content/uploads/2024/03/okul-tabanli-afet-egitimi_kitap_1.pdf), [AFAD Hazırım — Evcil Hayvanlarınızı Afete Hazırlayın](https://hazirim.gov.tr/tr/ozel-icerikler/evcil-hayvanlar-icin)
-- Deprem anı ve sonrası kartları için Hazırım rehberini, `A-02` tekerlekli sandalye uyarlaması için AFAD’ın ilgili metnini ve `S-03` vana ve şalter koşulu için il müdürlüğünün duyurusunu karşılaştırın. [AFAD Hazırım — Deprem](https://hazirim.gov.tr/tr/afetler/deprem), [AFAD — Deprem önlemleri](https://afad.gov.tr/deprem-oncesi-ani-ve-sonrasi-alabileceginiz-onlemleri-biliyor-musunuz), [Bartın İl AFAD — Elazığ depremi](https://bartin.afad.gov.tr/elazigdaki-deprem-sonrasi-mudahale-ve-iyilestirme-calismalari)
+- Bebek ihtiyaçları, son kullanma tarihleri, araç ve iş yeri çantası için 65–67. sayfalara, tesisatın yerini bilme konusu için 51. sayfaya bakın. Evcil hayvan maddelerinde AFAD’ın ayrı rehberini açın. [MEB — Okul Tabanlı Afet Eğitimi, Kitap 1](https://mebakub.meb.gov.tr/eskisite/wp-content/uploads/2024/03/okul-tabanli-afet-egitimi_kitap_1.pdf), [AFAD Hazırım — Evcil Hayvanlarınızı Afete Hazırlayın](https://hazirim.gov.tr/tr/ozel-icerikler/evcil-hayvanlar-icin)
+- Deprem anı ve sonrası kartları için Hazırım rehberini, `A-02` tekerlekli sandalye uyarlaması için AFAD’ın ilgili metnini ve `S-03` için Güvenli Yaşam kitapçığındaki “Gerekiyorsa tahliyeye başlayın” bölümünü karşılaştırın. [AFAD Hazırım — Deprem](https://hazirim.gov.tr/tr/afetler/deprem), [AFAD — Deprem önlemleri](https://afad.gov.tr/deprem-oncesi-ani-ve-sonrasi-alabileceginiz-onlemleri-biliyor-musunuz), [Güvenli Yaşam 1 Eğitimi](https://cankiri.afad.gov.tr/kurumlar/cankiri.afad/dOKUMANLAR/Guvenli_Yasam_Klavuzu/gy_1_egitim_kitapcigi.pdf)
 - `P-12` konuma ilişkin deprem tehlikesi ile yapının dayanıklılık değerlendirmesini ayrı ele alır. `O-07` için sigortanın kapsam içi ve kapsam dışı bina türlerini kontrol edin. [AFAD — Türkiye Deprem Tehlike Haritası](https://afad.gov.tr/turkiye-deprem-tehlike-haritasi), [DASK — Teminat ve Kapsamı](https://www.dask.gov.tr/tr/teminat-ve-kapsami)
 
 ## 3. Adım adım onay
@@ -126,7 +130,7 @@ onaylamayın**; onaylar izlenebilir olmalıdır.
     doğrulanmamış kaynak kullanımı) not edilir.
 14. `pnpm run build:prod` — bu aşamada **diğer maddeler hâlâ taslak olduğu için başarısız olması
     beklenir**. Çıktıda sizin onayladığınız maddenin **artık hata listesinde olmadığını** doğrulayın.
-15. Bütün maddeler onaylandığında `pnpm run build:prod` geçer; bu, yayın öncesi zorunlu kapıdır.
+15. Bütün maddeler onaylandığında içerik kapısı geçer. `pnpm run build:prod` ayrıca sürüme ait [avukat onay kaydını](hukuki-inceleme.md#5-avukat-onayı) doğrular.
 16. Onayı bu belgedeki **Onay kaydı** tablosuna ekleyin (tarih, madde, onaylayan, kaynak,
     commit).
 

@@ -6,11 +6,11 @@
  * içerik kaydından gelir (İ4); kullanıcı maddesinin metni `note` alanındadır
  * (K-13).
  *
- * Liste planda henüz üretilmemişse `buildBagItemIds` ile haneden yeniden
- * üretilir; böylece belge her durumda eksiksiz basılır.
+ * Liste güncel hane yapısından üretilir. Önceki işaret ve notlar eşleşen
+ * maddelerde korunur.
  */
 import { tr } from '../../i18n/tr.ts';
-import { buildBagItemIds } from '../../model/bag.ts';
+import { buildBagItemIds, mergeBagItems } from '../../model/bag.ts';
 import type { ChecklistState, Plan } from '../../model/types.ts';
 import {
   BlankLine,
@@ -40,10 +40,7 @@ function itemLabel(item: ChecklistState): string {
 
 export function BagChecklist({ plan }: BagChecklistProps) {
   const date = planDate(plan);
-  const items: ChecklistState[] =
-    plan.bag.items.length > 0
-      ? plan.bag.items
-      : buildBagItemIds(plan).map((id) => ({ id, done: false, note: '' }));
+  const items = mergeBagItems(plan.bag.items, buildBagItemIds(plan));
 
   return (
     <section class="print-doc print-doc--bag" aria-label={tr.print.documents.bagChecklist.title}>

@@ -15,7 +15,7 @@ export interface ContentItem {
 export const CONTENT_TEXT_MAX = 220;
 
 /** Metinler değiştikçe artar; "Hakkında" sayfasında gösterilir (§13.2). */
-export const CONTENT_VERSION = 3;
+export const CONTENT_VERSION = 4;
 
 /** Kategoriler §13.2'deki sırayla. */
 export const CONTENT_CATEGORIES: readonly ContentCategory[] = [
@@ -67,7 +67,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'P-05',
     category: 'plan',
-    text: 'Evden çıkış için birden fazla yol düşünün.',
+    text: 'Evden güvenle çıkabileceğiniz yolları önceden belirleyin.',
     sources: ['K-GUVENLI-YASAM'],
     status: 'taslak',
   },
@@ -117,7 +117,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
     id: 'P-12',
     category: 'plan',
     text: 'Türkiye Deprem Tehlike Haritası konumunuza ilişkin deprem tehlikesini gösterir. Binanızın dayanıklılığını değerlendirmek için yetkili kuruluşlara başvurun.',
-    sources: ['K-TDTH-BILGI', 'K-TDTH', 'K-UYARI'],
+    sources: ['K-TDTH-BILGI', 'K-TDTH', 'K-HAZIRIM-DEPREM'],
     status: 'taslak',
   },
 
@@ -125,8 +125,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'C-01',
     category: 'canta',
-    text: 'Su',
-    sources: ['K-SOZLUK', 'K-BURDUR'],
+    text: 'İçme suyu',
+    sources: ['K-CANTA-BB', 'K-BURDUR'],
     status: 'taslak',
   },
   {
@@ -146,8 +146,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'C-04',
     category: 'canta',
-    text: 'Düzenli kullanılan ilaçlar ve sağlık kayıtları',
-    sources: ['K-BURDUR', 'K-GUMUSHANE'],
+    text: 'Düzenli kullanılan ilaçlar ve gerekli sağlık kaydı kopyaları',
+    sources: ['K-BURDUR', 'K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
@@ -230,8 +230,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'C-16',
     category: 'canta',
-    text: 'Maske',
-    sources: ['K-BURDUR'],
+    text: 'Toz maskesi',
+    sources: ['K-GUVENLI-YASAM', 'K-BURDUR'],
     status: 'taslak',
   },
   {
@@ -274,8 +274,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'C-23',
     category: 'canta',
-    text: 'Bebek için yedek giysi',
-    sources: ['K-GUVENLI-YASAM'],
+    text: 'Mevsime uygun bebek giysisi',
+    sources: ['K-OKUL-TABANLI', 'K-GUVENLI-YASAM'],
     status: 'taslak',
   },
   {
@@ -325,8 +325,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'C-90',
     category: 'canta',
-    text: 'Çantayı çıkışa yakın ve kolay ulaşabileceğiniz bir yerde tutun.',
-    sources: ['K-HAZIRIM-DEPREM'],
+    text: 'Çantayı çıkışa yakın, yolu kapatmayacak ve kolay erişeceğiniz bir yerde tutun.',
+    sources: ['K-HAZIRIM-DEPREM', 'K-AILE'],
     status: 'taslak',
   },
   {
@@ -376,8 +376,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'B-03',
     category: 'belge',
-    text: 'Sağlık kayıtları',
-    sources: ['K-BURDUR'],
+    text: 'Gerekli sağlık kayıtlarının kopyası',
+    sources: ['K-GUVENLI-YASAM', 'K-BURDUR'],
     status: 'taslak',
   },
   {
@@ -413,7 +413,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'H-03',
     category: 'tehlike',
-    text: 'Kavanoz ve şişeleri kilidi ya da mandalı olan kapalı dolaplarda tutun.',
+    text: 'Kırılabilir eşyaları kapağı güvenlik mandalıyla kapanan dolaplarda saklayın.',
     sources: ['K-AILE', 'K-TEHLIKE-AVI'],
     status: 'taslak',
   },
@@ -427,22 +427,22 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'H-05',
     category: 'tehlike',
-    text: 'Tavandaki ağır nesnelerin ve aydınlatmaların bağlantılarını sağlamlaştırın.',
-    sources: ['K-AILE'],
+    text: 'Avize ve diğer ağır tavan eşyalarının sağlam biçimde sabitlendiğini kontrol ettirin.',
+    sources: ['K-AILE', 'K-TEHLIKE-AVI'],
     status: 'taslak',
   },
   {
     id: 'H-06',
     category: 'tehlike',
-    text: 'Su ısıtıcısı, buzdolabı, fırın gibi cihazları uygun malzemeyle duvara ya da yere sabitleyin.',
-    sources: ['K-ONLEM'],
+    text: 'Tesisata bağlı cihazların ve devrilebilecek beyaz eşyaların güvenli biçimde sabitlenmesi için yetkili servisten destek alın.',
+    sources: ['K-ONLEM', 'K-YAPISAL-OLMAYAN-RISKLER'],
     status: 'taslak',
   },
   {
     id: 'H-07',
     category: 'tehlike',
-    text: 'Tarım ve böcek ilaçlarını, yanıcı maddeleri kilitli, kapalı dolaplarda ve alt raflarda saklayın.',
-    sources: ['K-ONLEM'],
+    text: 'Yanıcı maddeleri ve tarım ilaçlarını birbirinden ayrı, kilitli ve devrilip dökülmeyecek biçimde saklayın.',
+    sources: ['K-ONLEM', 'K-AILE'],
     status: 'taslak',
   },
   {
@@ -557,8 +557,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'A-06',
     category: 'an',
-    text: 'Dışarıdaysanız enerji hatlarından, binalardan, direklerden, ağaçlardan ve duvar diplerinden uzaklaşın.',
-    sources: ['K-ONLEM'],
+    text: 'Dışarıdaysanız güvenle yapabiliyorsanız enerji hatlarından, binalardan, direklerden, ağaçlardan ve duvar diplerinden uzaklaşın.',
+    sources: ['K-ONLEM', 'K-GUVENLI-YASAM'],
     status: 'taslak',
   },
 
@@ -580,8 +580,8 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'S-03',
     category: 'sonra',
-    text: 'Gaz kokusu yoksa ve tahliyeyi geciktirmeden güvenle ulaşabiliyorsanız, çıkarken gaz ve su vanalarını ve elektrik şalterini kapatın.',
-    sources: ['K-BARTIN-TAHLIYE', 'K-ILK6'],
+    text: 'Tahliye gerektiğinde yetkililerin bildirdiği yolları kullanın ve güvenli çıkışı geciktirmeyin.',
+    sources: ['K-GUVENLI-YASAM', 'K-HAZIRIM-DEPREM'],
     status: 'taslak',
   },
   {
@@ -622,7 +622,7 @@ export const CONTENT_ITEMS: readonly ContentItem[] = [
   {
     id: 'S-09',
     category: 'sonra',
-    text: 'Yetkililer yönlendirene kadar toplanma alanında kalın.',
+    text: 'Toplanma alanından barınma alanına geçişte yetkililerin yönlendirmesini bekleyin.',
     sources: ['K-ILK6'],
     status: 'taslak',
   },

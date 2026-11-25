@@ -138,6 +138,7 @@ const CONTROL_CHARS = /\p{Cc}/gu;
 const MULTILINE_CONTROL_CHARS = /(?!\n)\p{Cc}/gu;
 const LINE_BREAKS = /\r\n?/g;
 const PHONE_CHARACTERS = /^[\d +()-]+$/;
+const PLAN_ID_PATTERN = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 
 const ISO_DATE_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:\d{2})?)?$/;
@@ -296,7 +297,13 @@ function readEnum<T extends string>(
   return value as T;
 }
 
-function readId(record: Record<string, unknown>, key: string, path: string, warn: Warn): string {
+function readId(
+  record: Record<string, unknown>,
+  key: string,
+  path: string,
+  warn: Warn,
+  pattern?: RegExp,
+): string {
   const value = record[key];
   if (value === undefined) return crypto.randomUUID();
   if (typeof value !== 'string') {
@@ -304,7 +311,7 @@ function readId(record: Record<string, unknown>, key: string, path: string, warn
     return crypto.randomUUID();
   }
   const text = normalizeText(value, false);
-  if (text === '') {
+  if (text === '' || (pattern !== undefined && !pattern.test(text))) {
     warn('gecersiz-deger', path);
     return crypto.randomUUID();
   }
@@ -576,6 +583,7 @@ function sanitizeChecklist(
   max: number | undefined,
   context: SanitizeContext,
 ): ChecklistState[] {
+  const seen = new Set<string>();
   return mapItems(
     readArray(value, path, context.warn),
     path,
@@ -584,8 +592,15 @@ function sanitizeChecklist(
     (item, itemPathValue) => {
       const record = readRecord(item, itemPathValue, CHECKLIST_KEYS, context.warn);
       if (record === null) return null;
+      const idPath = fieldPath(itemPathValue, 'id');
+      const id = readId(record, 'id', idPath, context.warn);
+      if (seen.has(id)) {
+        context.warn('gecersiz-deger', idPath);
+        return null;
+      }
+      seen.add(id);
       return {
-        id: readId(record, 'id', fieldPath(itemPathValue, 'id'), context.warn),
+        id,
         done: readBoolean(record, 'done', fieldPath(itemPathValue, 'done'), context.warn),
         note: readText(
           record,
@@ -873,7 +888,7 @@ export function sanitizePlan(input: unknown): { plan: Plan; warnings: string[] }
 
   const plan: Plan = {
     schemaVersion: SCHEMA_VERSION,
-    id: readId(record, 'id', 'id', warn),
+    id: readId(record, 'id', 'id', warn, PLAN_ID_PATTERN),
     createdAt: readTimestamp(record, 'createdAt', 'createdAt', now, warn),
     updatedAt: readTimestamp(record, 'updatedAt', 'updatedAt', now, warn),
     healthOptIn: context.healthOptIn,

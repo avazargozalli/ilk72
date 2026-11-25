@@ -11,7 +11,7 @@
  *   (`dangerouslySetInnerHTML` yok, §17).
  * - Sağlık bilgisi hiçbir yerde "varsayılan" olarak basılmaz; onu yalnızca
  *   `FullPlan` (`includeHealth`) ve `WalletCards` (`includeBloodType`) basar.
- * - Baskı stilini `src/styles/print.css` sağlar; bu dosya onu bir kez yükler.
+ * - Baskı stilini uygulama girişinde yüklenen `src/styles/print.css` sağlar.
  */
 import type { ComponentChildren } from 'preact';
 import { APP_NAME, EMERGENCY_NUMBER, EMERGENCY_TEL } from '../../config.ts';
@@ -19,8 +19,6 @@ import { getContentItem } from '../../content/registry.ts';
 import { getSource } from '../../content/sources.ts';
 import { formatDate, formatText, tr } from '../../i18n/tr.ts';
 import type { ChecklistState, Place, Plan } from '../../model/types.ts';
-
-import '../../styles/print.css';
 
 /** Boş olmayan (kırpılmış) metin mi? */
 export function filled(value: string | null | undefined): boolean {
@@ -31,6 +29,29 @@ export function filled(value: string | null | undefined): boolean {
 export function printValue(value: string | null | undefined): string {
   const text = (value ?? '').trim();
   return text === '' ? tr.print.values.empty : text;
+}
+
+/** Kartlarda yer daraldığında ad kısalabilir, numara ayrı ve tam görünür. */
+export function CardPhoneLine({
+  name,
+  phone,
+  phoneAlt,
+}: {
+  name: string;
+  phone: string;
+  phoneAlt?: string;
+}) {
+  const primary = phone.trim();
+  const alternate = phoneAlt?.trim() ?? '';
+  return (
+    <>
+      <span class="print-card__phone-row">
+        <span class="print-card__short">{printValue(name)} — </span>
+        <span class="print-card__number">{printValue(primary || alternate)}</span>
+      </span>
+      {primary && alternate ? <span class="print-card__number">{alternate}</span> : null}
+    </>
+  );
 }
 
 /** ISO tarih ya da ISO zaman damgasını `GG.AA.YYYY` biçiminde basar. */

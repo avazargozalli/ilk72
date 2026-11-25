@@ -21,7 +21,7 @@ import { Bag } from '../../src/ui/pages/Bag.tsx';
 
 /** Altı çizili maddelerin etiketleri (içerik kaydından). */
 const ITEM_TEXTS = {
-  water: 'Su',
+  water: 'İçme suyu',
   babyFood: 'Bebeğiniz kullanıyorsa kendi maması',
   childToy: 'Çocuğunuzun sevdiği küçük bir oyuncak',
   prescription: 'Reçete ve ilaç listesinin kopyası',

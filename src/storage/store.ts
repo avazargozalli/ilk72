@@ -199,7 +199,7 @@ async function initialize(): Promise<void> {
       SETTINGS_KEY,
       REVISION_KEY,
     ]);
-    settings = sanitizeSettings(storedSettings);
+    settings = { ...sanitizeSettings(storedSettings), lockEnabled: false };
     revision = storedRevision;
     if (isEncryptedPlanRecord(storedPlan)) {
       encryptedData = storedPlan.data;
@@ -207,8 +207,6 @@ async function initialize(): Promise<void> {
     } else if (storedPlan !== undefined) {
       const { plan } = sanitizePlan(storedPlan);
       currentPlan ??= plan;
-      // The plan record takes precedence over settings written by older app versions.
-      settings.lockEnabled = false;
     }
     persistenceRequested = settings.storagePersisted !== null;
   } catch (error) {

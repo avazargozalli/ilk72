@@ -174,7 +174,7 @@ function shareContact(contact: Plan['contacts'][number]): ShareContact | null {
     a: clampText(label, SHARE_CARD_LIMITS.contactLabelLength),
     t: phone,
     d: contact.outOfArea,
-    s: cleanText(contact.city, SHARE_CARD_LIMITS.cityLength),
+    s: contact.outOfArea ? cleanText(contact.city, SHARE_CARD_LIMITS.cityLength) : '',
   };
 }
 

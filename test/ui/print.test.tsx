@@ -12,6 +12,7 @@ import { fireEvent, render, screen } from '@testing-library/preact';
 import type { ComponentChildren } from 'preact';
 import { describe, expect, it, vi } from 'vitest';
 import { APP_NAME, EMERGENCY_TEL } from '../../src/config.ts';
+import { getContentItem } from '../../src/content/registry.ts';
 import { getSource } from '../../src/content/sources.ts';
 import { formatDate, formatText, tr } from '../../src/i18n/tr.ts';
 import { createEmptyPlan } from '../../src/model/defaults.ts';
@@ -394,7 +395,7 @@ describe('FridgeSheet (§12.2)', () => {
     expect(text).not.toContain(tr.print.sections.health);
   });
 
-  it('tek sayfa ve alt bilgi içerir', () => {
+  it('bir belge gövdesi ve alt bilgi içerir', () => {
     render(<FridgeSheet plan={createTestPlan()} />);
 
     expect(document.querySelectorAll('.print-sheet')).toHaveLength(1);
@@ -509,9 +510,29 @@ describe('BagChecklist (§12.5)', () => {
   it('madde metinlerini içerik kaydından ve kullanıcı notundan alır', () => {
     const text = renderText(<BagChecklist plan={createTestPlan()} />);
 
-    expect(text).toContain('Su');
+    expect(text).toContain(getContentItem('C-01')?.text);
     expect(text).toContain('6 şişe');
     expect(text).toContain('Uzun süre bozulmayan kuru gıda');
+  });
+
+  it('eski listede olmayan geçerli maddeleri ekler ve geçmiş koşullu maddeleri çıkarır', () => {
+    const plan = createTestPlan({
+      bag: {
+        location: '',
+        lastCheckedAt: null,
+        items: [
+          { id: 'C-20', done: true, note: 'Artık geçerli olmayan satır' },
+          { id: 'C-01', done: true, note: 'Altı şişe' },
+          { id: 'ozel-ornek', done: true, note: 'Ev anahtarı kopyası' },
+        ],
+      },
+    });
+    const text = renderText(<BagChecklist plan={plan} />);
+
+    expect(text).toContain(getContentItem('C-40')?.text);
+    expect(text).not.toContain('Artık geçerli olmayan satır');
+    expect(text).toContain('Altı şişe');
+    expect(text).toContain('Ev anahtarı kopyası');
   });
 
   it('altında kaynak notu basar', () => {

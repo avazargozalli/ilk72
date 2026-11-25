@@ -179,6 +179,51 @@
   padding: 2mm;
   border: 1px dashed var(--color-border);
   overflow: hidden;
+  font-size: 8.5pt;
+  line-height: 1.2;
+}
+
+:is(.wallet-card, .child-card) :is(p, li) {
+  margin-block: 0 0.45mm;
+}
+
+.wallet-card__name,
+.child-card__name {
+  font-size: 11pt;
+  font-weight: 700;
+}
+
+.wallet-card__emergency {
+  font-size: 14pt;
+  font-weight: 700;
+}
+
+.wallet-card__list,
+.child-card__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.print-card__short {
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.print-card__phone-row {
+  display: flex;
+}
+
+.print-card__number {
+  display: block;
+  flex: none;
+  white-space: nowrap;
+}
+
+.print-card__more {
+  font-style: italic;
 }
 
 .wallet-card__fold {
@@ -191,11 +236,21 @@
   font-size: 6pt;
 }
 
+.wallet-card__back-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 2mm;
+}
+
+.wallet-card__contact-list {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
 .wallet-card__qr {
-  float: inline-end;
+  flex: none;
   inline-size: 30mm;
   block-size: 30mm;
-  margin-inline-start: 2mm;
 }
 
 .print-blank__line {
@@ -243,6 +298,7 @@
   .import__intro,
   .import__controls,
   .print > h1,
+  .print__actions,
   .print__controls,
   .print__intro,
   .print__hint,
@@ -257,6 +313,12 @@
     padding: 0;
   }
 
+  .print {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
   a {
     color: var(--print-ink);
     text-decoration: underline;
@@ -264,6 +326,9 @@
 
   .print__preview {
     display: block;
+    padding: 0;
+    border: 0;
+    overflow: visible;
   }
 
   .print-doc {
@@ -272,6 +337,7 @@
     border-radius: 0;
     background: transparent;
     overflow: visible;
+    overflow-wrap: anywhere;
     break-before: page;
   }
 
@@ -351,6 +417,7 @@
   .print-doc--wallet,
   .print-doc--child {
     font-size: 8.5pt;
+    line-height: 1.2;
   }
 
   .print-doc--wallet .print-doc__title,
@@ -402,6 +469,27 @@
 
   .print-doc--fridge .print-emergency__number {
     font-size: 28pt;
+  }
+
+  .print-doc--fridge .print-sheet {
+    display: block;
+  }
+
+  .print-doc--fridge .print-section {
+    break-inside: auto;
+  }
+
+  .print-doc--fridge .print-section__title {
+    break-after: avoid;
+  }
+
+  .print-doc--fridge li {
+    break-inside: avoid;
+  }
+
+  .print-row__value {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
   }
 
   .print-list {
@@ -477,24 +565,8 @@
     writing-mode: vertical-rl;
   }
 
-  .wallet-card__name {
-    font-size: 11pt;
-    font-weight: 700;
-  }
-
-  .wallet-card__emergency {
-    font-size: 14pt;
-    font-weight: 700;
-  }
-
   .wallet-card__call {
     text-decoration: none;
-  }
-
-  .wallet-card__list,
-  .child-card__list {
-    margin: 0;
-    padding-inline-start: 4mm;
   }
 
   /* §12.4 çocuk kartları: cüzdan ölçüsü, A4'te dört kart (2 × 2). */
@@ -515,11 +587,6 @@
     padding: 2mm;
     border: 0.2mm dashed var(--print-rule);
     overflow: hidden;
-  }
-
-  .child-card__name {
-    font-size: 11pt;
-    font-weight: 700;
   }
 
   /* §12.6 boş form: elle doldurulacak alt çizgili satırlar. */

@@ -251,6 +251,16 @@ describe('buildShareCard — alan kuralları', () => {
     expect(buildShareCard(plan, plainOptions).i[0]?.t).toBe('0555 999 88 77');
   });
 
+  it('şehir dışı olarak işaretlenmeyen kişinin gizli şehir alanını paylaşmaz', () => {
+    const plan = vectorPlan();
+    plan.contacts = [
+      { ...createEmptyContact(), name: 'Ali', outOfArea: false, city: 'İzmir' },
+      { ...createEmptyContact(), name: 'Veli', outOfArea: true, city: 'Ankara' },
+    ];
+
+    expect(buildShareCard(plan, plainOptions).i.map(({ s }) => s)).toEqual(['', 'Ankara']);
+  });
+
   it('buluşma yerinde etiket ve tarifi virgülle birleştirir', () => {
     const plan = vectorPlan();
     plan.meeting.nearHome = { label: 'Park', detail: 'kapının karşısı' };

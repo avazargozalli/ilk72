@@ -9,9 +9,9 @@
  *
  * Ölçü `src/styles/print.css` içinde `.child-card` ile mm cinsinden verilir.
  */
-import { tr } from '../../i18n/tr.ts';
-import type { Plan } from '../../model/types.ts';
-import { DocHeading, filled, PrintFoot, planDate, printValue } from './parts.tsx';
+import { formatText, tr } from '../../i18n/tr.ts';
+import type { Member, Plan } from '../../model/types.ts';
+import { CardPhoneLine, DocHeading, filled, PrintFoot, planDate, printValue } from './parts.tsx';
 
 export interface ChildCardsProps {
   /** Yazdırılacak plan. */
@@ -22,6 +22,8 @@ export interface ChildCardsProps {
 
 /** A4 sayfada dört kart (2 × 2). */
 const CHILD_CARDS_PER_PAGE = 4;
+const PICKUP_ON_MAIN_CARD = 2;
+const PICKUP_ON_CONTINUATION_CARD = 6;
 
 function chunk<T>(items: readonly T[], size: number): T[][] {
   const pages: T[][] = [];
@@ -32,9 +34,7 @@ function chunk<T>(items: readonly T[], size: number): T[][] {
 }
 
 /** Çocuğun okul adı: gün içi yerlerinden `okul` türündeki ilk dolu kayıt. */
-function schoolName(plan: Plan, memberId: string): string | null {
-  const member = plan.members.find((item) => item.id === memberId);
-  if (member === undefined) return null;
+function schoolName(member: Member): string | null {
   for (const place of member.dailyPlaces) {
     if (place.kind !== 'okul') continue;
     if (filled(place.label)) return place.label.trim();
@@ -45,17 +45,22 @@ function schoolName(plan: Plan, memberId: string): string | null {
 export function ChildCards({ plan, includeSchoolName = false }: ChildCardsProps) {
   const date = planDate(plan);
   const children = plan.members.filter((member) => member.group === 'cocuk');
-  const pages = chunk(children, CHILD_CARDS_PER_PAGE);
-
   // İki veli telefonu: yetişkin gruptaki dolu numaralar (§12.4).
   const guardianPhones = plan.members
     .filter((member) => member.group === 'yetiskin' && filled(member.phone))
-    .slice(0, 2)
-    .map((member) => `${printValue(member.name)} — ${printValue(member.phone)}`);
+    .slice(0, 2);
 
   const outOfArea = plan.contacts.find((contact) => contact.outOfArea);
   // "Beni teslim alabilecekler:" yalnızca açıkça işaretli acil kişiler (§11.5/4).
   const pickUpContacts = plan.contacts.filter((contact) => contact.canPickUpChildren);
+  const pickUpGroups = [
+    pickUpContacts.slice(0, PICKUP_ON_MAIN_CARD),
+    ...chunk(pickUpContacts.slice(PICKUP_ON_MAIN_CARD), PICKUP_ON_CONTINUATION_CARD),
+  ];
+  const cards = children.flatMap((member) =>
+    pickUpGroups.map((contacts, index) => ({ member, contacts, index })),
+  );
+  const pages = chunk(cards, CHILD_CARDS_PER_PAGE);
 
   return (
     <section class="print-doc print-doc--child" aria-label={tr.print.documents.childCards.title}>
@@ -67,59 +72,82 @@ export function ChildCards({ plan, includeSchoolName = false }: ChildCardsProps)
           <PrintFoot date={date} />
         </div>
       ) : (
-        pages.map((members, pageIndex) => (
+        pages.map((pageCards, pageIndex) => (
           <div class="print-sheet child-sheet" key={`child-page-${pageIndex}`}>
             <p class="print-note">{tr.print.childCards.usage}</p>
-            {members.map((member) => {
-              const school = includeSchoolName ? schoolName(plan, member.id) : null;
+            {pageCards.map(({ member, contacts, index }) => {
+              const school = includeSchoolName ? schoolName(member) : null;
               return (
-                <div class="child-card" key={member.id}>
-                  <p class="child-card__eyebrow">{tr.print.documents.childCards.title}</p>
-                  <p class="child-card__name">{printValue(member.name)}</p>
-
-                  <p class="child-card__line">{tr.print.childCards.family}</p>
-                  {guardianPhones.length === 0 ? (
-                    <p class="child-card__line">{tr.print.values.empty}</p>
-                  ) : (
-                    <ul class="child-card__list">
-                      {guardianPhones.map((line) => (
-                        <li key={line}>{line}</li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <p class="child-card__line">
-                    {tr.print.childCards.outOfArea}{' '}
-                    {outOfArea === undefined
-                      ? tr.print.values.empty
-                      : `${printValue(outOfArea.name)} — ${printValue(outOfArea.phone)}`}
+                <div class="child-card" key={`${member.id}-${index}`}>
+                  <p class="child-card__eyebrow">
+                    {pickUpGroups.length === 1
+                      ? tr.print.documents.childCards.title
+                      : formatText(tr.print.childCards.cardNumber, {
+                          index: index + 1,
+                          total: pickUpGroups.length,
+                        })}
                   </p>
+                  <p class="child-card__name print-card__short">{printValue(member.name)}</p>
 
-                  <p class="child-card__line">
-                    {tr.print.childCards.meeting} {printValue(plan.meeting.nearHome.label)}
-                    {filled(plan.meeting.nearHome.detail)
-                      ? ` · ${plan.meeting.nearHome.detail.trim()}`
-                      : ''}
-                  </p>
+                  {index === 0 ? (
+                    <>
+                      <p class="child-card__line">{tr.print.childCards.family}</p>
+                      {guardianPhones.length === 0 ? (
+                        <p class="child-card__line">{tr.print.values.empty}</p>
+                      ) : (
+                        <ul class="child-card__list">
+                          {guardianPhones.map((guardian) => (
+                            <li key={guardian.id}>
+                              <CardPhoneLine name={guardian.name} phone={guardian.phone} />
+                            </li>
+                          ))}
+                        </ul>
+                      )}
 
-                  {school === null ? null : (
-                    <p class="child-card__line">
-                      {tr.print.childCards.school} {school}
-                    </p>
-                  )}
+                      <p class="child-card__line">
+                        {outOfArea === undefined ? (
+                          <>
+                            {tr.print.childCards.outOfArea} {tr.print.values.empty}
+                          </>
+                        ) : (
+                          <CardPhoneLine
+                            name={`${tr.print.childCards.outOfArea} ${printValue(outOfArea.name)}`}
+                            phone={outOfArea.phone || outOfArea.phoneAlt}
+                          />
+                        )}
+                      </p>
+
+                      <p class="child-card__line print-card__short">
+                        {tr.print.childCards.meeting} {printValue(plan.meeting.nearHome.label)}
+                        {filled(plan.meeting.nearHome.detail)
+                          ? ` · ${plan.meeting.nearHome.detail.trim()}`
+                          : ''}
+                      </p>
+
+                      {school === null ? null : (
+                        <p class="child-card__line print-card__short">
+                          {tr.print.childCards.school} {school}
+                        </p>
+                      )}
+                    </>
+                  ) : null}
 
                   <p class="child-card__line">{tr.print.childCards.pickUp}</p>
-                  {pickUpContacts.length === 0 ? (
+                  {contacts.length === 0 ? (
                     <p class="child-card__line">{tr.print.childCards.pickUpEmpty}</p>
                   ) : (
                     <ul class="child-card__list">
-                      {pickUpContacts.map((contact) => (
+                      {contacts.map((contact) => (
                         <li key={contact.id}>
-                          {printValue(contact.name)} — {printValue(contact.phone)}
+                          <CardPhoneLine
+                            name={contact.name}
+                            phone={contact.phone || contact.phoneAlt}
+                          />
                         </li>
                       ))}
                     </ul>
                   )}
+                  <p class="print-card__more">{tr.print.labels.cardShortened}</p>
                 </div>
               );
             })}

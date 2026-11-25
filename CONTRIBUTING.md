@@ -44,11 +44,11 @@ Tek tek komutlar:
 | `pnpm run coverage` | Kapsamla test; `src/model`, `src/storage`, `src/share`, `src/output`, `src/content` için satır ve dal ≥ %90 |
 | `pnpm run content:check` | İçerik onay kapısı denetimi |
 | `pnpm run build` | Geliştirme derlemesi (taslak içeriğe izin verir, "TASLAK" şeridi gösterir) |
-| `pnpm run build:prod` | Üretim derlemesi; onaysız içerik varsa **başarısız olur** |
+| `pnpm run build:prod` | Üretim derlemesi. Onaylı içerik ve kapsamı yayın sürümüyle eşleşen hukuki inceleme kaydı gerekir. |
 | `pnpm run e2e` | Playwright uçtan uca testleri (önce `pnpm exec playwright install chromium firefox webkit` gerekir) |
 
 `pnpm run build:prod` bu geliştirme sürümünde taslak içerik nedeniyle başarısız olur; bu beklenen
-durumdur ve içerik onaylanana kadar sürer.
+durumdur. Üretim için içerik ve hukuki onay kayıtları birlikte doğrulanır.
 
 ### Depo düzeni
 

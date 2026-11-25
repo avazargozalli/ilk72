@@ -358,11 +358,18 @@ describe('§13.4-4 — 12 ay uyarı, 18 ay hata', () => {
     expect(warnings[0]?.detail).toContain('12');
   });
 
-  it('olumsuz: 18 aydan eski inceleme hata üretir', () => {
-    const result = checkContent({
+  it('18 ayı geçen inceleme geliştirmede uyarır, üretimi durdurur', () => {
+    const input = {
       items: [itemReviewedAt('2025-05-19')],
       sources: [makeSource()],
       now: FIXED_NOW,
+    };
+    const devResult = checkContent(input);
+    expect(devResult.errors).toEqual([]);
+    expect(warningsWithCode(devResult, ISSUE_CODES.expiredReview)).toHaveLength(1);
+    const result = checkContent({
+      ...input,
+      prod: true,
     });
     const issues = errorsWithCode(result, ISSUE_CODES.expiredReview);
 

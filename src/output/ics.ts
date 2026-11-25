@@ -1,19 +1,19 @@
 /**
  * Şartname §12, Ek A, Ek B.2 — altı aylık gözden geçirme hatırlatması (.ics).
  *
- * `buildIcs` Ek A'daki referans kodun **birebir** TypeScript karşılığıdır:
+ * `buildIcs` Ek A'daki referans kodu temel alır:
  *
  * - Satırlar `CRLF` ile biter, dosya `END:VCALENDAR\r\n` ile kapanır.
  * - Satır katlama 75 oktettir; devam satırları tek boşlukla başlar ve 74 oktet
  *   taşır (1 + 74 = 75). Çok baytlı UTF-8 karakteri asla bölünmez.
  * - `\`, `;`, `,` ve satır sonu kaçırılır (`\\`, `\;`, `\,`, `\n`).
  * - Olay tüm gündür (`VALUE=DATE`), bitiş bir sonraki gündür, altı ayda bir
- *   yinelenir (`RRULE:FREQ=MONTHLY;INTERVAL=6`) ve 09:00'da görüntü uyarısı
+ *   yinelenir (kısa aylarda son gün kullanılır) ve 09:00'da görüntü uyarısı
  *   verir (`TRIGGER:PT9H`).
  *
- * **Kişisel veri yok (§12).** Takvim dosyası takvim sağlayıcısına gidebilir;
- * `summary` ve `description` yalnızca `tr.share.calendar` içindeki genel
- * metinlerdir (Ek B.2). Bu modül plan verisi okumaz.
+ * Takvim dosyasında tarih, etkinlik kimliği ve genel açıklama bulunur.
+ * `summary` ve `description` için `tr.share.calendar` metinleri kullanılır
+ * (Ek B.2). Uygulama takvim dosyasına kişi alanlarını eklemez.
  *
  * Dosya adı `ICS_FILE_NAME`, indirme `text/calendar` türüyle yapılır (§12).
  */
@@ -105,6 +105,12 @@ export function buildIcs(event: IcsEvent): string {
   const endDate = next.toISOString().split('T')[0] ?? '';
   if (!DATE_PATTERN.test(endDate)) throw new Error('gecersiz-tarih');
   const end = endDate.replace(/-/g, '');
+  const day = Number(date.slice(-2));
+  // RFC 5545 §3.3.10: select the requested day or the last day of a shorter month.
+  const recurrence =
+    day > 28
+      ? `FREQ=MONTHLY;INTERVAL=6;BYMONTHDAY=${day},-1;BYSETPOS=1`
+      : 'FREQ=MONTHLY;INTERVAL=6';
 
   return [
     'BEGIN:VCALENDAR',
@@ -117,7 +123,7 @@ export function buildIcs(event: IcsEvent): string {
     `DTSTAMP:${stamp}`,
     `DTSTART;VALUE=DATE:${start}`,
     `DTEND;VALUE=DATE:${end}`,
-    'RRULE:FREQ=MONTHLY;INTERVAL=6',
+    `RRULE:${recurrence}`,
     `SUMMARY:${icsEscape(summary)}`,
     `DESCRIPTION:${icsEscape(description)}`,
     ...(url ? [`URL:${url}`] : []),

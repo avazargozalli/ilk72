@@ -79,7 +79,7 @@ function needsStatus(plan: Plan, visitedSteps: ReadonlySet<number>): SectionStat
 
 function contactsStatus(plan: Plan): SectionStatus {
   const usable = plan.contacts.filter(
-    (contact) => isFilled(contact.name) && isFilled(contact.phone),
+    (contact) => isFilled(contact.name) && (isFilled(contact.phone) || isFilled(contact.phoneAlt)),
   );
   if (usable.length === 0) return 'bos';
   return usable.some((contact) => contact.outOfArea) ? 'dolu' : 'kismen';

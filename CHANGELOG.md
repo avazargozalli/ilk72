@@ -12,7 +12,15 @@ Bu dosya proje sürümlerindeki kullanıcıya görünen değişiklikleri listele
   Bir sürüm güncellemesi, açık sekmedeki plan değişiklikleri kaydedilene kadar bekler.
 - Cüzdan kartına isteğe bağlı kare kod eklendi. Paylaşım ve içe alma özetinde, sınırı aşan ve
   çakışan kayıtlar için kullanıcıya bilgi veriliyor.
-- İçerik sürümü 3. Resmî kaynak kaydı güncellendi. 83 madde afet uzmanı incelemesini bekliyor.
+- İçerik sürümü 4. 83 madde için resmî kaynak karşılaştırması kaydedildi, 15 maddenin metni
+  ya da kaynak eşleştirmesi düzeltildi. Maddeler uzman onayını bekliyor.
+- Üretim derlemesi hukuki onayı incelenen Git commit’iyle eşleştiriyor.
+- Çanta baskısı güncel hane bileşimini kullanıyor. Takvim hatırlatması ayın son günlerini
+  ve kısa ayları kapsıyor.
+- Acil ekranı 320 px genişlikte büyük yazıyla taşmadan açılıyor. Çocuk kartları uzun
+  teslim alma listelerini numaralı devam kartlarına yayıyor.
+- Eski kilit ayarının ilk kaydı engellemesi ve yinelenen çanta kayıtlarının ilerlemeyi
+  şişirmesi düzeltildi. Özet bağlantısı şehir dışı seçimi kaldırılan kişinin şehrini içermiyor.
 - Lisans bildirimleri derleme paketine eklendi. CI, Chromium, Firefox, WebKit ve mobil profili
   çalıştırıyor.
 
