@@ -1,487 +1,633 @@
-/**
- * Şartname §11.3–§11.10, §15 — sayfa düzeyi stiller.
- *
- * Bileşen stilleri `components.css` içindedir; burada yalnızca **sayfaların**
- * kendi düzenleri vardır. Bütün değerler `tokens.css` değişkenlerinden gelir:
- * dosyada hex renk, sabit puntolama ve sabit dokunma ölçüsü **yazılmaz** (§15).
- * Bilgi hiçbir yerde yalnız renkle verilmez; durumlar metinle de söylenir (İ10).
- *
- * §11.9 (acil ekranı) için ayrı bir bölüm vardır: tek sütun, çok büyük punto,
- * yüksek kontrast — afet anında titreyen elle ve küçük ekranda okunmalıdır.
- */
-
-/* ---------- Ortak sayfa kabuğu ---------- */
-
-.page {
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding: var(--space-5) var(--space-4) var(--space-7);
-}
-
-.page h1 {
-  font-size: 1.5em;
-  line-height: 1.25;
-  margin-block: 0 var(--space-3);
-}
-
-.page h2 {
-  font-size: 1.2em;
-  margin-block: var(--space-5) var(--space-2);
-}
-
-.page ul,
-.page ol {
-  padding-inline-start: var(--space-5);
-}
-
-.page li {
-  margin-block: var(--space-1);
-}
-
-/* Sayfa içi bağlantılar: yalnız vurgu rengi, altı çizili ve odak görünür.
-   Düğme görünümlü bağlantılar (`.button`) kendi renklerini korur; aksi hâlde
-   acil düğmesi kırmızı zemin üzerinde vurgu rengiyle okunamaz hâle gelir
-   (axe: color-contrast 1.14:1 — §15). */
-.page a:not(.button) {
-  color: var(--color-accent);
-  text-underline-offset: 0.2em;
-}
-
-.page a:not(.button):hover {
-  text-decoration-thickness: 2px;
-}
-
-/* ---------- Ana sayfa (§11.3) ---------- */
-
-.page--home {
-  display: grid;
-  gap: var(--space-4);
-}
-
-/* ---------- Özet (§11.7) ---------- */
-
-.summary__list {
-  list-style: none;
-  padding-inline-start: 0;
-  display: grid;
-  gap: var(--space-4);
-}
-
-.summary__section {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
-}
-
-.summary__section h2 {
-  margin-block-start: 0;
-}
-
-.summary__edit {
-  display: inline-block;
-  margin-block-start: var(--space-2);
-}
-
-/* ---------- Rehber (§11.10) ---------- */
-
-.guide__tabs-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-block: var(--space-4);
-}
-
-.guide__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  list-style: none;
-  padding-inline-start: 0;
-}
-
-.guide__cards {
-  list-style: none;
-  padding-inline-start: 0;
-  display: grid;
-  gap: var(--space-3);
-}
-
-.guide__card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
-}
-
-.guide__sources {
-  margin-block-start: var(--space-2);
-  font-size: 0.9em;
-  color: var(--color-text-muted);
-}
-
-.guide__report {
-  margin-block-start: var(--space-2);
-  font-size: 0.9em;
-}
-
-/* §13.4/2 — taslak içerik yalnız geliştirme derlemesinde görünür. */
-.guide__draft {
-  display: inline-block;
-  margin-block-start: var(--space-1);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-emergency);
-  border-radius: var(--radius-sm);
-  font-size: 0.85em;
-  font-weight: 700;
-}
-
-/* ---------- Kaynak satırı (§13.1) ---------- */
-
-.source-line {
-  display: block;
-}
-
-.source-line__prefix {
-  color: var(--color-text-muted);
-}
-
-.source-line__anchor {
-  color: var(--color-accent);
-}
-
-/* ---------- Telefon bağlantısı ---------- */
-
-.phone-link {
-  min-height: var(--touch-target);
-  display: inline-flex;
-  align-items: center;
-}
-
-/* ---------- Çanta (§11.6) ---------- */
-
-.bag__items {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.bag__note {
-  font-size: 0.9em;
-  color: var(--color-text-muted);
-}
-
-/* ---------- Hukuki ve bilgi sayfaları (§14) ---------- */
-
-.legal {
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding: var(--space-5) var(--space-4) var(--space-7);
-}
-
-.legal__section {
-  margin-block: var(--space-4);
-}
-
-.legal__section h2 {
-  font-size: 1.1em;
-  margin-block-end: var(--space-2);
-}
-
-.legal__section a,
-.legal__links a {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 44px;
-  min-inline-size: 44px;
-  overflow-wrap: anywhere;
-}
-
-.legal__section :where(li + li) {
-  margin-block-start: var(--space-2);
-}
-
-.legal__links {
-  margin-block-start: var(--space-6);
-  border-block-start: 1px solid var(--color-border);
-  padding-block-start: var(--space-3);
-}
-
-.legal__links ul {
-  list-style: none;
-  padding-inline-start: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.sources__list {
-  list-style: none;
-  padding-inline-start: 0;
-  display: grid;
-  gap: var(--space-3);
-}
-
-.sources__item {
-  border-block-end: 1px solid var(--color-border);
-  padding-block-end: var(--space-2);
-}
-
-/* ---------- Sihirbaz kabuğu (§11.4) ---------- */
-
-.wizard {
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding: var(--space-5) var(--space-4) var(--space-7);
-}
-
-/* ---------- Kabuk uyarı şeridi (§9.2) ---------- */
-
-.shell-banner {
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding-inline: var(--space-4);
-  padding-block-start: var(--space-3);
-}
-
-/* ---------- Yazdırma sayfası (§12) ---------- */
-
-.print {
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding: var(--space-5) var(--space-4) var(--space-7);
-}
-
-.print__fieldset {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  margin-block-end: var(--space-4);
-}
-
-.print__legend {
-  font-weight: 700;
-  padding-inline: var(--space-1);
-}
-
-.print__controls {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.print__hint,
-.print__intro {
-  color: var(--color-text-muted);
-}
-
-.print__actions {
-  margin-block: var(--space-4);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.print__preview-title {
-  margin-block-start: var(--space-6);
-}
-
-.print__preview {
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-  overflow-x: auto;
-}
-
-.print__empty {
-  color: var(--color-text-muted);
-}
-
-/* ---------- §11.9 Acil ekranı ---------- */
-
-.page--emergency {
-  max-width: 40rem;
-  margin-inline: auto;
-  padding: var(--space-4) var(--space-4) var(--space-7);
-  /* Çok büyük punto: gövde metni 1.25em, başlıklar 1.6em. */
-  font-size: 1.25em;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.page--emergency h1 {
-  font-size: 1.6em;
-}
-
-.page--emergency h2 {
-  font-size: 1.25em;
-  margin-block: var(--space-5) var(--space-2);
-}
-
-/* Tek sütun: hiçbir bölüm yan yana dizilmez. */
-.emergency__call,
-.emergency__places,
-.emergency__contacts-section,
-.emergency__after {
-  display: block;
-  margin-block-end: var(--space-5);
-}
-
-/* 112 düğmesi: ekranın en büyük ve en yüksek kontrastlı öğesi. */
-.emergency__call .button--emergency {
-  display: block;
-  width: 100%;
-  min-height: calc(var(--touch-target) * 2);
-  font-size: 1.4em;
-  font-weight: 700;
-  text-align: center;
-}
-
-.page--emergency :is(.emergency__places, .emergency__contacts, .emergency__cards) {
-  list-style: none;
-  padding-inline-start: 0;
-}
-
-.emergency__places li {
-  margin-block: var(--space-2);
-}
-
-.emergency__contacts {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-3);
-}
-
-.emergency__contact {
-  border-inline-start: 4px solid var(--color-accent);
-  padding-inline-start: var(--space-3);
-}
-
-.emergency__phone {
-  min-height: var(--touch-target);
-  font-size: 1.15em;
-  font-weight: 700;
-}
-
-.emergency__phone .phone-link {
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-}
-
-.emergency__cards {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2);
-}
-
-.emergency__card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-3);
-}
-
-/* ---------- Paylaşım (§10) ---------- */
-
-.page--share,
-.page--import,
-.page--settings {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.share__section,
-.settings__section,
-.import__preview,
-.import__conflicts {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
-}
-
-.share__note,
-.share__hint,
-.settings__hint,
-.import__intro {
-  color: var(--color-text-muted);
-}
-
-.share__actions,
-.import__actions,
-.settings__form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: end;
-}
-
-.share__link input,
-.settings__form input {
-  min-width: min(100%, 22rem);
-}
-
-.share__status,
-.settings__status {
-  font-weight: 700;
-}
-
-/* Kare kod: kendi kutusunda, sabit üst sınırla; taşmaz (§10.2). */
-.share__qr {
-  display: grid;
-  gap: var(--space-2);
-  justify-items: start;
-}
-
-.share__qr-image {
-  width: min(100%, 16rem);
-  height: auto;
-  background: #fff;
-}
-
-.import__fields,
-.import__list {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.import__conflict {
-  display: grid;
-  gap: var(--space-1);
-  border-block-start: 1px solid var(--color-border);
-  padding-block: var(--space-2);
-}
-
-.import__conflict-subject,
-.import__conflict-field {
-  font-weight: 700;
-}
-
-.settings__preview,
-.settings__summary {
-  display: grid;
-  gap: var(--space-2);
-}
-
-/* Tehlikeli işlem: yalnız bu bölümde uyarı kenarı; metin de açıklıyor (İ9). */
-.settings__danger {
-  border: 2px solid var(--color-emergency);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-}
-
-/* ---------- Küçük ekran (§15: 320 px'te yatay kaydırma yok) ---------- */
-
-@media (max-width: 30rem) {
-  .page,
-  .legal,
-  .wizard,
-  .print,
-  .page--emergency {
-    padding-inline: var(--space-3);
+/** İç ekranların yerleşimi (§11, §15). Baskı ölçüleri print.css içindedir. */
+
+@media screen {
+  :root {
+    --inner-gap: clamp(var(--space-2), 2.4vw, var(--space-3));
+    --inner-pad: clamp(var(--space-2), 3.8vw, var(--space-4));
   }
 
-  .legal__links ul,
-  .guide__tabs,
-  .button-row {
+  :is(.page, .legal, .wizard, .print) {
+    max-inline-size: 50rem;
+    min-inline-size: 0;
+    margin-inline: auto;
+    padding-block: clamp(var(--space-2), 2.45vw, var(--space-4)) var(--space-2);
+  }
+
+  :is(.page, .legal, .wizard, .print) h1 {
+    font-size: clamp(1.7em, 1.28em + 1.65vw, 2.5em);
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    overflow-wrap: anywhere;
+  }
+
+  :where(.page) :where(ul, ol) {
+    padding-inline-start: var(--space-4);
+  }
+
+  :is(.page, .legal) a:not(.button) {
+    text-underline-offset: 0.2em;
+  }
+
+  :is(.page, .legal) a:not(.button):hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .page__heading {
+    margin-block-end: var(--inner-gap);
+  }
+
+  :is(.page__heading, .wizard__header) p {
+    max-inline-size: var(--measure);
+    color: var(--color-text-muted);
+  }
+
+  :is(.page__heading, .wizard__header) > :last-child {
+    margin-block-end: 0;
+  }
+
+  :is(
+    .summary__section,
+    .guide__card,
+    .bag__metadata,
+    .bag__checklist,
+    .wizard__body,
+    .share__section,
+    .settings__section,
+    .import__preview,
+    .import__conflicts,
+    .print .print__fieldset,
+    .emergency__call,
+    .emergency__places,
+    .emergency__contacts-section,
+    .emergency__card
+  ) {
+    min-inline-size: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--inner-pad);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Plan özeti */
+
+  .page--summary {
+    display: grid;
+    gap: var(--inner-gap);
+  }
+
+  .page--summary > h1 {
+    margin-block-end: 0;
+  }
+
+  .summary__outputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--inner-pad);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-accent-soft);
+  }
+
+  :is(.summary__outputs, .summary__section-heading) h2 {
+    margin-block: 0;
+  }
+
+  .summary__section {
+    overflow-wrap: anywhere;
+  }
+
+  .summary__section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-1);
+    margin-block-end: var(--space-2);
+    padding-block-end: var(--space-1);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .summary__edit {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target);
+    min-inline-size: var(--touch-target);
+    padding-inline: var(--space-1);
+    font-weight: 650;
+  }
+
+  .summary__section dt {
+    font-size: 0.88em;
+    font-weight: 650;
+    color: var(--color-text-muted);
+  }
+
+  .summary__section dd {
+    margin: 0 0 var(--space-1);
+  }
+
+  .summary__list {
+    display: grid;
+    gap: var(--space-2);
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .summary__list > li + :where(li) {
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-2);
+  }
+
+  .summary__section > :last-child {
+    margin-block-end: 0;
+  }
+
+  /* Rehber */
+
+  .guide__heading,
+  .wizard__header {
+    padding: var(--inner-pad);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background-color: var(--color-accent-soft);
+  }
+
+  .guide__heading .guide__intro {
+    gap: var(--space-1);
+    border: 0;
+    border-block-start: 1px solid var(--color-border);
+    border-radius: 0;
+    padding: var(--space-2) 0 0;
+    background-color: transparent;
+  }
+
+  .guide__tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-1);
+    list-style: none;
+    padding: var(--space-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-block: 0 var(--inner-gap);
+    background-color: var(--color-surface);
+  }
+
+  .guide__tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--touch-target);
+    border-radius: var(--radius-md);
+    padding-inline: var(--space-1);
+    color: var(--color-accent);
+    font-weight: 650;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .guide__tab:hover {
+    background-color: var(--color-accent-soft);
+  }
+
+  .guide__tab--current,
+  .guide__tab--current:hover {
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+
+  .guide__cards {
+    display: grid;
+    gap: var(--inner-gap);
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .guide__card {
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+  }
+
+  .guide__card h3 {
+    font-size: 1.17em;
+    margin-block-end: var(--space-1);
+  }
+
+  .guide__draft {
+    align-self: flex-start;
+    border-radius: var(--radius-sm);
+    padding: 0.15em 0.55em;
+    background-color: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 0.75em;
+    font-weight: 650;
+  }
+
+  .guide__sources {
+    padding-block-start: var(--space-1);
+    border-block-start: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.86em;
+  }
+
+  .guide__report {
+    margin: auto 0 0;
+    font-size: 0.88em;
+  }
+
+  .guide__report a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target);
+  }
+
+  .source-line {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .source-line__prefix {
+    color: var(--color-text-muted);
+  }
+
+  .source-line__anchor {
+    color: var(--color-accent);
+  }
+
+  .phone-link {
+    min-block-size: var(--touch-target);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Çanta kontrol listesi */
+
+  .bag__metadata {
+    display: grid;
+    gap: var(--inner-gap);
+    align-items: end;
+    margin-block-end: var(--space-4);
+  }
+
+  .bag__metadata .field {
+    min-inline-size: 0;
+    margin-block-end: 0;
+  }
+
+  .bag__count {
+    color: var(--color-accent);
+    font-weight: 650;
+  }
+
+  .bag__items {
+    display: grid;
+    gap: var(--space-1);
+    list-style: none;
+    padding-inline-start: 0;
+    margin-block-end: 0;
+  }
+
+  .bag__items > li {
+    padding-inline: var(--space-1);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .bag__items > li:last-child {
+    border-block-end: 0;
+  }
+
+  .bag__note {
+    margin-inline-start: var(--touch-target);
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+  }
+
+  .bag__print {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target);
+    margin-block-start: var(--space-2);
+  }
+
+  /* Bilgi ve hukuk sayfaları */
+
+  .legal {
+    max-inline-size: min(100%, var(--measure));
+  }
+
+  .legal__section {
+    padding-block: var(--inner-gap);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .legal__section h2 {
+    margin-block-end: var(--space-2);
+  }
+
+  .legal__section :where(li + li) {
+    margin-block-start: var(--space-2);
+  }
+
+  .legal__section a,
+  .legal__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target);
+    min-inline-size: var(--touch-target);
+    overflow-wrap: anywhere;
+  }
+
+  .legal__section > :last-child {
+    margin-block-end: 0;
+  }
+
+  .legal__links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    padding-inline-start: 0;
+    margin-block: var(--space-3) 0;
+    list-style: none;
+  }
+
+  .sources__list {
+    display: grid;
+    gap: var(--space-3);
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .sources__item {
+    border-block-end: 1px solid var(--color-border);
+    padding-block-end: var(--space-2);
+  }
+
+  /* Plan sihirbazı */
+
+  .wizard {
+    display: grid;
+    gap: var(--inner-gap);
+    max-inline-size: 46rem;
+  }
+
+  .wizard__header .stepper {
+    color: var(--color-accent);
+    font-size: 0.9em;
+    margin-block-end: var(--space-1);
+  }
+
+  .wizard__progress {
+    display: block;
+    inline-size: 100%;
+    block-size: 0.4rem;
+    accent-color: var(--color-accent);
+    margin-block-end: var(--space-3);
+  }
+
+  .wizard__guide-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-target);
+    font-weight: 600;
+  }
+
+  .wizard__body {
+    overflow-wrap: anywhere;
+  }
+
+  .wizard__body fieldset {
+    min-inline-size: 0;
+  }
+
+  .wizard__body > :last-child,
+  .wizard__footer > :last-child {
+    margin-block-end: 0;
+  }
+
+  .wizard__actions {
+    margin-block-end: var(--space-1);
+  }
+
+  .wizard__actions .button--primary {
+    margin-inline-start: auto;
+  }
+
+  /* Kabuk uyarı şeridi */
+
+  .shell-banner {
+    max-inline-size: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+    padding-block-start: var(--space-3);
+  }
+
+  /* Yazdırma önizlemesi */
+
+  .print .print__intro {
+    color: var(--color-text-muted);
+    margin-block-end: var(--space-3);
+  }
+
+  .print .print__controls {
+    gap: var(--inner-gap);
+  }
+
+  .print .print__legend {
+    font-weight: 700;
+    padding-inline: var(--space-1);
+  }
+
+  .print .print__preview {
+    min-inline-size: 0;
+    padding: var(--inner-pad);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-accent-soft);
+  }
+
+  .print__preview-title {
+    margin-block-end: 0;
+  }
+
+  /* Acil durum, tek sütun ve birincil arama eylemi */
+
+  .page--emergency {
+    max-inline-size: 42rem;
+    padding-block-start: var(--space-2);
+    font-size: 1.2em;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .page--emergency h1 {
+    font-size: clamp(1.52em, 1.2em + 1.45vw, 2em);
+  }
+
+  :is(.emergency__call, .emergency__places, .emergency__contacts-section, .emergency__intro) {
+    margin-block-end: var(--inner-gap);
+  }
+
+  .emergency__call .button--emergency {
+    inline-size: 100%;
+    min-block-size: calc(var(--touch-target) * 2);
+    font-size: 1.28em;
+  }
+
+  .emergency__call-note {
+    margin: var(--space-2) 0 0;
+    font-size: 0.86em;
+    color: var(--color-text-muted);
+  }
+
+  .emergency__places dl {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .emergency__places dl > div + div {
+    padding-block-start: var(--space-1);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .emergency__places dt {
+    font-weight: 680;
+  }
+
+  .emergency__places dd {
+    margin-inline-start: 0;
+  }
+
+  .emergency__places > :last-child,
+  .emergency__contacts-section > :last-child,
+  .emergency__card p:last-child {
+    margin-block-end: 0;
+  }
+
+  .emergency__contacts,
+  .emergency__cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .emergency__contact + .emergency__contact {
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-2);
+  }
+
+  .emergency__contact :is(h3, p) {
+    margin-block-end: var(--space-1);
+  }
+
+  .emergency__phone {
+    font-size: 1.05em;
+    font-weight: 700;
+  }
+
+  .emergency__phone .phone-link {
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .emergency__card .source-line {
+    font-size: 0.76em;
+  }
+
+  /* Paylaşım, geri yükleme ve ayarlar */
+
+  :is(.page--share, .page--import, .page--settings, .settings__overview) {
+    display: grid;
+    gap: var(--inner-gap);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(.page--share, .page--settings) .page__heading {
+    margin-block-end: 0;
+  }
+
+  :is(.share__section, .settings__section, .import__preview, .import__conflicts) > :last-child {
+    margin-block-end: 0;
+  }
+
+  :is(.share__note, .share__hint, .settings__hint, .import__intro, .print .print__hint) {
+    color: var(--color-text-muted);
+  }
+
+  :is(.share__actions, .import__actions, .settings__form) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: end;
+  }
+
+  :is(.share__link, .settings__form .field, .settings__section input, .settings__overview) {
+    min-inline-size: 0;
+  }
+
+  :is(.share__status, .settings__status) {
+    font-weight: 650;
+  }
+
+  :is(.share__status, .settings__status):empty {
+    margin-block-end: 0;
+  }
+
+  .share__qr {
+    display: grid;
+    justify-items: start;
+  }
+
+  .share__qr-image {
+    inline-size: min(100%, 16rem);
+    block-size: auto;
+    background-color: white;
+  }
+
+  :is(.import__fields, .import__list, .settings__preview, .settings__summary) {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .import__conflict {
+    display: grid;
+    gap: var(--space-1);
+    border-block-start: 1px solid var(--color-border);
+    padding-block: var(--space-2);
+  }
+
+  :is(.import__conflict-subject, .import__conflict-field, .settings__danger) {
+    font-weight: 700;
+  }
+
+  .settings__danger {
+    border-color: var(--color-control-border);
+  }
+}
+
+@media screen and (min-width: 48rem) {
+  :is(.guide__cards, .bag__metadata, .settings__overview, .print .print__controls) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .print__controls > :not(fieldset) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media screen and (max-width: 30rem) {
+  :is(.wizard__actions, .summary__outputs .button-row, .print__actions) {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .wizard__actions .button--primary {
+    margin-inline-start: 0;
   }
 }

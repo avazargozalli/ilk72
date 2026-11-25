@@ -10,8 +10,12 @@ import { expect, test } from '@playwright/test';
 import { openApp } from './support/app.ts';
 import { guardExternalRequests } from './support/guards.ts';
 
-test('çevrimdışıyken uygulama ve acil ekranı çalışır', async ({ page, context }) => {
-  const guard = guardExternalRequests(page);
+test('çevrimdışıyken uygulama, ana sayfa görselleri ve acil ekranı çalışır', async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  const guard = guardExternalRequests(page, baseURL);
 
   await openApp(page);
 
@@ -26,11 +30,17 @@ test('çevrimdışıyken uygulama ve acil ekranı çalışır', async ({ page, c
     { timeout: 30_000 },
   );
   await page.reload();
-  await page.waitForTimeout(2_000);
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
 
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 20_000 });
+  for (const imageName of ['aile-planlama.webp', 'afet-cantasi.webp']) {
+    const homePhoto = page.locator(`main img[src$="gorseller/${imageName}"]`);
+    await homePhoto.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => homePhoto.evaluate((image: HTMLImageElement) => image.naturalWidth))
+      .toBeGreaterThan(0);
+  }
 
   await page.goto('/#/acil');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 20_000 });

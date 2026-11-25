@@ -179,41 +179,57 @@ export function Wizard({
 
   return (
     <div class="wizard">
-      <Stepper step={step} total={WIZARD_STEP_COUNT} title={texts.title} />
-
-      <h1 id="wizard-heading" tabIndex={-1} ref={headingRef}>
-        {texts.title}
-      </h1>
-      <p>{texts.why}</p>
-      <p>
-        <a href={guideHref(definition.guide)}>{tr.wizard.guideLinks[definition.guide]}</a>
-      </p>
+      <header class="wizard__header">
+        <Stepper step={step} total={WIZARD_STEP_COUNT} title={texts.title} />
+        <progress
+          class="wizard__progress"
+          value={step}
+          max={WIZARD_STEP_COUNT}
+          aria-hidden="true"
+        />
+        <h1 id="wizard-heading" tabIndex={-1} ref={headingRef}>
+          {texts.title}
+        </h1>
+        <p>{texts.why}</p>
+        <a class="wizard__guide-link" href={guideHref(definition.guide)}>
+          {tr.wizard.guideLinks[definition.guide]}
+        </a>
+      </header>
 
       {submitted && errors.length > 0 ? <ErrorSummary errors={errors} /> : null}
 
-      <StepContent
-        step={step}
-        props={{ plan, onPatch, errorOf, onFieldBlur, ...(onDownloadIcs ? { onDownloadIcs } : {}) }}
-      />
-
-      <div class="button-row">
-        <button
-          class="button button--secondary"
-          type="button"
-          disabled={step === 1}
-          onClick={handleBack}
-        >
-          {tr.wizard.actions.back}
-        </button>
-        <button class="button button--quiet" type="button" onClick={handleSkip}>
-          {tr.wizard.actions.skip}
-        </button>
-        <button class="button button--primary" type="button" onClick={handleNext}>
-          {isLast ? tr.wizard.actions.finish : tr.wizard.actions.next}
-        </button>
+      <div class="wizard__body">
+        <StepContent
+          step={step}
+          props={{
+            plan,
+            onPatch,
+            errorOf,
+            onFieldBlur,
+            ...(onDownloadIcs ? { onDownloadIcs } : {}),
+          }}
+        />
       </div>
 
-      <SaveStatus state={saveState} />
+      <div class="wizard__footer">
+        <div class="button-row wizard__actions">
+          <button
+            class="button button--secondary"
+            type="button"
+            disabled={step === 1}
+            onClick={handleBack}
+          >
+            {tr.wizard.actions.back}
+          </button>
+          <button class="button button--quiet" type="button" onClick={handleSkip}>
+            {tr.wizard.actions.skip}
+          </button>
+          <button class="button button--primary" type="button" onClick={handleNext}>
+            {isLast ? tr.wizard.actions.finish : tr.wizard.actions.next}
+          </button>
+        </div>
+        <SaveStatus state={saveState} />
+      </div>
     </div>
   );
 }

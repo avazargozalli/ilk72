@@ -1,0 +1,209 @@
+@media screen {
+  .shell-notice--draft {
+    margin-block: 0 var(--space-2);
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    background: var(--color-accent-soft);
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+  }
+
+  .home {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.98fr);
+    align-items: stretch;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .home-hero__copy {
+    align-self: center;
+    padding: clamp(22px, 4vw, 52px);
+  }
+
+  .home-hero h1,
+  .home__title {
+    margin-block: 0 var(--space-2);
+    color: var(--color-accent);
+    font-family: var(--font-family-display);
+    font-size: clamp(2.25rem, 4vw, 3.5rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  .home-hero__lead {
+    max-inline-size: 36ch;
+    margin-block-end: var(--space-3);
+    font-size: 1.07em;
+  }
+
+  .home-hero__actions {
+    margin-block-end: var(--space-2);
+  }
+
+  .home-hero__actions .button {
+    min-block-size: 50px;
+    padding-inline: 14px;
+    font-size: 0.9em;
+  }
+
+  .home-hero__details {
+    display: grid;
+    gap: 4px;
+    color: var(--color-text-muted);
+    font-size: 0.88em;
+  }
+
+  .home-hero__details p {
+    margin: 0;
+  }
+
+  .home-hero__image {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: 0;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    object-position: center 57%;
+  }
+
+  .home-next,
+  .home-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .home__title {
+    margin-block: var(--space-2) 0;
+    font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+    text-wrap: initial;
+  }
+
+  .home-card {
+    padding: clamp(16px, 2.5vw, 28px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .home-card h2 {
+    margin-block: 0 var(--space-1);
+    font-size: 1.23em;
+    letter-spacing: -0.025em;
+  }
+
+  .home-card p {
+    max-inline-size: var(--measure);
+    margin-block-end: var(--space-1);
+    color: var(--color-text-muted);
+  }
+
+  .home-card > :last-child {
+    margin-block-end: 0;
+  }
+
+  .home-card--guide {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px;
+  }
+
+  .home-card--guide > div {
+    padding: var(--space-1) var(--space-1) 0 0;
+  }
+
+  .home-card__image {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: var(--radius-md);
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .home-card__link,
+  .home-overview a:not(.button) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: var(--touch-target);
+    font-weight: 650;
+  }
+
+  .home-card--receive {
+    align-content: center;
+    background: var(--color-accent-soft);
+  }
+
+  .home-card .home-overview__progress {
+    color: var(--color-accent);
+    font-size: 1.17em;
+    font-weight: 640;
+  }
+
+  .home-overview__actions {
+    margin-block: var(--space-3) var(--space-1);
+  }
+}
+
+@media screen and (max-width: 54rem) {
+  .home-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-hero__copy {
+    padding: clamp(16px, 5vw, 34px);
+  }
+
+  .home-hero h1 {
+    text-wrap: initial;
+  }
+
+  .home-hero__image {
+    block-size: auto;
+    max-block-size: 320px;
+    aspect-ratio: 3 / 2;
+  }
+
+  .home-next,
+  .home-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media screen and (max-width: 34rem) {
+  .home-hero {
+    padding: 8px;
+  }
+
+  .home-hero__actions {
+    align-items: stretch;
+  }
+
+  .home-card--guide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-card--guide > div {
+    padding: 0 var(--space-1) var(--space-1);
+  }
+
+  .home-card__image {
+    max-block-size: 180px;
+    aspect-ratio: 3 / 2;
+  }
+}

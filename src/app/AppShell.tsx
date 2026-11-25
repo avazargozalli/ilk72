@@ -491,13 +491,28 @@ export function AppShell() {
 
   return (
     <>
-      <nav class="main-nav" aria-label={tr.shell.navigation}>
-        {(['home', 'guide', 'emergency', 'settings', 'about'] as const).map((key) => (
-          <a key={key} href={ROUTES[key]} aria-current={route.id === key ? 'page' : undefined}>
-            {tr.nav[key]}
+      <header class="app-header">
+        <div class="app-header__inner">
+          <a class="app-brand" href={ROUTES.home}>
+            <span class="app-brand__mark" aria-hidden="true">
+              72
+            </span>
+            <span>{tr.app.name}</span>
           </a>
-        ))}
-      </nav>
+          <nav class="main-nav" aria-label={tr.shell.navigation}>
+            {(['home', 'guide', 'settings', 'about', 'emergency'] as const).map((key) => (
+              <a
+                key={key}
+                class={key === 'emergency' ? 'main-nav__emergency' : undefined}
+                href={ROUTES[key]}
+                aria-current={route.id === key ? 'page' : undefined}
+              >
+                {tr.nav[key]}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </header>
       {/* §16 — çevrimdışıyken küçük not; plan kullanılabilir kalır. */}
       {offline ? (
         <div class="shell-banner">
@@ -565,16 +580,19 @@ export function AppShell() {
         </div>
       ) : null}
 
-      {boot === 'ready' && settings !== null && !settings.firstRunAccepted ? (
-        <FirstRunNotice onAccept={acceptFirstRun} />
-      ) : null}
-
-      <main id="main-content" tabIndex={-1}>
+      <main
+        id="main-content"
+        class={route.id === 'home' && !unlockRequired ? 'app-main app-main--home' : 'app-main'}
+        tabIndex={-1}
+      >
         {CONTENT_ITEMS.some((item) => item.status === 'taslak') && (
-          <Notice class="shell-notice" tone="info">
+          <Notice class="shell-notice shell-notice--draft" tone="info">
             {tr.shell.draft}
           </Notice>
         )}
+        {boot === 'ready' && settings !== null && !settings.firstRunAccepted ? (
+          <FirstRunNotice onAccept={acceptFirstRun} />
+        ) : null}
         {saveError === null ? null : (
           <Notice class="shell-notice" tone="error" live="polite">
             {saveError}

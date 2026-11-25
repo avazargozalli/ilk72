@@ -59,17 +59,21 @@ export const pages = {
 
   /** §11.3 — ana sayfa. */
   home: {
+    title: 'Aile afet ve acil durum planı',
     /** Plan yokken gösterilen üç cümlelik tanıtım. */
     intro: [
-      'İlk 72, ailenizin afet ve acil durum planını kısa bir soru dizisiyle hazırlamanıza yardımcı olur.',
-      'Planda kişiler, acil kişiler, buluşma yerleri, evin güvenli yerleri ve çanta listesi tek yerde toplanır.',
-      'Planı yazdırabilir ya da PDF olarak kaydedebilirsiniz; yazdıklarınız yalnızca bu cihazda saklanır.',
+      'Acil kişilerinizi, buluşma yerlerinizi ve evdeki görevleri tek bir planda toplayın.',
+      'Planınız bu tarayıcıda saklanır ve çevrimdışı açılır.',
+      'Hazırladığınız planı yazdırabilir veya PDF olarak kaydedebilirsiniz.',
     ],
     start: 'Planı hazırlamaya başla',
     printBlank: 'Boş formu yazdır',
+    guideTitle: 'Deprem rehberi',
+    guideBody: 'Deprem öncesi, sırası ve sonrası için resmî kaynaklara dayanan kısa bilgiler.',
+    guideAction: 'Rehberi aç',
     importTitle: 'Bana gönderilen planı aç',
     importBody:
-      'Birisi size bir plan bağlantısı gönderdiyse, bağlantıya dokunduğunuzda özet bu uygulamada açılır. Bunun için hesap açmanız ya da bir şey kurmanız gerekmez. Bağlantıyı kimlerin görebileceğini gönderen kişiyle konuşun.',
+      'Size ulaşan plan bağlantısına dokunun. Özet, hesap açmadan bu uygulamada görüntülenir. Bağlantıyı kimlerle paylaşabileceğinizi gönderene sorun.',
     planTitle: 'Planınız',
     /**
      * §11.8 — doluluk cümlesi. Toplam bölüm sayısı 9'dur; Türkçe sayı eki

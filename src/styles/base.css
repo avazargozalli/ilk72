@@ -81,22 +81,132 @@ main {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 var(--space-2);
-  max-width: var(--measure);
-  margin-inline: auto;
-  padding: var(--space-1) var(--space-2);
-  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-1);
+  flex: 1 1 auto;
 }
 
 .main-nav a {
   display: inline-flex;
   align-items: center;
-  min-height: var(--touch-target);
+  min-block-size: var(--touch-target);
+  padding-inline: 0.65em;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 0.89em;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .main-nav [aria-current="page"] {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
   font-weight: 700;
-  text-decoration-thickness: 2px;
+}
+
+.main-nav .main-nav__emergency {
+  margin-inline-start: auto;
+  padding-inline: 0.9em;
+  border: 1px solid var(--color-control-border);
+  color: var(--color-accent);
+}
+
+.app-header {
+  border-block-end: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-2), 5vw, var(--space-7));
+  max-inline-size: var(--layout-width);
+  min-block-size: 78px;
+  margin-inline: auto;
+  padding: var(--space-1) var(--gutter);
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  min-block-size: var(--touch-target);
+  color: var(--color-text);
+  font-size: 1.11em;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  text-decoration: none;
+}
+
+.app-brand__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 12px;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media screen {
+  #app {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 100svh;
+  }
+
+  .app-main {
+    inline-size: 100%;
+    max-inline-size: var(--content-width);
+    flex: 1 0 auto;
+    padding: clamp(16px, 2.65vw, 34px) var(--gutter) var(--space-5);
+  }
+
+  .app-main--home {
+    max-inline-size: var(--layout-width);
+  }
+}
+
+@media (hover: hover) {
+  .main-nav a:hover {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+}
+
+@media (max-width: 47rem) {
+  .app-header__inner {
+    align-items: flex-start;
+    gap: var(--space-1);
+    padding-block: 12px;
+  }
+
+  .main-nav a {
+    padding-inline: 0.45em;
+  }
+}
+
+@media (max-width: 23rem) {
+  .app-header__inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-brand {
+    align-self: flex-start;
+  }
+
+  .main-nav .main-nav__emergency {
+    margin-inline-start: 0;
+  }
+}
+
+@media print {
+  .app-header {
+    display: none;
+  }
 }
 
 :focus-visible {
@@ -107,6 +217,7 @@ main {
 /* "İçeriğe geç" bağlantısı (§15): yalnızca klavyeyle odaklanınca görünür. */
 .skip-link {
   position: absolute;
+  z-index: 1;
   top: var(--space-1);
   left: var(--space-1);
   padding: var(--space-1) var(--space-2);

@@ -110,8 +110,10 @@ export function Share({ plan }: ShareProps) {
 
   return (
     <div class="page page--share">
-      <h1 tabIndex={-1}>{tr.share.title}</h1>
-      <p class="share__intro">{tr.share.intro}</p>
+      <header class="page__heading">
+        <h1 tabIndex={-1}>{tr.share.title}</h1>
+        <p>{tr.share.intro}</p>
+      </header>
       <Notice tone="info">{tr.share.warning}</Notice>
 
       <section class="share__section" aria-labelledby="share-card-heading">

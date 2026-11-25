@@ -66,15 +66,15 @@ function SummarySection({
 
   return (
     <section class="summary__section" aria-labelledby={headingId}>
-      <h2 id={headingId}>{title}</h2>
-      <p class="summary__edit">
-        <a href={ROUTES.plan(SECTION_STEPS[section])}>
+      <header class="summary__section-heading">
+        <h2 id={headingId}>{title}</h2>
+        <a class="summary__edit" href={ROUTES.plan(SECTION_STEPS[section])}>
           {tr.pages.common.edit}
           <span class="visually-hidden">
             {formatText(tr.pages.common.editSection, { section: title })}
           </span>
         </a>
-      </p>
+      </header>
       {children}
     </section>
   );
@@ -520,7 +520,7 @@ export function Summary({ plan }: SummaryProps) {
     <div class="page page--summary">
       <h1 tabIndex={-1}>{tr.pages.summary.title}</h1>
 
-      <section aria-labelledby="summary-outputs">
+      <section class="summary__outputs" aria-labelledby="summary-outputs">
         <h2 id="summary-outputs">{tr.pages.summary.outputsTitle}</h2>
         <div class="button-row">
           <a class="button button--primary" href={ROUTES.print}>

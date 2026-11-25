@@ -25,19 +25,23 @@ export interface FooterProps {
 export function Footer({ class: className }: FooterProps) {
   return (
     <footer class={joinClassNames('footer', className)}>
-      <p class="footer__independence">{tr.components.footer.independence}</p>
-      <p class="footer__emergency">{tr.components.footer.emergencyNote}</p>
-      <nav class="footer__nav" aria-label={tr.components.footer.navLabel}>
-        <ul class="footer__links">
-          {LINKS.map((link) => (
-            <li class="footer__item" key={link.href}>
-              <a class="footer__link" href={link.href}>
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <div class="footer__inner">
+        <div class="footer__identity">
+          <p class="footer__independence">{tr.components.footer.independence}</p>
+          <p class="footer__emergency">{tr.components.footer.emergencyNote}</p>
+        </div>
+        <nav class="footer__nav" aria-label={tr.components.footer.navLabel}>
+          <ul class="footer__links">
+            {LINKS.map((link) => (
+              <li class="footer__item" key={link.href}>
+                <a class="footer__link" href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
     </footer>
   );
 }

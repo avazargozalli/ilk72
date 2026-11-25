@@ -65,17 +65,15 @@ export function Emergency({ plan }: EmergencyProps) {
   return (
     <div class="page page--emergency">
       <h1 tabIndex={-1}>{tr.pages.emergency.title}</h1>
-      {plan === null ? <p>{tr.pages.emergency.noPlan}</p> : null}
 
       <section class="emergency__call" aria-labelledby="emergency-call">
         <h2 id="emergency-call">{tr.pages.emergency.callTitle}</h2>
-        <p>
-          <a class="button button--emergency" href={EMERGENCY_TEL}>
-            {tr.pages.emergency.callAction}
-          </a>
-        </p>
-        <p>{tr.pages.emergency.callNote}</p>
+        <a class="button button--emergency" href={EMERGENCY_TEL}>
+          {tr.pages.emergency.callAction}
+        </a>
+        <p class="emergency__call-note">{tr.pages.emergency.callNote}</p>
       </section>
+      {plan === null ? <p class="emergency__intro">{tr.pages.emergency.noPlan}</p> : null}
 
       <section class="emergency__places" aria-labelledby="emergency-places">
         <h2 id="emergency-places">{tr.pages.emergency.placesTitle}</h2>

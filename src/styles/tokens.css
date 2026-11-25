@@ -11,10 +11,14 @@
 
   --font-family-base:
     system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
+  --font-family-display: Georgia, "Times New Roman", serif;
   --font-size-body: 18px;
   --font-size-large: 22px;
   --line-height-body: 1.5;
   --measure: 65ch;
+  --layout-width: 1184px;
+  --content-width: 816px;
+  --gutter: clamp(14px, 3.2vw, 38px);
 
   --space-1: 8px;
   --space-2: 16px;
@@ -25,36 +29,44 @@
   --space-7: 64px;
 
   --touch-target: 44px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-sm: 9px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
   --ring-width: 3px;
 
-  --color-bg: #f7f7f5;
-  --color-surface: #ffffff;
-  --color-text: #1b1b19;
-  --color-text-muted: #4b4b47;
-  --color-border: #b8b8b2;
-  --color-accent: #005a87;
+  --color-bg: #f6f5ef;
+  --color-surface: #fffdf8;
+  --color-surface-muted: #efefe8;
+  --color-text: #202e27;
+  --color-text-muted: #4d6055;
+  --color-border: #d5ddd4;
+  --color-control-border: #778980;
+  --color-accent: #195548;
+  --color-accent-soft: #e6efea;
   --color-accent-contrast: #ffffff;
   --color-emergency: #b3261e;
   --color-emergency-contrast: #ffffff;
-  --color-focus: #004f78;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 8%);
+  --color-focus: #2c705d;
+  --shadow-card: 0 2px 3px rgb(25 54 43 / 3%), 0 12px 36px rgb(25 54 43 / 5%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #121513;
-    --color-surface: #1b1f1d;
-    --color-text: #f1f2ee;
-    --color-text-muted: #c3c7c0;
-    --color-border: #6b716a;
-    --color-accent: #82c8f0;
-    --color-accent-contrast: #0a2733;
+    --color-bg: #111a16;
+    --color-surface: #1c2822;
+    --color-surface-muted: #17221d;
+    --color-text: #eff4ec;
+    --color-text-muted: #b9c9bf;
+    --color-border: #3b5146;
+    --color-control-border: #80998a;
+    --color-accent: #a8d7c4;
+    --color-accent-soft: #243a30;
+    --color-accent-contrast: #10291e;
     --color-emergency: #ffb4ab;
     --color-emergency-contrast: #4d0904;
-    --color-focus: #a7d8f5;
-    --shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+    --color-focus: #b1e5cf;
+    --shadow-card: 0 12px 36px rgb(0 0 0 / 18%);
   }
 }
 

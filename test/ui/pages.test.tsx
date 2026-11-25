@@ -43,7 +43,7 @@ describe('Home — plan yok (§11.3)', () => {
     const onStart = vi.fn();
     render(<Home plan={null} onStart={onStart} />);
 
-    expect(h1(tr.app.name)).toBeTruthy();
+    expect(h1(tr.pages.home.title)).toBeTruthy();
     expect(tr.pages.home.intro).toHaveLength(3);
     for (const sentence of tr.pages.home.intro) {
       expect(screen.getByText(sentence)).toBeTruthy();

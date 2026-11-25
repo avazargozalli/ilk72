@@ -6,6 +6,8 @@ Bu dosya proje sürümlerindeki kullanıcıya görünen değişiklikleri listele
 
 ## [Yayımlanmamış]
 
+- Ana ekran, gezinme ve iç sayfalar ortak bir tasarımla yenilendi. Aile planı ve afet çantası
+  görselleri çevrimdışı çalışıyor. README’ye güncel masaüstü, mobil ve rehber görüntüleri eklendi.
 - Gizlilik Bildirimi, Kullanım Koşulları, Künye ve Erişilebilirlik Beyanı güncellendi.
   Türk mevzuatına ve sağlayıcı açıklamalarına dayalı yayın incelemesi kayda alındı.
 - Plan, kilit ve yedekten geri yükleme işlemlerinde yerel kayıt tutarlılığı güçlendirildi.

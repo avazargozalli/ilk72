@@ -7,9 +7,25 @@ bir web uygulaması. Hesap gerektirmez ve planı kendiliğinden başka bir yere 
 boş formu yazdırabilir ve içerik düzeltmesi önerebilirsiniz. Rehberdeki 83 madde afet uzmanının
 incelemesini, hukuki metinler avukat görüşünü bekliyor. Taslaklar varken üretim derlemesi durur.
 
-## Ekran görüntüsü
+## Ekran görüntüleri
 
-![İlk 72 ana ekranında plan hazırlamaya başlama ve boş formu yazdırma seçenekleri](docs/ekran-goruntusu.png)
+![İlk 72 masaüstü ana ekranında plan hazırlama, boş formu yazdırma ve deprem rehberini açma seçenekleri](docs/ekran-goruntusu.png)
+
+<details>
+<summary>Mobil ana ekran</summary>
+
+<img src="docs/ekran-goruntusu-mobil.png" width="390" alt="İlk 72 mobil ana ekranında plan hazırlama ve boş formu yazdırma seçenekleri" />
+
+</details>
+
+<details>
+<summary>Deprem rehberi</summary>
+
+![Deprem rehberinde Önce, An ve Sonra sekmeleri ile kaynak bağlantıları](docs/ekran-goruntusu-rehber.png)
+
+</details>
+
+[Uygulama görselleri ve üretim kaydı](docs/gorseller.md)
 
 ## Uygulama yayını
 

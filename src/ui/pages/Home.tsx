@@ -22,6 +22,8 @@ import type { Plan } from '../../model/types.ts';
 import { Notice } from '../components/index.ts';
 import { dateOnly, isReviewOverdue } from './pages/shared.ts';
 
+const illustrationPath = `${import.meta.env.BASE_URL}gorseller/`;
+
 export interface HomeProps {
   /** Kayıtlı plan; yoksa `null`. */
   plan: Plan | null;
@@ -78,14 +80,14 @@ function PlanOverview({
   const overdue = isReviewOverdue(plan);
 
   return (
-    <>
-      <section aria-labelledby="home-plan">
+    <div class="home-overview">
+      <section class="home-card home-overview__plan" aria-labelledby="home-plan">
         <h2 id="home-plan">{tr.pages.home.planTitle}</h2>
-        <p>{progressSentence(current)}</p>
+        <p class="home-overview__progress">{progressSentence(current)}</p>
         {/* §11.8, İ9 — sabit uyarı; doluluk bir güvenlik derecesi değildir. */}
         <p>{tr.pages.home.progressNote}</p>
 
-        <div class="button-row">
+        <div class="button-row home-overview__actions">
           <StartAction
             label={tr.pages.home.continue}
             onStart={onStart}
@@ -106,7 +108,7 @@ function PlanOverview({
         </p>
       </section>
 
-      <section aria-labelledby="home-review">
+      <section class="home-card" aria-labelledby="home-review">
         <h2 id="home-review">{tr.pages.home.reviewTitle}</h2>
         {lastDrillAt === null ? null : (
           <p>
@@ -128,39 +130,80 @@ function PlanOverview({
           <a href={ROUTES.plan(9)}>{tr.pages.home.reviewLink}</a>
         </p>
       </section>
-    </>
+    </div>
   );
 }
 
 export function Home({ plan, progress, onStart }: HomeProps) {
+  const [lead, ...details] = tr.pages.home.intro;
   return (
-    <div class="page page--home">
-      <h1 tabIndex={-1}>{tr.app.name}</h1>
-
+    <div class="home">
       {plan === null ? (
         <>
-          {tr.pages.home.intro.map((sentence) => (
-            <p key={sentence}>{sentence}</p>
-          ))}
-
-          <div class="button-row">
-            <StartAction
-              label={tr.pages.home.start}
-              onStart={onStart}
-              class="button button--primary"
+          <section class="home-hero" aria-labelledby="home-title">
+            <div class="home-hero__copy">
+              <h1 id="home-title" tabIndex={-1}>
+                {tr.pages.home.title}
+              </h1>
+              <p class="home-hero__lead">{lead}</p>
+              <div class="button-row home-hero__actions">
+                <StartAction
+                  label={tr.pages.home.start}
+                  onStart={onStart}
+                  class="button button--primary"
+                />
+                <a class="button button--secondary" href={ROUTES.print}>
+                  {tr.pages.home.printBlank}
+                </a>
+              </div>
+              <div class="home-hero__details">
+                {details.map((sentence) => (
+                  <p key={sentence}>{sentence}</p>
+                ))}
+              </div>
+            </div>
+            <img
+              class="home-hero__image"
+              src={`${illustrationPath}aile-planlama.webp`}
+              width={1080}
+              height={810}
+              alt=""
+              fetchPriority="high"
             />
-            <a class="button button--secondary" href={ROUTES.print}>
-              {tr.pages.home.printBlank}
-            </a>
-          </div>
-
-          <section aria-labelledby="home-import">
-            <h2 id="home-import">{tr.pages.home.importTitle}</h2>
-            <p>{tr.pages.home.importBody}</p>
           </section>
+
+          <div class="home-next">
+            <section class="home-card home-card--guide" aria-labelledby="home-guide">
+              <img
+                class="home-card__image"
+                src={`${illustrationPath}afet-cantasi.webp`}
+                width={600}
+                height={450}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <div>
+                <h2 id="home-guide">{tr.pages.home.guideTitle}</h2>
+                <p>{tr.pages.home.guideBody}</p>
+                <a class="home-card__link" href={ROUTES.guide}>
+                  {tr.pages.home.guideAction} <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </section>
+            <section class="home-card home-card--receive" aria-labelledby="home-import">
+              <h2 id="home-import">{tr.pages.home.importTitle}</h2>
+              <p>{tr.pages.home.importBody}</p>
+            </section>
+          </div>
         </>
       ) : (
-        <PlanOverview plan={plan} progress={progress} onStart={onStart} />
+        <>
+          <h1 class="home__title" tabIndex={-1}>
+            {tr.pages.home.title}
+          </h1>
+          <PlanOverview plan={plan} progress={progress} onStart={onStart} />
+        </>
       )}
     </div>
   );

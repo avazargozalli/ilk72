@@ -56,46 +56,51 @@ export function Bag({ plan, onChange }: BagProps) {
 
   return (
     <div class="page page--bag">
-      <h1 tabIndex={-1}>{tr.pages.bag.title}</h1>
-      <p>{tr.pages.bag.intro}</p>
+      <header class="page__heading">
+        <h1 tabIndex={-1}>{tr.pages.bag.title}</h1>
+        <p>{tr.pages.bag.intro}</p>
+      </header>
 
       {readOnly ? <Notice tone="info">{tr.pages.bag.readOnly}</Notice> : null}
 
-      <Field
-        id="bag-location"
-        label={tr.wizard.fields.bagLocation}
-        hint={tr.wizard.hints.bagLocation}
-      >
-        <TextInput
-          value={plan.bag.location}
-          maxLength={PLAN_LIMITS.shortTextLength}
-          disabled={readOnly}
-          onInput={(value) => patchBag({ location: value })}
-        />
-      </Field>
+      <div class="bag__metadata">
+        <Field
+          id="bag-location"
+          label={tr.wizard.fields.bagLocation}
+          hint={tr.wizard.hints.bagLocation}
+        >
+          <TextInput
+            value={plan.bag.location}
+            maxLength={PLAN_LIMITS.shortTextLength}
+            disabled={readOnly}
+            onInput={(value) => patchBag({ location: value })}
+          />
+        </Field>
 
-      <Field
-        id="bag-last-checked-at"
-        label={tr.pages.bag.lastCheckedAt}
-        hint={tr.pages.bag.lastCheckedHint}
-      >
-        <input
-          class="text-input"
-          type="date"
-          value={dateValue(plan.bag.lastCheckedAt)}
-          disabled={readOnly}
-          onInput={(event) =>
-            patchBag({
-              lastCheckedAt: event.currentTarget.value === '' ? null : event.currentTarget.value,
-            })
-          }
-        />
-      </Field>
+        <Field
+          id="bag-last-checked-at"
+          label={tr.pages.bag.lastCheckedAt}
+          hint={tr.pages.bag.lastCheckedHint}
+        >
+          <input
+            class="text-input"
+            type="date"
+            value={dateValue(plan.bag.lastCheckedAt)}
+            disabled={readOnly}
+            onInput={(event) =>
+              patchBag({
+                lastCheckedAt: event.currentTarget.value === '' ? null : event.currentTarget.value,
+              })
+            }
+          />
+        </Field>
+      </div>
 
-      <p>{formatText(tr.pages.bag.itemsCount, { done: doneCount, total: items.length })}</p>
-
-      <fieldset class="repeater__item-group">
+      <fieldset class="repeater__item-group bag__checklist">
         <legend class="repeater__item-label">{tr.wizard.fields.bagItemsLegend}</legend>
+        <p class="bag__count">
+          {formatText(tr.pages.bag.itemsCount, { done: doneCount, total: items.length })}
+        </p>
         <ul class="bag__items">
           {items.map((item) => {
             const text = itemText(item);
@@ -117,7 +122,9 @@ export function Bag({ plan, onChange }: BagProps) {
       </fieldset>
 
       <p>
-        <a href={ROUTES.print}>{tr.pages.bag.printLink}</a>
+        <a class="bag__print" href={ROUTES.print}>
+          {tr.pages.bag.printLink}
+        </a>
       </p>
     </div>
   );

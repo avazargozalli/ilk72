@@ -251,27 +251,31 @@ export function Settings({
 
   return (
     <div class="page page--settings">
-      <h1 tabIndex={-1}>{tr.share.settings.title}</h1>
-      <p>{tr.share.settings.intro}</p>
+      <header class="page__heading">
+        <h1 tabIndex={-1}>{tr.share.settings.title}</h1>
+        <p>{tr.share.settings.intro}</p>
+      </header>
 
-      <section class="settings__section" aria-labelledby="settings-display-heading">
-        <h2 id="settings-display-heading">{tr.share.settings.display.title}</h2>
-        <Checkbox
-          id="settings-large-text"
-          label={tr.share.settings.display.largeText}
-          hint={tr.share.settings.display.largeTextHint}
-          checked={settings.largeText}
-          onChange={(checked) => onChange({ largeText: checked })}
-        />
-      </section>
+      <div class="settings__overview">
+        <section class="settings__section" aria-labelledby="settings-display-heading">
+          <h2 id="settings-display-heading">{tr.share.settings.display.title}</h2>
+          <Checkbox
+            id="settings-large-text"
+            label={tr.share.settings.display.largeText}
+            hint={tr.share.settings.display.largeTextHint}
+            checked={settings.largeText}
+            onChange={(checked) => onChange({ largeText: checked })}
+          />
+        </section>
 
-      <section class="settings__section" aria-labelledby="settings-persistence-heading">
-        <h2 id="settings-persistence-heading">{tr.share.settings.persistence.title}</h2>
-        <p class="settings__hint">{tr.share.settings.persistence.hint}</p>
-        <p class="settings__status" role="status">
-          {persistenceMessage(settings.storagePersisted)}
-        </p>
-      </section>
+        <section class="settings__section" aria-labelledby="settings-persistence-heading">
+          <h2 id="settings-persistence-heading">{tr.share.settings.persistence.title}</h2>
+          <p class="settings__hint">{tr.share.settings.persistence.hint}</p>
+          <p class="settings__status" role="status">
+            {persistenceMessage(settings.storagePersisted)}
+          </p>
+        </section>
+      </div>
 
       <section class="settings__section" aria-labelledby="settings-backup-heading">
         <h2 id="settings-backup-heading">{tr.share.settings.backup.title}</h2>

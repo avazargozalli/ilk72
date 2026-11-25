@@ -74,13 +74,13 @@ export default defineConfig({
         scope: './',
         // Renkler `src/styles/tokens.css` ile aynı olmalı (§15); manifest CSS
         // okuyamadığı için burada yalnızca açık tema değerleri yinelenir.
-        background_color: '#f7f7f5',
-        theme_color: '#f7f7f5',
+        background_color: '#f6f5ef',
+        theme_color: '#f6f5ef',
       },
       workbox: {
         // `manifest.webmanifest` eklenti tarafından ayrıca ön belleğe alınır;
         // burada tekrarlanmaz (§16).
-        globPatterns: ['**/*.{html,js,css,svg,png,ico,json}'],
+        globPatterns: ['**/*.{html,js,css,svg,png,webp,ico,json}'],
         navigateFallback: 'index.html',
         runtimeCaching: [],
       },

@@ -71,4 +71,32 @@ test.describe('erişilebilirlik (WCAG 2.2 AA)', () => {
     expect(hasHorizontalOverflow).toBe(false);
     guard.expectNoExternalRequests();
   });
+
+  test('ana sayfa 320 px, büyük yazı ve koyu temada kullanılabilir', async ({ page, baseURL }) => {
+    const guard = guardExternalRequests(page, baseURL);
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await openApp(page, '/#/ayarlar');
+    await page.getByRole('checkbox', { name: 'Büyük yazı' }).check();
+    await page.goto('/#/');
+    await expect(page.locator('html')).toHaveAttribute('data-large-text', 'true');
+
+    const actions = [
+      page.getByRole('button', { name: 'Planı hazırlamaya başla', exact: true }),
+      page.getByRole('link', { name: 'Boş formu yazdır', exact: true }),
+    ];
+    for (const action of actions) {
+      await expect(action).toBeVisible();
+      const target = await action.boundingBox();
+      expect(target?.width).toBeGreaterThanOrEqual(44);
+      expect(target?.height).toBeGreaterThanOrEqual(44);
+    }
+
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    expect(results.violations, summarize(results.violations)).toEqual([]);
+    guard.expectNoExternalRequests();
+  });
 });

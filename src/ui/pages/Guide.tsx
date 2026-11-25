@@ -19,7 +19,7 @@
 import { CONTENT_ISSUE_URL, ROUTES } from '../../config.ts';
 import { contentByCategory } from '../../content/registry.ts';
 import { formatText, tr } from '../../i18n/tr.ts';
-import { Notice } from '../components/index.ts';
+import { Notice } from '../components/Notice.tsx';
 import { SourceLine } from './pages/SourceLine.tsx';
 
 export type GuidePart = 'once' | 'an' | 'sonra';
@@ -40,9 +40,12 @@ export function Guide({ part = 'once' }: GuideProps) {
 
   return (
     <div class="page page--guide">
-      <h1 tabIndex={-1}>{tr.pages.guide.title}</h1>
-
-      <Notice tone="info">{tr.pages.guide.intro}</Notice>
+      <header class="page__heading guide__heading">
+        <h1 tabIndex={-1}>{tr.pages.guide.title}</h1>
+        <Notice tone="info" class="guide__intro">
+          {tr.pages.guide.intro}
+        </Notice>
+      </header>
 
       <nav class="guide__tabs-nav" aria-label={tr.pages.guide.tabsLabel}>
         <ul class="guide__tabs">

@@ -41,7 +41,7 @@ describe('uygulama kabuğu', () => {
     const heading = await openApp();
 
     expect(document.querySelector('main')).not.toBeNull();
-    expect(heading.textContent).toBe(tr.app.name);
+    expect(heading.textContent).toBe(tr.pages.home.title);
     expect(heading.getAttribute('tabindex')).toBe('-1');
     expect(document.title).toBe(`${tr.nav.home} · ${tr.app.name}`);
   });
